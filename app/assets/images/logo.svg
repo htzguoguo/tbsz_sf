@@ -1,0 +1,11 @@
+<svg width="600" height="100" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <text transform="matrix(2.006157802129252,0,0,3.047619274684365,-12.96450742968942,-70.88096034526836) " xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_11" y="48.15625" x="10.010743" stroke-width="0" fill="#59BAD3">天保市政水费收费管理系统</text>
+ </g>
+</svg>

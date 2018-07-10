@@ -1,0 +1,28 @@
+{
+  "plugins": [
+
+      "transform-class-properties",
+      "transform-object-rest-spread",
+      "syntax-dynamic-import",
+      "transform-runtime",
+      "syntax-decorators",
+      "transform-decorators-legacy",
+      ["import", {
+          "libraryName": "antd",
+          "style": "css"
+      }]
+
+  ],
+  "presets": [
+    "es2015",
+    "react",
+    "flow"
+  ],
+  "env": {
+    "start": {
+      "presets": [
+        "react-hmre"
+      ]
+    }
+  }
+}
