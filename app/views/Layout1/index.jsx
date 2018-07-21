@@ -57,7 +57,7 @@ App.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-    const { auth, menu } = state;
+    const { auth, menu } = state;     
     return {
         auth: auth ? auth : null,
         navpath: menu.navpath

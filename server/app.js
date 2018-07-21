@@ -31,7 +31,7 @@ app.use(session({
 
 /*app.use( express.static( staticPath ) );*/
 defaultRoute(app);
-app.use( '/auth',cache( 'minutes', 2 ), authrouter );
+app.use( '/api/v1/auth',cache( 'minutes', 2 ), authrouter );
 app.use( '/api/v1',admin_oauth.authorizationRequired,  apirouter_v1 );
 
 

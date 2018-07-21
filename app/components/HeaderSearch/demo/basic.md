@@ -23,10 +23,10 @@ ReactDOM.render(
       placeholder="站内搜索"
       dataSource={['搜索提示一', '搜索提示二', '搜索提示三']}
       onSearch={(value) => {
-        console.log('input', value); // eslint-disable-line
+         eslint-disable-line
       }}
       onPressEnter={(value) => {
-        console.log('enter', value); // eslint-disable-line
+         eslint-disable-line
       }}
     />
   </div>

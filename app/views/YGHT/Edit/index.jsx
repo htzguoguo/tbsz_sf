@@ -53,7 +53,7 @@ class ItemEdit extends Component{
     onProjectOrPriceChanged() {
        let project =  this.props.form.getFieldValue('projects');
        let price = this.props.form.getFieldValue('price');
-       console.log(project, price);
+        
        if (Number.isFinite(project) && Number.isFinite(price)) {
            this.props.form.setFieldsValue({'total' : Number(project) * Number(price)});
        }

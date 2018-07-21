@@ -32,7 +32,7 @@ class Header extends React.Component {
         this.state ={
             current:'video',
             openKey: "sub1",
-            activeKey: "menu101",
+            activeKey: "menu1",
             collapsed: false,
             mode: 'inline'
         };
@@ -74,11 +74,13 @@ class Header extends React.Component {
         if (key === 'logout') {
             this.handleLogOut();
         }
-      }
+    }
     render() {
         const { items, updateNavPath, history } = this.props;
-        const {profile} = this.props;         
-        let username = profile.user ? profile.user.truename : '';         
+        const {profile} = this.props;   
+        let { activeKey, openKey } = this.state;             
+        let username = profile.user ? profile.user.truename : ''; 
+              
         const adminPanle = (
             <Menu onClick={this.handleMenuClick}>               
                 <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
@@ -92,10 +94,10 @@ class Header extends React.Component {
         const _menuProcess = (nodes, pkey) => {
             return Array.isArray(nodes) && nodes.map((item, i) => {
                     const menu = _menuProcess(item.child, item.key);
-                   /* if(item.url && isActive(item.url, history)){
+                   if(item.url && isActive(item.url, history)){
                         activeKey = 'menu'+item.key
                         openKey = 'sub'+pkey
-                    }*/
+                    }
                     if (menu.length > 0) {
                         return (
                             <SubMenu
@@ -127,17 +129,17 @@ class Header extends React.Component {
                             <img src="./assets/images/logo.svg" height="40px" alt=""/>
                         </div>
                         <Menu theme="dark"
-                              mode="horizontal"
-                              onClick={this.handleClick.bind(this)}
-                              selectedKeys={[this.state.current]}
-                              defaultSelectedKeys={['video']}
-                              style={{lineHeight: '64px',float:'left', background : '#404040'}}>
+                            mode="horizontal"
+                            onClick={this.menuClickHandle}
+                            selectedKeys={[activeKey]}
+                            defaultSelectedKeys={[activeKey]}
+                            style={{lineHeight: '64px',float:'left', background : '#404040'}}>
                             {menu}
                         </Menu>
                         <div className='userInfo'>
                             <Dropdown overlay={adminPanle}>
                                 <a className="ant-dropdown-link">
-                                    <Avatar icon="user" style={{backgroundColor: '#87d068', verticalAlign: 'middle'}}>{username}</Avatar> <Icon type="down" />
+                                    <Avatar icon="user"  size="default"  style={{backgroundColor: '#87d068', verticalAlign: 'middle'}}>{username}</Avatar> <Icon type="down" />
                                 </a>
                             </Dropdown>
                         </div>
@@ -159,6 +161,7 @@ function mapStateToProps(state) {
         items: state.menu.items
     }
 }
+
 function mapDispatchToProps(dispatch) {
     return {
         getAllMenu: bindActionCreators(getAllMenu, dispatch),

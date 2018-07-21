@@ -20,7 +20,7 @@ export function fetchProfile() {
   return {
     type: 'FETCH_PROFILE',
     payload: {
-      promise: api.get('/api/v1/users/my/' + uid)
+      promise: api.get('users/my/' + uid)
     }
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Form, Input, Button, message, notification, Row, Col, Checkbox  } from 'antd'
+import { Form, Input, Button, Icon, message, notification, Row, Col, Checkbox  } from 'antd'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom';
@@ -48,13 +48,13 @@ class Login extends React.Component  {
                     }
                     if (!res.error && res.payload.data)  {
                         /*  message.success('Welcome ' + res.payload.data.name);*/
-                        console.log('res.payload.data',res.payload.data );
+                         
                         notification.success({
                             message: '提示',
                             description: '欢迎登陆：' + res.payload.data.user.truename,
                             duration: 3,
                         });
-                        this.props.history.replace('/app/yght/list');
+                        this.props.history.replace('/app/toll/take/0/0/0');
                     }
                 }).catch(err => {
                     this.setState({
@@ -109,16 +109,29 @@ class Login extends React.Component  {
                                 <Row type="flex" justify="space-between">
                                     <Col span={11}>
                                         <FormItem  className='bottom-line-input'>
-                                            {getFieldDecorator('user')(
-                                                <Input id="ant-input-user" type="text"
-                                                       placeholder="账户"
-                                                       style={{height:38, border : '0px'}} />
+                                            {getFieldDecorator(
+                                                'user',
+                                                {
+                                                    rules: [{ required: true, message: 'Please input your username!' }],
+                                                    initialValue: 'admin1',
+                                                }
+                                            )(
+                                                <Input                                                    
+                                                    id="ant-input-user" type="text"
+                                                    placeholder="账户"                                                     
+                                                    style={{height:38, border : '0px'}} />
                                             )}
                                         </FormItem>
                                     </Col>
                                     <Col span={11}>
                                         <FormItem className='bottom-line-input'>
-                                            {getFieldDecorator('password')(
+                                            {getFieldDecorator(
+                                                'password',
+                                                {
+                                                    rules: [{ required: true, message: 'Please input your username!' }],
+                                                    initialValue: '123456',
+                                                }
+                                            )(
                                                 <Input  type="password"
                                                         autoComplete="off"
                                                         placeholder="密码"
@@ -127,6 +140,7 @@ class Login extends React.Component  {
                                                         onPaste={noop}
                                                         onCopy={noop}
                                                         onCut={noop}
+                                                        setFieldsValue="123456"
                                                 />
                                             )}
 

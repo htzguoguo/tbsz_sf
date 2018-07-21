@@ -28,7 +28,7 @@ describe("<Header/>", function () {
         </MemoryRouter>
       </Provider>
     );
-    console.log(component);
+     
     const headerComponent = findRenderedDOMComponentWithTag(component, 'a');
     assert.equal(headerComponent.length, 1);
   });

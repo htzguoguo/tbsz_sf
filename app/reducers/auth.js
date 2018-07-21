@@ -19,7 +19,7 @@ const initialState = {
 };
 
 export default function auth(state = initialState, action = {}) {
-  console.log('action.type',action.type);
+   
   switch (action.type) {
     case LOGIN_PENDING:
       return Object.assign({}, initialState, {loggingIn: true});
@@ -45,6 +45,7 @@ export default function auth(state = initialState, action = {}) {
         loginErrors: null
       };
     case FETCH_PROFILE_SUCCESS:
+       
       return Object.assign({}, state, {user: action.payload.data, loggingIn: false, loginErrors: null});
     default:
       return state;

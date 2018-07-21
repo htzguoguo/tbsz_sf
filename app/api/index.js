@@ -3,27 +3,33 @@
  */
 const axios = require('axios');
 var MockAdapter = require('axios-mock-adapter');
-var normalAxios = axios.create();
+import {authExpire} from '../utils/notification';
+var normalAxios = axios.create({
+  baseURL: '/api/v1'
+});
 var mockAxios = axios.create();
 var workItems = require('./mock/workItems');
 
 axios.defaults.headers.Authorization =  sessionStorage.getItem( 'token');
-axios.interceptors.response.use(response => {
-  return response;
-  }, error => {
-  console.log('error',error );
-  if (401 === error.response.status) {
-    console.log('error.response.status',error.response.status);
-    window.location.replace('/#login');
-  }
-  return Promise.reject(error);
+
+normalAxios.interceptors.response.use(
+  response => {   
+    return response;
+  }, 
+  error => {     
+    if (401 === error.response.status) {  
+      authExpire(
+        () => window.location.replace('/#login')
+      );
+    }
+    return Promise.reject(error);
 });
 
 // mock 数据
 var mock = new MockAdapter(mockAxios);
 
 mock.onPut('/login').reply(config => {
-  console.log('mockAxios', '/login');
+   
   let postData = JSON.parse(config.data).data;
   if (postData.user === 'admin' && postData.password === '123456') {
     return [200, require('./mock/user') ];
@@ -58,9 +64,9 @@ mock.onPost('/worktimes').reply(config => {
 
 mock.onDelete('/worktimes').reply(config => {
   let { key } = config.params;
-  console.log('key', key, '1' === key);
+   
   workItems.items = workItems.items.filter(item => item.key !== key);
-  console.log('workItems', workItems);
+   
   return [200, {
     result: true
   }];

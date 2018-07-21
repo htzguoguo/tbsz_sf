@@ -72,18 +72,9 @@ class Header extends React.Component {
     }
     render() {
         const { items, updateNavPath, history } = this.props;
-        const {profile} = this.props;         
-        let username = profile.user ? profile.user.truename : '';        
-        // const adminPanle = (
-        //     <Menu>
-        //         <Menu.Item>
-        //             修改密码
-        //         </Menu.Item>
-        //         <Menu.Item>
-        //             <a onClick={this.handleLogOut}>注销</a>
-        //         </Menu.Item>
-        //     </Menu>
-        // );
+        const {profile} = this.props;  
+              
+        let username = profile.user ? profile.user.truename : '';
         const adminPanle = (
             <Menu className={styles.menu} selectedKeys={[]} >
                 <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
@@ -118,10 +109,8 @@ class Header extends React.Component {
 
         const menu = _menuProcess(items);
 
-        return(
-            
-                <div className='header'>
-                    
+        return(            
+                <div className='header'>                    
                         <div className='logo'>
                             <img src="./assets/images/logo.svg" height="40px" alt=""/>
                         </div>

@@ -1,0 +1,14 @@
+{
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact",         
+    },
+    "emmet.triggerExpansionOnTab": true,
+    "emmet.syntaxProfiles": {
+        "javascript": "jsx" 
+    },
+    "files.associations": {
+        "*.js": "javascriptreact"
+    },
+    "editor.foldingStrategy": "indentation",
+    
+}

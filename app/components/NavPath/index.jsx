@@ -1,10 +1,10 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { bindActionCreators } from 'redux'
-import { Breadcrumb } from 'antd'
-import { connect } from 'react-redux'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
+import { Breadcrumb } from 'antd';
+import { connect } from 'react-redux';
 
-import './index.less'
+import './index.less';
 
 const defaultProps = {
     data: []
@@ -28,6 +28,7 @@ class NavPath extends React.Component {
         })
         return (
             <Breadcrumb style={{ margin: '12px 0' }}>
+            <Breadcrumb.Item key='bc-0'>首页</Breadcrumb.Item>
                 {bread}
             </Breadcrumb>
         )

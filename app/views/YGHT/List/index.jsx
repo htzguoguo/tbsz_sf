@@ -124,7 +124,7 @@ class ContentLists extends Component {
     }
     fetch = (params = {}) => {
         this.setState({ loading: true });
-        api.get('/api/v1/workitems', {
+        api.get('workitems', {
             params: {
                 results: 10,
                 ...params,
