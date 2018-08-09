@@ -30,7 +30,9 @@ export function showNotification(type, desc){
 }
 
 export function handleError (error) {
-    if(error.response.status === 404) {
+    if(error && error.response && error.response.status === 404) {
         showNotification('warning', '没有发现相关的记录!');
+    }else if (error && error.response && error.response.status === 500) {
+        showNotification('warning', '操作不成功，请重试!');
     }
 }

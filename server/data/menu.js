@@ -15,19 +15,31 @@ module.exports = {
         },
         {
             key: 2,
-            name: '角色管理',
+            name: '查询管理',
             icon: 'user',
             url: '/app/yght/list'
         },
         {
             key: 3,
-            name: '用户管理',
+            name: '报表管理',
             icon: 'laptop',
             url: '/app/user'
         },
         {
             key: 4,
-            name: '权限管理',
+            name: '明细管理',
+            icon: 'notification',
+            url: '/app/auth'
+        },
+        {
+            key: 5,
+            name: '托收管理',
+            icon: 'notification',
+            url: '/app/auth'
+        },
+        {
+            key: 6,
+            name: '字典管理',
             icon: 'notification',
             url: '/app/auth'
         }

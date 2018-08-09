@@ -79,8 +79,7 @@ class Header extends React.Component {
         const { items, updateNavPath, history } = this.props;
         const {profile} = this.props;   
         let { activeKey, openKey } = this.state;             
-        let username = profile.user ? profile.user.truename : ''; 
-              
+        let username = profile.user ? profile.user.truename : '';
         const adminPanle = (
             <Menu onClick={this.handleMenuClick}>               
                 <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
@@ -94,7 +93,7 @@ class Header extends React.Component {
         const _menuProcess = (nodes, pkey) => {
             return Array.isArray(nodes) && nodes.map((item, i) => {
                     const menu = _menuProcess(item.child, item.key);
-                   if(item.url && isActive(item.url, history)){
+                    if(item.url && isActive(item.url, history)){
                         activeKey = 'menu'+item.key
                         openKey = 'sub'+pkey
                     }
@@ -102,6 +101,7 @@ class Header extends React.Component {
                         return (
                             <SubMenu
                                 key={'sub'+item.key}
+                                keyPath = {item.name}
                                 title={<span><Icon type={item.icon} /><span className="nav-text">{item.name}</span></span>}
                             >
                                 {menu}
@@ -109,7 +109,10 @@ class Header extends React.Component {
                         )
                     } else {
                         return (
-                            <Menu.Item key={'menu'+item.key}>
+                            <Menu.Item 
+                            key={'menu'+item.key}
+                            keyPath = {item.name}
+                            >
                                 {
                                     item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
                                 }

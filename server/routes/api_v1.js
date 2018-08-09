@@ -7,10 +7,12 @@ const users = require( './user' );
 const menu = require('./menu');
 const workitems = require('./workitem');
 const waterfee = require('./waterfee');
+const unit = require('./unit');
 
 router.use( '/users', users );
 router.use( '/menu', menu );
 router.use( '/workitems', workitems );
 router.use( '/water', waterfee );
+router.use( '/unit', unit );
 
 module.exports = router;

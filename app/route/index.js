@@ -11,6 +11,14 @@ import TakeToll from '../views/Toll/TakeToll';
 import ListToll from '../views/Toll/List';
 import PrepareToll from '../views/Toll/Prepare';
 import SearchToll from '../views/Toll/Search';
+
+import UnitEntry from '../views/Unit/Entry';
+import UnitCollectionEntry from '../views/Unit/Collection';
+import UnitSearch from '../views/Unit/Search';
+import AllowanceEdit from '../views/Unit/AllowanceEdit';
+import Change from '../views/Unit/Change';
+import ChangeBrowse from '../views/Unit/ChangeBrowse';
+
 import YGHT from '../views/YGHT';
 import YGHT_List from '../views/YGHT/List';
 import YGHT_View from '../views/YGHT/View';
@@ -25,10 +33,23 @@ export const appChildRoutes = [
     'exactly': true
   },
   {
+    'path':'/app/unit',
+    'component': Toll,
+    'exactly': true
+  },
+  {
     'path':'/app/yght',
     'component': YGHT,
     'exactly': true
   }
+];
+
+export const unitChildRoutes = [
+  {
+    'path':'/app/unit/entry',
+    'component': UnitEntry,
+    'exactly': false
+  }, 
 ];
 
 export const tollChildRoutes = [
@@ -50,6 +71,36 @@ export const tollChildRoutes = [
   {
     'path':'/app/toll/search',
     'component': SearchToll,
+    'exactly': false
+  },
+  {
+    'path':'/app/unit/entry',
+    'component': UnitEntry,
+    'exactly': false
+  }, 
+  {
+    'path':'/app/unit/search',
+    'component': UnitSearch,
+    'exactly': false
+  },
+  {
+    'path':'/app/unit/allowedit',
+    'component': AllowanceEdit,
+    'exactly': false
+  }, 
+  {
+    'path':'/app/unit/collection',
+    'component': UnitCollectionEntry,
+    'exactly': false
+  },
+  {
+    'path':'/app/unit/change',
+    'component': Change,
+    'exactly': false
+  },
+  {
+    'path':'/app/unit/changebrowse',
+    'component': ChangeBrowse,
     'exactly': false
   },
 ];

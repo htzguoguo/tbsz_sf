@@ -25,7 +25,7 @@ const common = merge(
     },
     indexTemplate(
         {
-            title : '长深高速公路养护系统',
+            title : '天保市政水费收费管理系统',
             appMountId : 'root'
         }
     ),

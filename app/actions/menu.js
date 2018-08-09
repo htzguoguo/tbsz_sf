@@ -18,12 +18,13 @@ export function updateNavPath(path, key) {
   }
 }
 
-export function updateSubMenu(openKey, activeKey) {  
+export function updateSubMenu(openKey, activeKey, navpath) {  
   return {
     type: UPDATE_SUBMENU,
     payload: {
       openKey,
-      activeKey
+      activeKey,
+      navpath
     }
   }
 }

@@ -1,4 +1,3 @@
-const Helper = require( '../modules/http_helper' );
 const express = require('express');
 const {
         queryWaterFee,

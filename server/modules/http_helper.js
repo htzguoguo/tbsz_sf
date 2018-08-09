@@ -95,4 +95,15 @@ module.exports.NotAuthorized = function ( req, res ) {
     res.status(401).send( result );
 };
 
+module.exports.ConvertNullToZeroString = function ( data ) {
+    "use strict";
+    Object.keys(data).forEach(
+        key => {
+            if(data[key] === null ) {
+                data[key] = '';
+            }
+        }
+    );
+};
+
 

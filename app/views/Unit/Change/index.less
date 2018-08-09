@@ -1,0 +1,107 @@
+#unitEntryForm {    
+    .ant-form-item {
+        margin-bottom: 12px;        
+    }
+    
+}
+#newUnitForm {
+    .ant-card-head-title {
+        color: red;
+    }
+}
+
+@media all {
+    .page-break { display: none; }
+    }
+    
+@media print { 
+    #printForm
+    	{
+            -webkit-print-color-adjust: exact !important;
+            color : black;
+            font-family:  "宋体" !important; 
+            margin: 0px;
+            padding: 0px;
+            margin:0 auto;       
+    	}   
+}
+
+.page-break { display: block; page-break-before: always; }
+.no-print, .no-print *
+{
+    display: none !important;
+}
+
+body {
+    font-family: "宋体";
+}
+#printcontainer{
+    width:100%;
+    text-align: center;
+    margin:0 auto;
+
+}
+
+.objTitle {
+    width : "2.6cm";
+    height : "1.7cm";
+    text-align: center;
+}
+
+.objContent {
+    width : "66mm";
+    text-align: center;
+}
+
+.printtable {
+    border-collapse: collapse;
+    margin:0px auto;
+
+}
+.page-4 {
+    width: 195mm;
+}
+.page-6 {
+    width: 145mm;
+}
+.print-container  {
+    width: 210mm;
+    height : 297mm;
+    // margin:0px auto;
+    margin: 0px;
+    padding: 0px;
+}
+.noborder {
+    border: 0px solid black;
+    padding-top:5mm;
+    /*border:1px solid #000;*/
+}
+.printtable-border {
+    border: 1px solid black;
+}
+.printtable-border td {
+    border: 1px solid black;
+}
+.printtable-noborder {
+    border: 0px solid black;
+}
+.printtable-noborder td {
+    border: 0px solid black;
+}
+.paging
+{
+    page-break-after :always;
+}
+
+@media screen {
+    #printForm
+	{
+        display: none !important; 
+        -webkit-print-color-adjust: exact !important;
+        color : black;
+        font-family:  "宋体" !important; 
+        margin: 0px;
+        padding: 0px; 
+        margin:0 auto;      
+	}
+}
