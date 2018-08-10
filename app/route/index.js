@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import Layout from '../views/Layout1';
+import LayoutWithSideBar from '../views/LayoutWithSideBar';
 import Login from '../views/Login3';
 import Toll from '../views/Toll';
 import TakeToll from '../views/Toll/TakeToll';
@@ -43,6 +44,8 @@ export const appChildRoutes = [
     'exactly': true
   }
 ];
+
+
 
 export const unitChildRoutes = [
   {
@@ -126,10 +129,12 @@ export const yghtChildRoutes = [
   }
 ];
 
+export const childRoutes = [...tollChildRoutes, ...yghtChildRoutes];
+
 const routes = (
   <Switch>
     <Route path="/login" component={Login}/>
-    <Route path="/app" component={Layout}/>
+    <Route path="/app" component={LayoutWithSideBar}/>
     <Route path="/" component={Login}/>
   </Switch>
 );

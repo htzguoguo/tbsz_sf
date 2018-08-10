@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-
+import {  matchPath } from 'react-router'
 import { Link, withRouter } from 'react-router-dom';
 import { Route, Redirect } from 'react-router-dom';
 import { Menu, Icon, Layout, Divider} from 'antd';
@@ -15,15 +15,13 @@ const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 import NavPath from '../../components/NavPath';
 
+const menuItems = [{url : '/app/toll/take/:num/:year/:month'},
+    {url : '/app/toll/list'},{url : '/app/toll/prepare'},{url : '/app/toll/search'},{url : '/app/unit/entry'}];
 
 import './index.less';
 class Toll extends Component {     
     constructor(pros) {
         super(pros);
-        // this.state = {
-        //     openKey: "sub1",
-        //     activeKey: "sidebarsub1",
-        // };
     }   
     componentWillMount(){
         this.setState({
@@ -55,11 +53,28 @@ class Toll extends Component {
         this.props.updateSubMenu('sub1', item.key, item.keyPath)
     }
 
+    isActive = (path, history) => {
+        let url = history.location.pathname;
+        return matchPath(url, {
+            path,
+            exact: false,
+            strict: false
+        })
+    }
 
     render() {
         var documentHeight = this.state.height - 64;
         const {navpath} = this.props;
-        let { activeKey, openKey } = this.props.menu; 
+        let { activeKey, openKey } = this.props.menu;
+        
+        Array.isArray(menuItems) && menuItems.map((item, i) => {            
+            if(this.isActive(item.url, this.props.history)){
+                activeKey = 'sidebarsub'+ (i + 1).toString()
+                openKey = 'sub1' 
+                console.log(activeKey, openKey, i);
+            }
+        });
+      
         //let { activeKey, openKey } = this.state;
         return(
             <Layout className="ant-layout-container" style={{background : '#fff'}}>
@@ -117,7 +132,7 @@ class Toll extends Component {
                             </Menu.Item>
                             <Menu.Item 
                             key="sidebarsub6"
-                            keyPath="录入单位基本信息"
+                            keyPath="录入修改托收信息"
                             >
                                 <Link to="/app/unit/collection">
                                     <span><Icon type="minus" />录入修改托收信息</span>

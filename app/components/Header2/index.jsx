@@ -15,13 +15,16 @@ const defaultProps = {
     items: []
 };
 const propTypes = {
-    items: PropTypes.array
+    items: PropTypes.array,
+
 };
 
 const isActive = (path, history) => {
-    return matchPath(path, {
+    console.log('Header2-isActive', path, history.location.pathname);
+    let url = history.location.pathname;
+    return url.indexOf(path) != -1 || matchPath(path, {
         path: history.location.pathname,
-        exact: true,
+        exact: false,
         strict: false
     })
 }
@@ -44,13 +47,13 @@ class Header extends React.Component {
         });
     }
     componentDidMount () {
-        this.props.getAllMenu()
+        // this.props.getAllMenu()
     }
 
     componentWillReceiveProps(nextProps) {
         Array.isArray(nextProps.items) && nextProps.items.map((item, i) => {
             Array.isArray(item.child) && item.child.map((node) => {
-                if(node.url && isActive(node.url, this.props.history)){
+                if(node.baseurl && isActive(node.baseurl, this.props.history)){
                     this.menuClickHandle({
                         key: 'menu'+node.key,
                         keyPath: ['menu'+node.key, 'sub'+item.key]
@@ -93,32 +96,42 @@ class Header extends React.Component {
         const _menuProcess = (nodes, pkey) => {
             return Array.isArray(nodes) && nodes.map((item, i) => {
                     const menu = _menuProcess(item.child, item.key);
-                    if(item.url && isActive(item.url, history)){
+                    if(item.baseurl && isActive(item.baseurl, history)){
                         activeKey = 'menu'+item.key
                         openKey = 'sub'+pkey
                     }
-                    if (menu.length > 0) {
-                        return (
-                            <SubMenu
-                                key={'sub'+item.key}
-                                keyPath = {item.name}
-                                title={<span><Icon type={item.icon} /><span className="nav-text">{item.name}</span></span>}
-                            >
-                                {menu}
-                            </SubMenu>
-                        )
-                    } else {
-                        return (
-                            <Menu.Item 
-                            key={'menu'+item.key}
-                            keyPath = {item.name}
-                            >
-                                {
-                                    item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
-                                }
-                            </Menu.Item>
-                        )
-                    }
+                    return (
+                        <Menu.Item 
+                        key={'menu'+item.key}
+                        keyPath = {item.name}
+                        >
+                            {
+                                item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
+                            }
+                        </Menu.Item>
+                    )
+                    // if (menu.length > 0) {
+                    //     return (
+                    //         <SubMenu
+                    //             key={'sub'+item.key}
+                    //             keyPath = {item.name}
+                    //             title={<span><Icon type={item.icon} /><span className="nav-text">{item.name}</span></span>}
+                    //         >
+                    //             {menu}
+                    //         </SubMenu>
+                    //     )
+                    // } else {
+                    //     return (
+                    //         <Menu.Item 
+                    //         key={'menu'+item.key}
+                    //         keyPath = {item.name}
+                    //         >
+                    //             {
+                    //                 item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
+                    //             }
+                    //         </Menu.Item>
+                    //     )
+                    // }
                 });
         }
 
