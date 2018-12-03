@@ -1,0 +1,14 @@
+@media print {
+    @page {
+        size: auto;
+    }
+    .print-container {
+        page-break-after: avoid;
+        page-break-before: avoid;
+    }
+    // table { page-break-after:always }
+    // tr    { page-break-inside:avoid; page-break-after:always }
+    // td    { page-break-inside:avoid; page-break-after:always }
+    // thead { display:table-header-group }
+    // tfoot { display:table-footer-group }
+}

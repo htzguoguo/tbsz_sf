@@ -5,17 +5,15 @@ import PropTypes from 'prop-types';
 import {
     Button, Form, Input,
     Select,  notification,
-    Row, Divider, Checkbox,
+    Row, Divider, 
     Col, Radio, DatePicker,
     InputNumber, Icon, Spin } from 'antd';
  
 import moment from 'moment';    
 const Option = Select.Option;
-const Search = Input.Search;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
 
-const createForm = Form.create;
+
+
 const FormItem = Form.Item;
 import api from '../../../api';
 import styles from './index.less';
@@ -300,6 +298,7 @@ class UnitEntry extends Component{
         const {banks, pipes, chargestandard, unitkinds, 
             usekinds, inputkinds, chargekinds, firestandard} = this.state;
         const {  getFieldDecorator } = this.props.form;
+        const userWater = this.props.form.getFieldValue('用水形式编号');
         return (
             <div className="ant-row" style={{marginTop:20}}>
                 <div className='console-title-border console-title'>
@@ -338,8 +337,137 @@ class UnitEntry extends Component{
                     </Col>  
                 </Row>                
                 <Form id="unitEntryForm" className={styles.unitEntryForm} layout="horizontal" form={this.props.form}>
-                    <Divider dashed><h5>基本信息</h5></Divider>  
-                    <Row> 
+                  <Row>
+                    <Divider dashed><h5>分类信息</h5></Divider> 
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="费用标准"
+                                >
+                                    {getFieldDecorator(
+                                        '区号',
+                                        {
+                                            rules: [{
+                                                required: true, message: '请选择费用标准!',
+                                            }]                                             
+                                        }
+                                    )(
+                                        <Select                                         
+                                        style={{ width: '100%' }}
+                                        > 
+                                        {chargestandard.map(d => <Option key={d.区号}>{d.区号}-{d.单价}</Option>)}                                      
+                                        </Select>
+                                    )}
+                            </FormItem>           
+                        </Col>
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="抄表形式"
+                                >
+                                    {getFieldDecorator(
+                                        '抄表形式编号',                                        
+                                        {
+                                            rules: [{
+                                                required: true, message: '请选择抄表形式!',
+                                            }]                                             
+                                        }
+                                    )(
+                                        <Select                                         
+                                        style={{ width: '100%' }}
+                                        >  
+                                        {inputkinds.map(d => <Option key={d.抄表形式编号}>{d.抄表形式编号}-{d.抄表形式}</Option>)}                                      
+                                        </Select>
+                                    )}
+                            </FormItem>           
+                        </Col>
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="用水形式"
+                                >
+                                    {getFieldDecorator(
+                                        '用水形式编号',
+                                        {
+                                            rules: [{
+                                                required: true, message: '请选择用水形式!',
+                                            }]                                             
+                                        }
+                                    )(
+                                        <Select                                         
+                                        style={{ width: '100%' }}
+                                        > 
+                                        {usekinds.map(d => <Option key={d.用水形式编号}>{d.用水形式编号}-{d.用水形式}</Option>)}    
+                                        </Select>
+                                    )}
+                            </FormItem>           
+                        </Col> 
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="收费形式"
+                                >
+                                    {getFieldDecorator(
+                                        '收费形式编号',
+                                        {
+                                            rules: [{
+                                                required: true, message: '请选择收费形式!',
+                                            }]                                             
+                                        }
+                                    )(
+                                        <Select                                         
+                                        style={{ width: '100%' }}
+                                        > 
+                                        {chargekinds.map(d => <Option key={d.收费形式编号}>{d.收费形式编号}-{d.收费形式}</Option>)}                                       
+                                        </Select>
+                                    )}
+                            </FormItem>           
+                        </Col> 
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="单位性质"
+                                >
+                                    {getFieldDecorator('单位性质编号')(
+                                        <Select                                         
+                                        style={{ width: '100%' }}
+                                        >  
+                                        {unitkinds.map(d => <Option key={d.单位性质编号}>{d.单位性质编号}-{d.单位性质}</Option>)}                                       
+                                        </Select>
+                                    )}
+                            </FormItem>           
+                        </Col>
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="防火标准"
+                                >
+                                    {getFieldDecorator(
+                                        '防火标准编号',
+                                        {                               
+                                            initialValue : '1'
+                                        } 
+                                    )(
+                                        <Select                                         
+                                        style={{ width: '100%' }}
+                                        >  
+                                        {firestandard.map(d => <Option key={d.防火标准编号}>{d.防火标准编号}-{d.管径}</Option>)}                                       
+                                        </Select>
+                                    )}
+                            </FormItem>           
+                        </Col>  
+                        <Col span={8}>
+                            <FormItem
+                                    {...formItemLayout}
+                                    label="扣水单位编号"
+                                    
+                                >
+                                    {getFieldDecorator('扣水单位编号')(
+                                        <Input  placeholder="" />
+                                    )}
+                            </FormItem>           
+                        </Col> 
+                    <Divider dashed><h5>基本信息</h5></Divider>
                         <Col span={8}>
                             <FormItem
                                     {...formItemLayout}
@@ -524,7 +652,12 @@ class UnitEntry extends Component{
                                     label="业务种类"
                                     
                                 >
-                                    {getFieldDecorator('业务种类')(
+                                    {getFieldDecorator(
+                                        '业务种类',
+                                        {                               
+                                            initialValue : '00201'
+                                        } 
+                                        )(
                                         <Input  placeholder="" />
                                     )}
                             </FormItem>           
@@ -539,22 +672,34 @@ class UnitEntry extends Component{
                                         <Input  placeholder="" />
                                     )}
                             </FormItem>           
-                        </Col>
-                        <Col span={16}>
-                            <Col span={12}>
-                                <FormItem
+                        </Col>                         
+                        <Col span={8}>
+                            <FormItem
+                                {...formItemLayout}
+                                label="托收电话"
+                                
+                            >                                 
+                            {getFieldDecorator('托收电话')(
+                                <Input  placeholder="" />
+                            )}                                
+                        </FormItem>      
+                        </Col>        
+                        <Col span={8}>
+                            <FormItem
                                     {...formItemLayout}
-                                    label="托收电话"
+                                    label="行别"
                                     
-                                >                                 
-                                {getFieldDecorator('托收电话')(
-                                    <Input  placeholder="" />
-                                )}                                
-                            </FormItem>      
-                            </Col>        
-                            <Col span={12}>
-                            </Col>         
-                        </Col>                              
+                                >
+                                    {getFieldDecorator(
+                                        '行别',
+                                        {                               
+                                            initialValue : '1'
+                                        } 
+                                        )(
+                                        <Input  placeholder="" />
+                                    )}
+                            </FormItem>     
+                        </Col>                      
                     <Divider dashed><h5>用水信息</h5></Divider>
                         <Col span={8}>
                             <FormItem
@@ -655,7 +800,8 @@ class UnitEntry extends Component{
                                             initialValue : '0'
                                         } 
                                     )(
-                                        <InputNumber                                                                             
+                                        <InputNumber
+                                        disabled={userWater === '2' ? false : true}                                                                             
                                         min={0}
                                         precision={2} 
                                         style={{ width: '100%' }}                                   
@@ -676,7 +822,8 @@ class UnitEntry extends Component{
                                             initialValue : '0'
                                         } 
                                     )(
-                                        <InputNumber                                                                             
+                                        <InputNumber
+                                        disabled={userWater === '0' ? false : true}                                                                             
                                         min={0}
                                         precision={2} 
                                         style={{ width: '100%' }}                                   
@@ -803,146 +950,18 @@ class UnitEntry extends Component{
                             <Col span={12}>
                             </Col>         
                         </Col>
-                    <Divider dashed><h5>分类信息</h5></Divider> 
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="费用标准"
-                                >
-                                    {getFieldDecorator(
-                                        '区号',
-                                        {
-                                            rules: [{
-                                                required: true, message: '请选择费用标准!',
-                                            }]                                             
-                                        }
-                                    )(
-                                        <Select                                         
-                                        style={{ width: '100%' }}
-                                        > 
-                                        {chargestandard.map(d => <Option key={d.区号}>{d.区号}-{d.单价}</Option>)}                                      
-                                        </Select>
-                                    )}
-                            </FormItem>           
-                        </Col>
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="抄表形式"
-                                >
-                                    {getFieldDecorator(
-                                        '抄表形式编号',                                        
-                                        {
-                                            rules: [{
-                                                required: true, message: '请选择抄表形式!',
-                                            }]                                             
-                                        }
-                                    )(
-                                        <Select                                         
-                                        style={{ width: '100%' }}
-                                        >  
-                                        {inputkinds.map(d => <Option key={d.抄表形式编号}>{d.抄表形式编号}-{d.抄表形式}</Option>)}                                      
-                                        </Select>
-                                    )}
-                            </FormItem>           
-                        </Col>
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="用水形式"
-                                >
-                                    {getFieldDecorator(
-                                        '用水形式编号',
-                                        {
-                                            rules: [{
-                                                required: true, message: '请选择用水形式!',
-                                            }]                                             
-                                        }
-                                    )(
-                                        <Select                                         
-                                        style={{ width: '100%' }}
-                                        > 
-                                        {usekinds.map(d => <Option key={d.用水形式编号}>{d.用水形式编号}-{d.用水形式}</Option>)}    
-                                        </Select>
-                                    )}
-                            </FormItem>           
-                        </Col> 
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="收费形式"
-                                >
-                                    {getFieldDecorator(
-                                        '收费形式编号',
-                                        {
-                                            rules: [{
-                                                required: true, message: '请选择收费形式!',
-                                            }]                                             
-                                        }
-                                    )(
-                                        <Select                                         
-                                        style={{ width: '100%' }}
-                                        > 
-                                        {chargekinds.map(d => <Option key={d.收费形式编号}>{d.收费形式编号}-{d.收费形式}</Option>)}                                       
-                                        </Select>
-                                    )}
-                            </FormItem>           
-                        </Col> 
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="单位性质"
-                                >
-                                    {getFieldDecorator('单位性质编号')(
-                                        <Select                                         
-                                        style={{ width: '100%' }}
-                                        >  
-                                        {unitkinds.map(d => <Option key={d.单位性质编号}>{d.单位性质编号}-{d.单位性质}</Option>)}                                       
-                                        </Select>
-                                    )}
-                            </FormItem>           
-                        </Col>
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="防火标准"
-                                >
-                                    {getFieldDecorator(
-                                        '防火标准编号',
-                                        {                               
-                                            initialValue : '1'
-                                        } 
-                                    )(
-                                        <Select                                         
-                                        style={{ width: '100%' }}
-                                        >  
-                                        {firestandard.map(d => <Option key={d.防火标准编号}>{d.防火标准编号}-{d.管径}</Option>)}                                       
-                                        </Select>
-                                    )}
-                            </FormItem>           
-                        </Col>  
-                        <Col span={8}>
-                            <FormItem
-                                    {...formItemLayout}
-                                    label="扣水单位编号"
-                                    
-                                >
-                                    {getFieldDecorator('扣水单位编号')(
-                                        <Input  placeholder="" />
-                                    )}
-                            </FormItem>           
-                        </Col>                                     
-                    </Row> 
-                    <Divider></Divider>
-                    <FormItem wrapperCol={{ span: 10 }}>
-                        <Col span={12} >                           
-                        </Col>    
-                        <Col span={12} >
-                            <Button type="primary" icon="save" onClick={this.handleSubmit.bind(this)}>保存</Button>
-                            &nbsp;&nbsp;&nbsp;
-                            <Button type="ghost" icon="close" onClick={this.handleReset.bind(this)}>重置</Button>
-                        </Col>
-                    </FormItem>
+                                                        
+                  </Row> 
+                  <Divider></Divider>
+                  <FormItem wrapperCol={{ span: 10 }}>
+                      <Col span={12} >                           
+                      </Col>    
+                      <Col span={12} >
+                          <Button type="primary" icon="save" onClick={this.handleSubmit.bind(this)}>保存</Button>
+                          &nbsp;&nbsp;&nbsp;
+                          <Button type="ghost" icon="close" onClick={this.handleReset.bind(this)}>重置</Button>
+                      </Col>
+                  </FormItem>
                 </Form>
             </div>
         );

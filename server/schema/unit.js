@@ -5,7 +5,7 @@ const path = require("path");
 const dateFormat = require('dateformat');
 const Helper = require( '../modules/http_helper' );
 const db = require('./tbszSqlConnection');
-
+const {toWord} = require('../modules/word_helper');
 module.exports.queryUnitsByPinYin = queryUnitsabbrByPinYin;
 
 async function queryUnitsabbrByPinYin(req, res) {
@@ -24,19 +24,52 @@ async function queryUnitsabbrByPinYin(req, res) {
     }
 }
 
-module.exports.queryUnitByNum = queryUnit;
+module.exports.queryUnitByDownNum = queryUnitByDownNum;
 
-async function queryUnit(req, res) {
+async function queryUnitByDownNum(req, res) {
     let { num } = req.params;
     try {         
-        let result = await queryUnitByNum(num); 
+        let result = await queryUnitByDownNumImpt(num); 
         Helper.ResourceFound( res, result );
     }catch(ex) {
         Helper.InternalServerError( res, ex, num );
     }
 }
 
-async function queryUnitByNum(num) {
+module.exports.queryUnitByDownNumImpt = queryUnitByDownNumImpt;
+
+async function queryUnitByDownNumImpt(num) {
+    let sqlStat1 = `
+    Select 编号, 户名, 开户行行名 , 开户行行号, 银行代码, 帐号 , 
+    帐户地址 ,组织代码,协议书号,业务种类,托收联系人 ,
+    托收电话,联系人,电话,区号,用水日期,装表日期,使用期限,
+    水贴费状态,水贴费,管径,申请水量,定额,装表费,节门状态,
+    现场负责,装表地点,退续用手续,拆表日期,表损日期,换表日期,
+    单位性质编号,用水形式编号,收费形式编号,抄表形式编号,
+    防火标准编号,扣水单位编号,用户简称,用户拼音 
+        from 水费单位信息 where 扣水单位编号=:num
+    `;
+    let result = await db.query(
+        sqlStat1,
+        { replacements: { num }, type: db.QueryTypes.SELECT }
+    );
+    return result;
+}
+
+module.exports.queryUnitByNum = queryUnitByNum;
+
+async function queryUnitByNum(req, res) {
+    let { num } = req.params;
+    try {         
+        let result = await queryUnitByNumImpt(num); 
+        Helper.ResourceFound( res, result );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, num );
+    }
+}
+
+module.exports.queryUnitByNumImpt = queryUnitByNumImpt;
+async function queryUnitByNumImpt(num) {
     let sqlStat1 = `
     Select 编号, 户名, 开户行行名 , 开户行行号, 银行代码, 帐号 , 
     帐户地址 ,组织代码,协议书号,业务种类,托收联系人 ,
@@ -372,7 +405,7 @@ async function MoveUnitPosition(req, res, direction) {
             { replacements: { no: num }, type: db.QueryTypes.SELECT }
         )
         if(result.length > 0) {
-            let r = await queryUnitByNum(result[0].编号);
+            let r = await queryUnitByNumImpt(result[0].编号);
             Helper.ResourceFound( res, r );
         }else {
             Helper.ResourceNotFound(res, {}, '没有发现记录')
@@ -412,7 +445,8 @@ function buildWhereSingle(obj, key, para, paraKey, params, where) {
 async function searchUnits(obj){
     let sql = `
     SELECT A.编号,A.户名,A.装表地点,A.开户行行名,A.帐号,A.联系人,A.电话,A.用水日期,A.使用期限,A.装表日期,A.水贴费状态,A.水贴费,A.管径,D.单位性质,
-        B.用水形式, E.抄表形式, A.区号, F.单价, C.收费形式, A.申请水量, A.定额, A.节门状态,A.扣水单位编号,A.装表费
+        B.用水形式, E.抄表形式, A.区号, F.单价, C.收费形式, A.申请水量, A.定额, A.节门状态,A.扣水单位编号,A.装表费,
+        A.用户简称,A.用户拼音,A.组织代码,A.帐户地址,A.托收联系人,A.托收电话,A.防火标准编号,A.开户行行号,A.银行代码,A.协议书号,A.业务种类,A.拆表日期,A.退续用手续,A.现场负责,A.表损日期,A.换表日期
         FROM 水费字典用水形式 B INNER JOIN 水费单位信息 A ON B.用水形式编号 = A.用水形式编号 INNER JOIN
         水费字典收费形式 C ON A.收费形式编号 = C.收费形式编号 INNER JOIN 水费字典单位性质 D ON A.单位性质编号 = D.单位性质编号 INNER JOIN 水费字典抄表形式 E ON A.抄表形式编号 = E.抄表形式编号 INNER JOIN
         水费字典费用标准 F ON A.区号 = F.区号  
@@ -423,7 +457,7 @@ async function searchUnits(obj){
     generalSqlParams(obj, '户名');
 
     buildWhereSingle(obj, '编号', ` (A.编号 like :num) `, 'num', params, where); 
-    buildWhereSingle(obj, '户名', ` (A.编号 like :name) `, 'name', params, where); 
+    buildWhereSingle(obj, '户名', ` (A.户名 like :name) `, 'name', params, where); 
     buildWhereSingle(obj, '用水形式编号', ` (A.用水形式编号= :usekind) `, 'usekind', params, where); 
     buildWhereSingle(obj, '抄表形式编号', ` (A.抄表形式编号= :inputkind) `, 'inputkind', params, where);
     buildWhereSingle(obj, '单位性质编号', ` (A.单位性质编号= :unitkind) `, 'unitkind', params, where); 
@@ -433,8 +467,9 @@ async function searchUnits(obj){
     buildWhereSingle(obj, '用水日期', ` (substring(A.用水日期,1,6)= :usedd) `, 'usedd', params, where);
     buildWhereSingle(obj, '装表日期', ` (substring(A.装表日期,1,6)= :setupdd) `, 'setupdd', params, where);
     buildWhereSingle(obj, '续用水', ` (substring(A.装表日期,1,6)<>substring(A.用水日期,1,6)) `, null, params, where);
-    buildWhereSingle(obj, '签合同单位', ` (A.编号=A.扣水单位编号) `, null, params, where);
-    
+    buildWhereSingle(obj, '签合同单位', ` (A.编号=A.扣水单位编号) `, null, params, where);   
+    where.push(` (A.节门状态='开') `)
+
     let ww = where.join(' and ');
     sql += ww.length > 2 ? ' where ' +  ww : ''; 
     let result = await db.query(
@@ -459,7 +494,7 @@ async function toExcel(req, res) {
 
 async function unitsToExcel(obj) {
     let items = await searchUnits(obj);       
-    let data = fs.readFileSync(path.join(__dirname, 'assets', 'excel', '单位.xlsx'));
+    let data = fs.readFileSync(path.join('./', 'assets', 'excel', '单位.xlsx'));
     let template = new XlsxTemplate(data);
     // Replacements take place on first sheet
     let sheetNumber = 'Sheet1';
@@ -472,6 +507,27 @@ async function unitsToExcel(obj) {
     template.substitute(sheetNumber, values);
     // Get binary data
     return template.generate({type: 'base64'});
+}
+
+module.exports.unitsToWord = unitsToWord;
+
+async function unitsToWord(req, res) {
+    let obj = req.body || {};
+    try {       
+        let wb = await unitsToWordImpt(obj);
+        res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.wordprocessingml.document']]);
+        res.end( new Buffer(wb.buf, 'base64') ); 
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, {  } );
+    }
+}
+
+async function unitsToWordImpt(obj) {
+  let items = await searchUnits(obj); 
+  Helper.ConvertNullToZeroString(items)
+  let values = {items};
+  let result = toWord('unit', values, false);
+  return result;
 }
 
 module.exports.queryAllowanceByNum = queryAllowance;
@@ -811,7 +867,7 @@ async function MoveCollectionPosition(req, res, direction) {
             { replacements: { no: num }, type: db.QueryTypes.SELECT }
         )
         if(result.length > 0) {
-            let r = await queryUnitByNum(result[0].编号);
+            let r = await queryUnitByNumImpt(result[0].编号);
             Helper.ResourceFound( res, r );
         }else {
             Helper.ResourceNotFound(res, {}, '没有发现记录')
@@ -1082,7 +1138,7 @@ async function changeToExcel(req, res) {
 
 async function changeToExcelImpt(start, end) {
     let items = await searchUnitChangeImpt(start, end);       
-    let data = fs.readFileSync(path.join(__dirname, 'assets', 'excel', '过户.xlsx'));
+    let data = fs.readFileSync(path.join('./', 'assets', 'excel', '过户.xlsx'));
     let template = new XlsxTemplate(data);
     // Replacements take place on first sheet
     let sheetNumber = 'sheet1';
@@ -1096,6 +1152,271 @@ async function changeToExcelImpt(start, end) {
     // Get binary data
     return template.generate({type: 'base64'});
 }
+
+module.exports.checkError = checkError;
+
+async function checkError(req, res) {
+    let obj = req.body || {};
+    try {
+        let result = await checkErrorImpt(obj);        
+        Helper.ResourceUpdated( res, result );
+        
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, obj );
+    }
+}
+
+async function checkErrorImpt(obj) {
+    let today = obj.date;
+    let year = today.slice(0, 4);
+    let month = today.slice(4);
+    let para1Year = '';
+    let para1Month = '';
+    let para1Date = obj.date1;
+    let para2Year = '';
+    let para2Month = '';
+    let para2Date = obj.date2;
+    if(para1Date && para1Date.length > 0) {
+        para1Year = para1Date.slice(0, 4);
+        para1Month = para1Date.slice(4);
+    }
+    if(para2Date && para2Date.length > 0) {
+        para2Year = para2Date.slice(0, 4);
+        para2Month = para2Date.slice(4);
+    }
+    let sqlDelete = `
+    Delete from 水费误差分析 where 年=:year and 月=:month 
+    `;    
+    await db.query(
+        sqlDelete,
+        { 
+            replacements: {year, month}, 
+            type: db.QueryTypes.DELETE }
+    );
+    let sqlSelectFee = `
+    Select 编号 from 水费基本表 where 年=:year and 月=:month order by 编号
+    `;
+    let fees = await db.query(
+        sqlSelectFee,
+        { 
+            replacements: {year, month}, 
+            type: db.QueryTypes.SELECT }
+    );
+    for(let i = 0; i < fees.length; i++) {
+        let fee = fees[i];
+        
+        if(obj.para1) {  //大于
+            let sqlSelectUsage = `
+            Select 用水量 from 水费基本表 where ((年=:year and 月=:month) or ( 年=:year1 and 月=:month1)) and (编号=:no) 
+            `;
+            let usages = await db.query(
+                sqlSelectUsage,
+                { 
+                    replacements: {year, month,year1 : para1Year, month1 : para1Month, no : fee.编号 }, 
+                    type: db.QueryTypes.SELECT }
+            );
+            let WaterLast = 0;
+            let WaterNow = 0;
+            if(usages.length === 2) {
+                WaterLast = parseInt(usages[0].用水量);  //上月数据        
+                WaterNow = parseInt(usages[1].用水量);   //本月数据
+            }
+            
+            if ((WaterNow > WaterLast * ( 1 + parseFloat(obj.proportion1))) && (WaterLast != 0))  { 
+                //不合理的数据，需要计入数据库
+                let sqlInsert = `
+                Insert into  水费误差分析 values (:a1,:a2,:a3,:a4,:a5,:a6,:a7,:a8,:a9,:a10 ) 
+                `;
+                await db.query(
+                    sqlInsert,
+                    { 
+                        replacements: {
+                            a1 : year,
+                            a2 : month,
+                            a3 : (i + 1).toString(),
+                            a4 : fee.编号,
+                            a5 : WaterNow,
+                            a6 : para1Year,
+                            a7 : para1Month,
+                            a8 : "超过比例 " + obj.proportion1,
+                            a9 : WaterLast,
+                            a10 : ''
+                        }, 
+                        type: db.QueryTypes.INSERT }
+                );    
+            }
+        }
+        if(obj.para2) {  //小于
+            let sqlSelectUsage = `
+            Select 用水量 from 水费基本表 where ((年=:year and 月=:month) or ( 年=:year1 and 月=:month1)) and (编号=:no) 
+            `;
+            let usages = await db.query(
+                sqlSelectUsage,
+                { 
+                    replacements: {year, month,year1 : para2Year, month1 : para2Month, no : fee.编号 }, 
+                    type: db.QueryTypes.SELECT }
+            );
+            let WaterLast = 0;
+            let WaterNow = 0;
+            if(usages.length === 2) {
+                WaterLast = parseInt(usages[0].用水量);  //上月数据        
+                WaterNow = parseInt(usages[1].用水量);   //本月数据
+            }
+            if ((WaterNow < WaterLast * ( 1 - parseFloat(obj.proportion2))) && (WaterLast != 0))  { 
+                //不合理的数据，需要计入数据库
+                let sqlInsert = `
+                Insert into  水费误差分析 values (:a1,:a2,:a3,:a4,:a5,:a6,:a7,:a8,:a9,:a10 ) 
+                `;
+                await db.query(
+                    sqlInsert,
+                    { 
+                        replacements: {
+                            a1 : year,
+                            a2 : month,
+                            a3 : (i + 1).toString(),
+                            a4 : fee.编号,
+                            a5 : WaterNow,
+                            a6 : para1Year,
+                            a7 : para1Month,
+                            a8 : "小于比例 " + obj.proportion1,
+                            a9 : WaterLast,
+                            a10 : ''
+                        }, 
+                        type: db.QueryTypes.INSERT }
+                );    
+            }
+        }
+    }
+    let sqlSelectCheck = `
+    SELECT A.年,A.月,A.编号,B.户名,B.装表地点,A.用水量,A.对比年,A.对比月,A.对比内容,A.对比水量 FROM 水费误差分析 A INNER JOIN 水费单位信息 B ON A.编号 = B.编号
+        where A.年=:year and 月=:month
+        `;
+    let result = await db.query(
+        sqlSelectCheck,
+        { 
+            replacements: {year, month}, 
+            type: db.QueryTypes.SELECT }
+    );
+    return result;
+}
+
+module.exports.checkErrorToExcel = checkErrorToExcel;
+
+async function checkErrorToExcel(req, res) {
+    let { date } = req.params;
+    try {       
+        let wb = await checkErrorToExcelImpt(date);
+        res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']]);
+        res.end( new Buffer(wb, 'base64') ); 
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, ex );
+    }
+}
+
+async function checkErrorToExcelImpt(date) {   
+    let year = date.slice(0, 4);
+    let month = date.slice(4);
+    let sqlSelectCheck = `
+    SELECT A.年,A.月,A.编号,B.户名,B.装表地点,A.用水量,A.对比年,A.对比月,A.对比内容,A.对比水量 FROM 水费误差分析 A INNER JOIN 水费单位信息 B ON A.编号 = B.编号
+        where A.年=:year and 月=:month
+        `;
+    let items = await db.query(
+        sqlSelectCheck,
+        { 
+            replacements: {year, month}, 
+            type: db.QueryTypes.SELECT }
+    );   
+    let data = fs.readFileSync(path.join('./', 'assets', 'excel', 'Error.xlsx'));
+    let template = new XlsxTemplate(data);
+    // Replacements take place on first sheet
+    let sheetNumber = 'Sheet1';
+    // Set up some placeholder values matching the placeholders in the template
+    let values = {        
+        errors: items
+    };
+    // Perform substitution
+    template.substitute(sheetNumber, values);
+    // Get binary data
+    return template.generate({type: 'base64'});
+}
+
+module.exports.changeIdCheck = changeIdCheck;
+
+async function changeIdCheck(req, res) {
+    let { num } = req.params;
+    try {
+        let result = await changeIdCheckImpt(num);        
+        Helper.ResourceFound( res, result );
+        
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, {num} );
+    }
+}
+
+async function changeIdCheckImpt(num) {
+    let sqlCheck = `
+    Select 编号 from 水费单位信息 where 编号 =:num
+        `;
+    let items = await db.query(
+        sqlCheck,
+        { 
+            replacements: {num}, 
+            type: db.QueryTypes.SELECT }
+    );   
+    return items.length === 0 ? true : false;
+}
+
+module.exports.saveUnitChangeId =  saveUnitChangeId;
+
+async function saveUnitChangeId(req, res) {
+    let obj = req.body || {};
+    try {
+        let result = await saveUnitChangeIdImpt(obj);        
+        Helper.ResourceUpdated( res, result );
+        
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, { num : obj.编号 } );
+    }
+}
+ 
+async function saveUnitChangeIdImpt(obj) {    
+    let sqlUpdate1 = `
+    update 水费单位信息 set 编号=:n1, 扣水单位编号=:n2 where 编号=:n3 
+    `;
+    await db.query(
+        sqlUpdate1,
+        { replacements: {n1 : obj.编号n, n2 : obj.扣水单位编号n, n3 : obj.编号}, type: db.QueryTypes.UPDATE }
+    );
+    let sqlUpdate2 = `
+    update 水费基本表 set 编号=:n1 where 编号=:n2 
+    `;
+    await db.query(
+        sqlUpdate2,
+        { replacements: {n1 : obj.编号n, n2 : obj.编号}, type: db.QueryTypes.UPDATE }
+    );
+    return true;
+}
+
+module.exports.queryPersonAndNumber =  queryPersonAndNumber;
+
+async function queryPersonAndNumber(numbers) {
+  let sqlSelect = `
+  select 编号, 托收联系人, 托收电话
+      from dbo.水费单位信息 
+      where 编号 in (${numbers.join(',')})
+  `;
+  let items = await db.query(
+      sqlSelect,
+      { replacements: {}, type: db.QueryTypes.SELECT }
+  );
+  return items;
+}
+
+
+
+
+
+
 
 
 

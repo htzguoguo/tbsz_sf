@@ -13,21 +13,22 @@ import {saveAuth, dropAuth} from '../utils/loginSession';
 
 const initialState = {
   user: null,
+  items : [],
   loggingIn: false,
   loggingOut: false,
   loginErrors: null
 };
 
 export default function auth(state = initialState, action = {}) {
-   
+  let user; 
   switch (action.type) {
     case LOGIN_PENDING:
       return Object.assign({}, initialState, {loggingIn: true});
     case LOGIN_SUCCESS:
-      let user = action.payload.data;
-      saveAuth(user.token_type, user.access_token, user.user.ID);
-     /* window.localStorage.setItem('uid', user.access_token);*/
-      return Object.assign({}, state, {user: user, loggingIn: false, loginErrors: null});
+        user = action.payload.data;
+        saveAuth(user.token_type, user.access_token, user.user.姓名);
+      /* window.localStorage.setItem('uid', user.access_token);*/
+        return Object.assign({}, state, {user: user, loggingIn: false, loginErrors: null});
     case LOGIN_ERROR:
       return {
         ...state,
@@ -45,8 +46,8 @@ export default function auth(state = initialState, action = {}) {
         loginErrors: null
       };
     case FETCH_PROFILE_SUCCESS:
-       
-      return Object.assign({}, state, {user: action.payload.data, loggingIn: false, loginErrors: null});
+      user = action.payload.data; 
+      return Object.assign({}, state, {user: action.payload.data, items : user.items.menus,  loggingIn: false, loginErrors: null});
     default:
       return state;
   }

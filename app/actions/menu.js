@@ -8,7 +8,7 @@ export const GET_ALL_MENU_SUCCESS = 'GET_ALL_MENU_SUCCESS';
 export const UPDATE_NAVPATH = 'UPDATE_NAVPATH';
 export const UPDATE_SUBMENU = 'UPDATE_SUBMENU';
 
-export function updateNavPath(path, key) {  
+export function updateNavPath(path, key) {
   return {
     type: UPDATE_NAVPATH,
     payload: {
@@ -29,11 +29,11 @@ export function updateSubMenu(openKey, activeKey, navpath) {
   }
 }
 
-export function getAllMenu() {
+export function getAllMenu(op) {
   return {
     type: GET_ALL_MENU,
     payload: {
-      promise: api.get('menu')
+      promise: api.get(`menu/${op}`)
     }
   }
 }

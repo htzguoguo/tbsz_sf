@@ -12,7 +12,6 @@ const test = require('./config/webpack.test');
 
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
-console.log('TARGET', TARGET);
 if (TARGET === 'start' || !TARGET) {
     module.exports = merge(common, development);
 }

@@ -2,7 +2,7 @@ import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import {
-    Table, Button, message, Icon,
+    Table, Button, message, 
     notification,
     Divider,  Row, Col, 
     Form, 
@@ -10,13 +10,13 @@ import {
 } from 'antd';
 import moment from 'moment';
 import api from '../../../api';
-import {monthFormat, dateFormat, formItemLayout, convertPropertiesToMoment, formatDatePickerValue} from '../../../utils/format';
+import {monthFormat,  formItemLayout, } from '../../../utils/format';
 import {handleError} from "../../../utils/notification";
 import styles from './index.less';
 
 const { MonthPicker } = DatePicker;
 const FormItem = Form.Item;
-let _data = [];
+
 function cancel() {
     message.error('点击了取消');
 }
@@ -101,7 +101,7 @@ class ChangeBrowse extends Component {
                 responseType: 'json'
             }).then((dt) => {
                 let data = dt.data;             
-                _data = data;
+                
                 const pagination = this.state.pagination;             
                 pagination.total = data.length;             
                 this.setState({
@@ -174,7 +174,7 @@ class ChangeBrowse extends Component {
 
     renderSearchButtons = () =>
     <Col span={8}>
-        <Button icon="search" onClick={this.onSearch} type="primary">显示</Button>
+        <Button icon="search" onClick={this.onSearch} type="primary" style={{marginTop: 4}}>显示</Button>
         <Button icon="reload" style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
         <Button icon="save" style={{ marginLeft: 8 }} type="danger"   onClick={this.onToExcel}>导出Excel</Button>
     </Col>

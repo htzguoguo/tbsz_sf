@@ -23,7 +23,8 @@ class Login extends React.Component  {
     constructor(pros) {
         super(pros);
         this.state = {
-            loading: false
+            loading: false,
+            height: document.body.clientHeight
         }
     }
 
@@ -48,13 +49,13 @@ class Login extends React.Component  {
                     }
                     if (!res.error && res.payload.data)  {
                         /*  message.success('Welcome ' + res.payload.data.name);*/
-                         
                         notification.success({
                             message: '提示',
-                            description: '欢迎登陆：' + res.payload.data.user.truename,
+                            description: '欢迎登陆：' + res.payload.data.user.姓名,
                             duration: 3,
                         });
-                        this.props.history.replace('/app/toll/take/0/0/0');
+                        //this.props.history.replace('/app/toll/take/0/0/0');
+                        this.props.history.replace('/app');
                     }
                 }).catch(err => {
                     this.setState({
@@ -67,9 +68,9 @@ class Login extends React.Component  {
     }
 
     componentWillMount(){
-        this.setState({
-            height: document.body.clientHeight
-        });
+        // this.setState({
+        //     height: document.body.clientHeight
+        // });
     }
     // 自动获取浏览器可视区域高度
 
@@ -81,12 +82,12 @@ class Login extends React.Component  {
 
     componentDidMount(){
         // 监听window窗口变化,自动调整左侧菜单的高度
-        window.addEventListener('resize', this.autoHeigth.bind(this));
+        //window.addEventListener('resize', this.autoHeigth.bind(this));
     }
 
     componentWillUnmount(){
         // 组件注销时,移除window的resize事件监听,释放浏览器内存
-        window.removeEventListener('resize',this.autoHeigth.bind(this));
+        //window.removeEventListener('resize',this.autoHeigth.bind(this));
     }
 
     render() {
@@ -112,8 +113,8 @@ class Login extends React.Component  {
                                             {getFieldDecorator(
                                                 'user',
                                                 {
-                                                    rules: [{ required: true, message: 'Please input your username!' }],
-                                                    initialValue: 'admin1',
+                                                    rules: [{ required: true, message: '请输入用户名!' }],
+                                                    initialValue: '刘海英',
                                                 }
                                             )(
                                                 <Input                                                    
@@ -128,8 +129,8 @@ class Login extends React.Component  {
                                             {getFieldDecorator(
                                                 'password',
                                                 {
-                                                    rules: [{ required: true, message: 'Please input your username!' }],
-                                                    initialValue: '123456',
+                                                    rules: [{ required: true, message: '请输入密码!' }],
+                                                    initialValue: '123',
                                                 }
                                             )(
                                                 <Input  type="password"
@@ -150,10 +151,10 @@ class Login extends React.Component  {
                                 </Row>
                                 <Row className="row">
                                     <Col span={20}>
-                                        <div style={{ borderBottom: '1px solid #E9E9E9' }}>
-                                            <Checkbox>
+                                        <div style={{marginTop:'20px', borderBottom: '1px solid #E9E9E9' }}>
+                                            {/* <Checkbox>
                                                 记住密码
-                                            </Checkbox>
+                                            </Checkbox> */}
                                         </div>
                                     </Col>
                                     <Col span={4} className="text-right">

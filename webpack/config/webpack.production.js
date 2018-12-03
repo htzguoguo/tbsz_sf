@@ -15,6 +15,7 @@ const setFreeVariable = require('./parts/setFreeVariable');
 const minify = require('./parts/minify');
 const copyAssets = require('./parts/copyAssets');
 const minifyCSS = require('./parts/minifyCSS');
+const compress = require('./parts/compress');
 
 const production = merge(
     {
@@ -41,8 +42,9 @@ const production = merge(
             // potentially unsafe transformations.
             safe: true,
             },
-        })
-);
+        }),
+    compress(),    
+    );
 
 /*const production = {
     // Define vendor entry point needed for splitting

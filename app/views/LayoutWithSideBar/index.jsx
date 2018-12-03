@@ -35,8 +35,17 @@ class App extends React.Component {
         });
     }
     componentDidMount () {
-        this.props.actions.getAllMenu()
     }
+
+    componentWillReceiveProps(nextProps) {
+        // if( (!this.props.auth.user || !nextProps.auth.user || this.props.auth.user.姓名 !== nextProps.auth.user.姓名) &&
+        //     (!nextProps.items || nextProps.items.length === 0)) {
+        //     if( nextProps.auth && nextProps.auth.user) {
+        //         this.props.actions.getAllMenu(nextProps.auth.user.权限1)
+        //     }
+        // }
+    }
+
     componentWillMount() {
         this.setState({
             height: document.body.clientHeight
@@ -55,7 +64,6 @@ class App extends React.Component {
     }
 
     openMenu = v => {
-        
         this.setState({
             openKey: v[v.length - 1],
             firstHide: false,
@@ -64,7 +72,8 @@ class App extends React.Component {
 
     render() {
         var documentHeight = this.state.height - 64;
-        const {auth, navpath, items, actions} = this.props;
+        const {auth, navpath,  actions} = this.props;
+        const items = auth.items;
         // let activeKey, openKey; 
         // const _menuProcess = (nodes) => {
         //     if(nodes && nodes.length > 0) {
@@ -110,11 +119,10 @@ class App extends React.Component {
             
         // }
         // let menu = _menuProcess(items);
-          
         return (
             <Layout className="ant-layout-has-sider">
                 <Layout>
-                    <Header profile={auth} logout={actions.logout} />
+                    <Header profile={auth} items={items} logout={actions.logout} />
                     <Content >
                         <div style={{ minHeight: 360 }}>
                             <Layout className="ant-layout-container" style={{background : '#fff'}}>
@@ -132,9 +140,9 @@ class App extends React.Component {
                                         {menu}
                                     </Menu>
                                 </Sider> */}
-                                <SiderMenu />
+                                <SiderMenu items={items} />
                                 <Layout className='right-content-body'>
-                                    {/* <NavPath data={navpath} /> */}                     
+                                    <NavPath/>                     
                                     <Content className="ant-row" style={{ margin: '0 16px' }}>
                                         <div className="ant-col-md-24" style={{clear: 'both'}}>
                                             {childRoutes.map((route, index) => (
@@ -160,11 +168,9 @@ App.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-    const { auth, menu } = state;     
+    const { auth } = state;     
     return {
         auth: auth ? auth : null,
-        navpath: menu.navpath,
-        items : menu.items,
     };
 };
 

@@ -2,11 +2,11 @@ import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import {
-    Table, Button, message, Icon,
-    notification, Popconfirm, Tooltip,
+    Table, Button, message,  
+    notification,  
     Divider, Input, Row, Col, Radio,
-    Select, Card, Form, Alert,
-    DatePicker,  InputNumber, Checkbox
+    Select,   Form,  
+    DatePicker,    Checkbox
 } from 'antd';
 import moment from 'moment';
 import api from '../../../api';
@@ -15,12 +15,8 @@ import styles from './index.less';
 
 
 const { MonthPicker } = DatePicker;
-const Option = Select.Option;
-const Search = Input.Search;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
-const FormItem = Form.Item;
-let _data = [];
+const Option = Select.Option; 
+const FormItem = Form.Item; 
 const monthFormat = 'YYYYMM';
 const formItemLayout = {
     labelCol: { span: 6 },
@@ -118,8 +114,7 @@ class SearchUnits extends Component {
         {            
             responseType: 'json'
         }).then((dt) => {
-            let data = dt.data;             
-            _data = data;
+            let data = dt.data;
             const pagination = this.state.pagination;
             // Read total count from server
             // pagination.total = data.totalCount;
@@ -159,8 +154,7 @@ class SearchUnits extends Component {
             values.用水日期 = values.用水日期 ? values.用水日期.format("YYYYMM") : '';
             values.装表日期 = values.装表日期 ? values.装表日期.format("YYYYMM") : '';
             api.post('/unit/unitsearch', values).then((dt) => {
-                let data = dt.data;             
-                _data = data;
+                let data = dt.data;
                 const pagination = this.state.pagination;             
                 pagination.total = data.length;             
                 this.setState({
@@ -192,6 +186,40 @@ class SearchUnits extends Component {
             );  
         });
     }
+
+    onToWord = (e) => {
+      e.preventDefault();        
+      this.props.form.validateFields((err, values) => {
+          if (!err) {
+              this.setState({ loading: true });
+              values.用水日期 = values.用水日期 ? values.用水日期.format("YYYYMM") : '';
+              values.装表日期 = values.装表日期 ? values.装表日期.format("YYYYMM") : '';
+              api.post(
+                  `unit/unitstoword`, 
+                  values,
+                  {            
+                      responseType: 'arraybuffer'
+                  }
+              ).then((dt) => {                 
+                      this.setState({
+                          loading: false                  
+                      });
+                      let blob = new Blob([dt.data], { type:   'application/vnd.openxmlformats-officedocument.wordprocessingml.document'} )
+                      let link = document.createElement('a')
+                      link.href = window.URL.createObjectURL(blob)
+                      link.download = `天保市政公司用水单位资料卡片${moment().format('YYYYMMDD')}.docx`
+                      link.click()
+              }).catch(
+              err => {
+                  handleError(err);                         
+                  this.setState({
+                      loading: false                
+                  });
+              }
+              );  
+          }
+      });
+  }
 
     onToExcel = (e) => {
         e.preventDefault();        
@@ -238,7 +266,7 @@ class SearchUnits extends Component {
             <Button icon="search" onClick={this.onSearch} type="primary">查询</Button>
             <Button icon="reload" style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
             <Button icon="save" style={{ marginLeft: 8 }} type="danger"   onClick={this.onToExcel}>导出Excel</Button>
-            
+            <Button icon="save" style={{ marginLeft: 8 }} type="danger"   onClick={this.onToWord}>导出Word</Button>
         </span>
     </div>
 

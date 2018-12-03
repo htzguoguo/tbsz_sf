@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import {
     Table, Button, message, Icon,
-    notification, Popconfirm, Tooltip,
+    notification,  
     Divider, Input, Row, Col, Radio,
-    Select, Card, Form, Alert,
+    Select,  Form,  
     DatePicker,  InputNumber, Checkbox
 } from 'antd';
 import moment from 'moment';
@@ -16,20 +16,14 @@ import styles from './index.less';
 
 const { MonthPicker } = DatePicker;
 const Option = Select.Option;
-const Search = Input.Search;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
+
 const FormItem = Form.Item;
-let _data = [];
+
 const monthFormat = 'YYYYMM';
 const formItemLayout = {
     labelCol: { span: 5 },
     wrapperCol: { span: 16 },
 };
-
-function cancel() {
-    message.error('点击了取消');
-}
 
 class SearchWaterFees extends Component {
     constructor(props){
@@ -110,8 +104,7 @@ class SearchWaterFees extends Component {
         {            
             responseType: 'json'
         }).then((dt) => {
-            let data = dt.data;             
-            _data = data;
+            let data = dt.data;
             const pagination = this.state.pagination;
             // Read total count from server
             // pagination.total = data.totalCount;
@@ -160,8 +153,7 @@ class SearchWaterFees extends Component {
             values.起始年月 = values.起始年月 ? values.起始年月.format("YYYYMM") : '';
             values.终止年月 = values.终止年月 ? values.终止年月.format("YYYYMM") : '';
             api.post('/water/feesearch', values).then((dt) => {
-                let data = dt.data;             
-                _data = data;
+                let data = dt.data;
                 const pagination = this.state.pagination;             
                 pagination.total = data.length;             
                 this.setState({

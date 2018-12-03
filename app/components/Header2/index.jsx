@@ -16,11 +16,13 @@ const defaultProps = {
 };
 const propTypes = {
     items: PropTypes.array,
-
+    profile : PropTypes.object,
+    logout : PropTypes.object,
+    history : PropTypes.object,
+    updateNavPath : PropTypes.func
 };
 
 const isActive = (path, history) => {
-    console.log('Header2-isActive', path, history.location.pathname);
     let url = history.location.pathname;
     return url.indexOf(path) != -1 || matchPath(path, {
         path: history.location.pathname,
@@ -50,23 +52,24 @@ class Header extends React.Component {
         // this.props.getAllMenu()
     }
 
-    componentWillReceiveProps(nextProps) {
-        Array.isArray(nextProps.items) && nextProps.items.map((item, i) => {
-            Array.isArray(item.child) && item.child.map((node) => {
-                if(node.baseurl && isActive(node.baseurl, this.props.history)){
-                    this.menuClickHandle({
-                        key: 'menu'+node.key,
-                        keyPath: ['menu'+node.key, 'sub'+item.key]
-                    })
-                }
-            })
-        });
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     Array.isArray(nextProps.items) && nextProps.items.map((item, i) => {
+    //         Array.isArray(item.child) && item.child.map((node) => {
+    //             if(node.baseurl && isActive(node.baseurl, this.props.history)){
+    //                 this.menuClickHandle({
+    //                     key: 'menu'+node.key,
+    //                     keyPath: [node.name, item.name]
+    //                 })
+    //             }
+    //         })
+    //     });
+    // }
     menuClickHandle = (item) => {
         this.setState({
             activeKey: item.key
         });
-        this.props.updateNavPath(item.keyPath, item.key)
+        
+        this.props.updateNavPath(item.item.props.keyPath, item.key)
     }
     handleClick(e) {
         this.setState({
@@ -82,7 +85,7 @@ class Header extends React.Component {
         const { items, updateNavPath, history } = this.props;
         const {profile} = this.props;   
         let { activeKey, openKey } = this.state;             
-        let username = profile.user ? profile.user.truename : '';
+        let username = profile.user ? profile.user.姓名 : '';
         const adminPanle = (
             <Menu onClick={this.handleMenuClick}>               
                 <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
@@ -95,10 +98,11 @@ class Header extends React.Component {
         );
         const _menuProcess = (nodes, pkey) => {
             return Array.isArray(nodes) && nodes.map((item, i) => {
-                    const menu = _menuProcess(item.child, item.key);
+                    //const menu = _menuProcess(item.child, item.key);
                     if(item.baseurl && isActive(item.baseurl, history)){
                         activeKey = 'menu'+item.key
                         openKey = 'sub'+pkey
+                        this.props.updateNavPath(item.name, item.key)
                     }
                     return (
                         <Menu.Item 
@@ -110,28 +114,6 @@ class Header extends React.Component {
                             }
                         </Menu.Item>
                     )
-                    // if (menu.length > 0) {
-                    //     return (
-                    //         <SubMenu
-                    //             key={'sub'+item.key}
-                    //             keyPath = {item.name}
-                    //             title={<span><Icon type={item.icon} /><span className="nav-text">{item.name}</span></span>}
-                    //         >
-                    //             {menu}
-                    //         </SubMenu>
-                    //     )
-                    // } else {
-                    //     return (
-                    //         <Menu.Item 
-                    //         key={'menu'+item.key}
-                    //         keyPath = {item.name}
-                    //         >
-                    //             {
-                    //                 item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
-                    //             }
-                    //         </Menu.Item>
-                    //     )
-                    // }
                 });
         }
 
@@ -174,13 +156,13 @@ Header.defaultProps = defaultProps;
 
 function mapStateToProps(state) {
     return {
-        items: state.menu.items
+        //items: state.menu.items
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        getAllMenu: bindActionCreators(getAllMenu, dispatch),
+        //getAllMenu: bindActionCreators(getAllMenu, dispatch),
         updateNavPath: bindActionCreators(updateNavPath, dispatch)
     }
 }

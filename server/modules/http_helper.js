@@ -7,13 +7,13 @@ module.exports.InternalServerError = function ( res, error, context ) {
     var result = {
         "error": {
             "code": "bf-500",
-            "message":  error,
+            "message":  error.message,
             "context":  context
         }
     };
     res.status( 500 );
     res.setHeader( 'Content-Type', 'application/json' );
-    res.send( result );
+    res.json( result );
 };
 
 module.exports.BadRequest = function ( res, error, context ) {
@@ -27,7 +27,7 @@ module.exports.BadRequest = function ( res, error, context ) {
     };
     res.status( 400 );
     res.setHeader('Content-Type', 'application/json' );
-    res.send( result );
+    res.json( result );
 };
 
 module.exports.ResourceNotFound = function ( res,  context, message ) {
@@ -41,7 +41,7 @@ module.exports.ResourceNotFound = function ( res,  context, message ) {
     };
     res.status( 404 );
     res.setHeader('Content-Type', 'application/json' );
-    res.send( result );
+    res.json( result );
 };
 
 module.exports.ResourceDeleted = function ( res ) {
@@ -55,9 +55,9 @@ module.exports.ResourceCreated = function ( res, data ) {
     res.status( 201 );
     res.setHeader( 'Content-Type', 'application/json' );
     if ( data ) {
-        res.send( data );
+        res.json( data );
     }else {
-        res.send( { "data" : 'Created' }  );
+        res.json( { "data" : 'Created' }  );
     }
 };
 
@@ -66,9 +66,10 @@ module.exports.ResourceUpdated = function ( res, data ) {
     res.status( 201 );
     res.setHeader( 'Content-Type', 'application/json' );
     if ( data ) {
-        res.send(  data );
+        //res.send(  data );
+        res.json(data)
     }else {
-        res.send( { "data" : 'Updated'} );
+        res.json( { "data" : 'Updated'} );
     }
 };
 
@@ -77,7 +78,13 @@ module.exports.ResourceFound = function ( res, data ) {
     var result = data;
     res.status( 200 );
     res.setHeader( 'Content-Type', 'application/json' );
-    res.send(  result   );
+
+    // var rowNew = JSON.stringify(result);
+    // res.set({ 'Content-Length': rowNew.length }); 
+    // res.send(result); 
+
+    //res.send(  result   );
+    res.json(result)
     /* res.end();*/
     /* res.end();*/
 };
@@ -92,18 +99,26 @@ module.exports.NotAuthorized = function ( req, res ) {
             }
         }
     };
-    res.status(401).send( result );
+    res.status(401).json( result );
 };
 
 module.exports.ConvertNullToZeroString = function ( data ) {
     "use strict";
-    Object.keys(data).forEach(
+    let convert = (item) => {Object.keys(item).forEach(
         key => {
-            if(data[key] === null ) {
-                data[key] = '';
+            if(item[key] === null ) {
+                item[key] = '';
             }
         }
-    );
+    )};
+    if(Array.isArray(data)) {
+        data.forEach(
+            item => convert(item)
+        );
+    }else {
+        convert(data);
+    }
+    
 };
 
 

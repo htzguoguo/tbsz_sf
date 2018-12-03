@@ -2,27 +2,26 @@ import React, { Component } from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {
-    Button, Form, Input,
+    Button, Form, Input,DatePicker,
     Select,  notification,
     Row, Divider, Checkbox,
-    Col, Radio,
+    Col, Radio,Modal, List, Alert,
     InputNumber, Icon } from 'antd';
 const Option = Select.Option;
 const Search = Input.Search;
-const RadioButton = Radio.Button;
+const confirm = Modal.confirm;
 const RadioGroup = Radio.Group;
-
-
-const createForm = Form.create;
+const { MonthPicker } = DatePicker;
+import moment from 'moment';
 const FormItem = Form.Item;
 import api from '../../../api';
-import { makeFinalStore } from 'alt-utils/lib/makeFinalStore';
-import { isNumber } from 'util';
 
+const monthFormat = 'YYYYMM';
 
 class TakeToll extends Component{
     constructor(props) {
         super(props);
+        const current = new Date();
         this.num = props.match.params.num;
         this.isEdit = this.num === '0' ? false : true;
         this.year = props.match.params.year;
@@ -30,15 +29,21 @@ class TakeToll extends Component{
         this.onFeeSearch = this.onFeeSearch.bind(this);
         this.onYearChange = this.onYearChange.bind(this);
         this.onMonthChange = this.onMonthChange.bind(this);
+        this.onDateChange = this.onDateChange.bind(this);
+        this.handlePayment = this.handlePayment.bind(this);
         this.handleCalculateFee = this.handleCalculateFee.bind(this);
-        this.selectedYear = this.isEdit ? this.year : 2017;
-        this.selectedMonth = this.isEdit ? this.month : '07';
+        this.selectedYear = this.isEdit ? this.year : moment().year('YYYY');
+        this.selectedMonth = this.isEdit ? this.month : moment().month('MM');
         this.selectedNum = this.isEdit ? this.num : '0002';
         this.selectType = '3';
+        this.state = {
+          modalVisible: false,
+          confirmLoading: false,
+          selectedItems:[],
+      };
     }
 
     componentDidMount() {
-         
         if (this.isEdit) {
             this.onFeeSearch(this.num);
         }
@@ -69,7 +74,7 @@ class TakeToll extends Component{
                 });
                 return;
             }     
-            values.操作员 = this.props.user.truename;      
+            values.操作员 = this.props.user.姓名;      
             api.put('/water/fee',values).then((data) => {
 
                 notification.success({
@@ -103,10 +108,18 @@ class TakeToll extends Component{
                 data = data.data;
                 let item = data[0];
                 this.props.form.setFieldsValue(data[0]);
-                this.showNotification(
+                this.setState({selectedItems : [{...values, ...data[0]}]});
+                if(item.超额水量 > 0) {
+                  this.showNotification(
+                    'warning',
+                    `企业用水量已超计划, 超计划水量为[${Math.abs(item.超额水量)}]`
+                  ); 
+                }else{
+                  this.showNotification(
                     'success',
                     `完成计算;实收水费为[${item.实收水费}]`
-                );                
+                  );
+                }               
             }).catch(this.handleError);
         });
     }
@@ -118,6 +131,12 @@ class TakeToll extends Component{
     onMonthChange(month) {
         this.selectedMonth = month;
     }
+
+    onDateChange(date, dateString) {
+        this.selectedYear = date.format('YYYY');
+        this.selectedMonth = date.format('MM');
+    }
+
 
     showNotification = (type, desc) => {
         notification[type]({ 
@@ -170,7 +189,6 @@ class TakeToll extends Component{
     }
 
     handlePrior = () => {
-
         let num = parseInt(this.props.form.getFieldValue('编号')) > 0 ?
         this.props.form.getFieldValue('编号') : this.selectedNum;
         let year = this.selectedYear;
@@ -190,7 +208,6 @@ class TakeToll extends Component{
     }
 
     handleNext = () => {
-         
         let num = parseInt(this.props.form.getFieldValue('编号')) > 0 ?
                     this.props.form.getFieldValue('编号') : this.selectedNum;
          
@@ -214,6 +231,144 @@ class TakeToll extends Component{
         this.selectType = e.target.value;       
     }
 
+    handlePayment(e) {
+        e.preventDefault();
+        const onFeeSearch =  this.onFeeSearch;
+        const handleError = this.handleError;
+        this.props.form.validateFieldsAndScroll((errors, values) => {
+            if (errors) {
+                notification.error({
+                    message: '提示',
+                    description: '输入的数据有误，您检查',
+                    duration: 3,
+                });
+                return;
+            }
+            confirm({
+                title: '严重警告:',
+                content: `确定"${values.户名}${values.年}年${values.月}月"的水费已经缴纳吗？`,
+                onOk() {
+                    api.post(`/water/payment/${values.编号}/${values.年}/${values.月}`,{}).then((data) => {
+                        notification.success({
+                            message: '提示',
+                            description: `完成${values.户名}${values.年}年${values.月}月水费缴纳。`,
+                            duration: 3,
+                        });
+                        onFeeSearch(values.编号);
+                    }).catch(handleError);
+                }, 
+                onCancel() {
+                },                   
+                okText : "确认",
+                cancelText : "取消"
+            });
+        }); 
+    }
+
+    handleModalVisible = (flag) => {
+      this.setState({
+          modalVisible: !!flag,
+      });
+  }
+
+  handleSMS = (item) => {
+      this.setState({
+          confirmLoading: true,
+      });
+      api.post('water/fees/sms',item).then((data) => {
+          data = data.data;
+          notification.success({
+              message: '提示',
+              description: `完成发送短信。`,
+              duration: 3,
+          });
+          this.setState({
+              confirmLoading: false,
+              selectedItems : data
+          });
+      }).catch(
+          err => {
+              this.setState({
+                  confirmLoading: false,
+
+              });  
+              notification.error({
+                  message: '提示',
+                  description: `发送短信不成功,请重试。`,
+                  duration: 3,
+              });
+          }
+      );
+  }
+
+  renderSMSResult = (item) => {
+      if(item && item.desc){
+          let desc = item.desc;
+          if (desc.indexOf('success') !== -1) {
+              //return <span>发送成功</span>
+              return <Alert message="发送成功" type="success" showIcon />
+          }else if(desc === 'error:Missing recipient') {
+              //return <span>发送失败,原因：手机号码无效</span>
+              return <Alert message="发送失败,原因：手机号码无效" type="error" showIcon />
+          }else {
+              //return <span>发送失败</span>
+              return <Alert message="发送失败" type="error" showIcon />
+          }
+      }
+      return '';
+  }
+
+  renderSMSForm = () => {
+    const {modalVisible, confirmLoading, selectedItems} = this.state;
+    const items = selectedItems;
+    return (
+            <Modal
+                width={800}
+                title="发送超计划短信提醒"
+                visible={modalVisible}
+                confirmLoading={confirmLoading}
+                onOk={() => this.handleSMS(items[0])}
+                onCancel={() => this.handleModalVisible()}
+                okText="发送短信"
+                cancelText="取消"
+                >
+                <List
+                    size="middle"
+                    dataSource={items}
+                    renderItem={item => {
+                            if(item && item.desc) {
+                                return <List.Item key={item.编号}>
+                                    <List.Item.Meta
+                                    avatar={<Icon type="user" />}
+                                    title={`${item.编号}-${item.户名}`}
+                                    description={
+                                      <span className="highlight">贵企业用本月份水量已超计划, 超计划水量为[{Math.abs(item.超额水量)}]
+                                      </span>
+                                    }
+                                    />
+                                    {
+                                      item && item.desc ? this.renderSMSResult(item) : ''
+                                    }
+                                </List.Item>
+                            }else {
+                                return <List.Item key={item.编号}>
+                                <List.Item.Meta
+                                avatar={<Icon type="user" />}
+                                title={`${item.编号}-${item.户名}`}
+                                description={
+                                  <span className="highlight">贵企业用本月份水量已超计划, 超计划水量为[{Math.abs(item.超额水量)}]
+                                  </span>
+                                }
+                                />
+                                </List.Item>
+                            }
+                }}
+                > 
+                </List>
+            </Modal>
+    );
+  }
+
     render() {
         var self = this;
         const { getFieldProps,getFieldDecorator, getFieldError, isFieldValidating } = this.props.form;
@@ -221,7 +376,7 @@ class TakeToll extends Component{
             labelCol: { span: 3 },
             wrapperCol: { span: 16 },
         };
-
+        const waterOverUsage = this.props.form.getFieldValue('超额水量')
         return (
             <div className="ant-row" style={{marginTop:20}}>
                 <div className='console-title-border console-title'>
@@ -231,7 +386,8 @@ class TakeToll extends Component{
                 </div>
                 <Row style={{ marginBottom: 16 }} >
                     <Col span={5}>
-                        <Select 
+                    <MonthPicker onChange={this.onDateChange} defaultValue={moment()} format={monthFormat}/>
+                        {/* <Select 
                             placeholder="年份" 
                             defaultValue={this.selectedYear}
                             onChange={e => {
@@ -277,7 +433,7 @@ class TakeToll extends Component{
                             <Option value="10">10</Option>
                             <Option value="11">11</Option>
                             <Option value="12">12</Option>
-                        </Select>
+                        </Select> */}
                     </Col>
                     <Col span={5}>
                         <Search
@@ -306,9 +462,11 @@ class TakeToll extends Component{
                         <Radio value={2}>手工</Radio>
                         <Radio value={3}>全部</Radio>                         
                     </RadioGroup>    
-                    </Col>                  
+                    </Col>
+                    <Col span={3} >
+                      <Button disabled={waterOverUsage > 0? false : true} type="danger"     icon="check"  onClick={() => this.handleModalVisible(true)}>超计划短信提醒</Button>
+                    </Col>
                 </Row>
-                
                 <Form layout="horizontal" form={this.props.form}>
                     <Divider dashed><h5>单位基本信息</h5></Divider>  
                     <Row>
@@ -318,7 +476,15 @@ class TakeToll extends Component{
                         labelCol={{span: 5}}
                         >                       
                             <Col span={7}>
-                                    {getFieldDecorator('年')(
+                                    {getFieldDecorator(
+                                        '年',
+                                        {
+                                            rules: [{
+                                                required: true, message: '请先获取正确的企业信息!',
+                                            }] ,
+                                                                                        
+                                        }
+                                        )(
                                         <Input  placeholder="年" disabled/>
                                     )}                                 
                             </Col>
@@ -328,7 +494,15 @@ class TakeToll extends Component{
                                 </span>
                             </Col>                            
                             <Col span={7}>                               
-                                    {getFieldDecorator('月')(
+                                    {getFieldDecorator(
+                                        '月',
+                                        {
+                                            rules: [{
+                                                required: true, message: '请先获取正确的企业信息!',
+                                            }] ,
+                                                                                        
+                                        }
+                                        )(
                                         <Input  placeholder="月" disabled/>
                                     )}                                
                             </Col> 
@@ -340,7 +514,15 @@ class TakeToll extends Component{
                                     label="编号"
                                     labelCol={{span: 5}}
                                 >
-                                    {getFieldDecorator('编号')(
+                                    {getFieldDecorator(
+                                        '编号',
+                                        {
+                                            rules: [{
+                                                required: true, message: '请先获取正确的企业信息!',
+                                            }] ,
+                                                                                        
+                                        }
+                                        )(
                                         <Input  placeholder="编号" disabled/>
                                     )}
                             </FormItem>            
@@ -483,6 +665,20 @@ class TakeToll extends Component{
                         </FormItem>  
                         </Col>  
                         <Col span={12}>
+                        <FormItem
+                            {...formItemLayout}
+                            labelCol={{span: 5}}
+                            label="老表水费">
+                            {getFieldDecorator('老表水费', {                               
+                                initialValue : '0'
+                            })(
+                                <InputNumber                                                                         
+                                    min={0}
+                                    precision={2} 
+                                    style={{ width: '100%' }}                                   
+                                />
+                            )}
+                        </FormItem> 
                         </Col>
                     </Col>
                     <Col span={8}>
@@ -697,8 +893,7 @@ class TakeToll extends Component{
                                 initialValue : '0'
                             })(
                                 <InputNumber 
-                                    disabled                                    
-                                    min={0}
+                                    disabled
                                     precision={0} 
                                     style={{ width: '100%' }}                                   
                                 />
@@ -767,7 +962,7 @@ class TakeToll extends Component{
                                 initialValue : '0'
                             })(
                                 <InputNumber                                    
-                                    min={0}
+                                    min={-100000}
                                     precision={2} 
                                     style={{ width: '100%' }}                                   
                                 />
@@ -789,8 +984,7 @@ class TakeToll extends Component{
                     <Col span={5}> 
                         <FormItem
                             {...formItemLayout} 
-                            validateStatus="warning" 
-                                                      
+                            validateStatus="warning"
                             >                              
                                 {getFieldDecorator('减排污费', {                               
                                     initialValue : '0'
@@ -824,20 +1018,19 @@ class TakeToll extends Component{
                     </Col>
                     </Row>
                     <Divider ></Divider> 
-                    <FormItem wrapperCol={{ span: 10 }}>
-                        <Col span={12} >
-                             <Button type="danger" icon="form" onClick={this.handleCalculateFee}>计算水费</Button>
+                    <FormItem wrapperCol={{ span: 24 }}>
+                        <Col span={6} >
+                            <Button type="danger" icon="form" onClick={this.handleCalculateFee}>计算水费</Button>
                         </Col>    
-                        <Col span={12} >
+                        <Col span={6} >
                             <Button type="primary" icon="check-circle-o" onClick={this.handleSubmit.bind(this)}>保存水费</Button>
                             &nbsp;&nbsp;&nbsp;
                             <Button type="ghost" icon="close" onClick={this.handleReset.bind(this)}>重置</Button>
                         </Col>
-                       
                         
-                       
                     </FormItem>
                 </Form>
+                {self.renderSMSForm()}
             </div>
         );
     }
@@ -848,7 +1041,6 @@ let takeToll = Form.create({})(TakeToll);
 
 const mapStateToProps = (state) => {
     const { user } = state.auth;
-     
     return {    
         user 
     };

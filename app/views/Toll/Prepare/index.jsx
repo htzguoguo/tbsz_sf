@@ -4,9 +4,9 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import {
-    Button, message, Icon,
-    notification, Popconfirm, Tooltip,
-    Divider, Input, Row, Col, Radio,
+    Button, message,  
+    notification,  
+    Divider,   Row,  
     Select, Form, Alert, InputNumber,
     Spin , Modal
 } from 'antd';
@@ -33,7 +33,7 @@ class PrepareWaterFee extends Component {
     } 
     
     handlePrepareWaterFee = (e) => {        
-        e.preventDefault();
+        e.preventDefault();         
         let commitApi = () => {
             this.setState({
                 loading: true                
@@ -45,7 +45,7 @@ class PrepareWaterFee extends Component {
                 month : values.月,
                 commission : values.手续费,
                 others : values.其它,
-                user : this.props.user.truename,    
+                user : this.props.user.姓名 ? this.props.user.姓名 : '',    
             }
             ).then(
                 data => {

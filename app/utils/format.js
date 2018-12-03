@@ -27,3 +27,13 @@ export function formatDatePickerValue(obj, keys, format) {
         }
     );
 }
+
+export function ArrayBufferToString (buffer, encoding) {
+    if (encoding == null) encoding = 'utf8'
+
+    return Buffer.from(buffer).toString(encoding)
+}
+
+export function  copy (source, StartChar, Count ) {
+    return source.slice(StartChar - 1, StartChar + Count - 1);
+}

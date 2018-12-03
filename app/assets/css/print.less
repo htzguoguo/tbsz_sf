@@ -1,0 +1,162 @@
+#unitEntryForm {    
+    .ant-form-item {
+        margin-bottom: 12px;        
+    }
+    
+}
+#newUnitForm {
+    .ant-card-head-title {
+        color: red;
+    }
+}
+
+@media all {
+    .page-break { display: none; }
+    }
+    
+@media print {
+    
+
+    @page {
+        margin-left: 0mm;
+        margin-right: 0mm;
+        margin-top : 0mm;
+        margin-bottom: 0mm;
+    }
+    
+    #printForm
+    	{
+            -webkit-print-color-adjust: exact !important;
+            color : black;
+            font-family:  "宋体" !important; 
+            margin: 0px;
+            padding: 0px;
+            margin:0 auto;       
+        }  
+        
+    #printForm1
+    {
+        -webkit-print-color-adjust: exact !important;
+        color : black;
+        font-family:  "宋体" !important; 
+        margin: 0px;
+        padding: 0px;
+        margin:0 auto;       
+    }       
+}
+
+.page-break { display: block; page-break-before: always; }
+.no-print, .no-print *
+{
+    display: none !important;
+}
+
+body {
+    font-family: "宋体";
+}
+#printcontainer{
+    width:100%;
+    text-align: center;
+    margin:0 auto;
+
+}
+
+.objTitle {
+    width : "2.6cm";
+    height : "1.7cm";
+    text-align: center;
+}
+
+.objContent {
+    width : "66mm";
+    text-align: center;
+}
+
+.printtable {
+    border-collapse: collapse;
+    margin:0px auto;
+    border-spacing:0px;
+}
+
+
+.page-4-h {
+    width: 275mm;
+}
+.page-4 {
+    width: 185mm;
+}
+
+.page-7 {
+    width: 175mm;
+}
+
+.page-7-h {
+    width: 238mm;
+}
+
+.page-6 {
+    width: 145mm;
+}
+
+
+
+.print-container  {
+    width: 210mm;
+    height : 295mm;
+    // margin:0px auto;
+    margin: 0px;
+    padding: 0px;
+}
+.print-container-h  {
+    width: 295mm;
+    height : 210mm;
+    // margin:0px auto;
+    margin: 0px;
+    padding: 0px;
+}
+.noborder {
+    border: 0px solid black;
+    //padding-top:5mm;
+    /*border:1px solid #000;*/
+}
+
+.printtable-border1 {
+    border: 0px solid black;
+}
+.printtable-border1 td {
+    border: 1px solid black;
+}
+
+.printtable-border {
+    border: 1px solid black;
+}
+.printtable-border td {
+    border: 1px solid black;
+}
+.printtable-noborder {
+    border: 0px solid black;
+}
+.printtable-noborder td {
+    border: 0px solid black;
+}
+.paging {
+    page-break-after: always;
+    //page-break-before: always;
+}
+
+.paging:last-child {
+    page-break-after: auto;
+}
+
+@media screen {
+    #printForm
+	{
+       display: none !important; 
+        -webkit-print-color-adjust: exact !important;
+        color : black;
+        font-family:  "宋体" !important; 
+        margin: 0px;
+        padding: 0px; 
+        margin:0 auto;      
+	}
+}

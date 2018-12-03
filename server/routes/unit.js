@@ -2,6 +2,7 @@ const express = require('express');
 const {
         queryUnitsByPinYin,
         queryUnitByNum,
+        queryUnitByDownNum,
         queryUnitParas,
         queryBankByName,
         saveUnit,
@@ -18,13 +19,20 @@ const {
         createChangeNameNum,
         saveUnitChange,
         searchUnitChange,
-        changeToExcel
+        changeToExcel,
+        checkError,
+        checkErrorToExcel,
+        changeIdCheck,
+        saveUnitChangeId,
+        unitsToWord
     } = require( "../schema/unit.js" );
 const router = express.Router();
 
 router.get( '/unitsabbr/:pinyin',  queryUnitsByPinYin);
 
 router.get( '/units/:num',  queryUnitByNum);
+
+router.get( '/units/down/:num',  queryUnitByDownNum);
 
 router.get( '/allowance/:num',  queryAllowanceByNum);
 
@@ -65,6 +73,11 @@ router.post(
     '/unitstoexcel',
     unitsToExcel
     );
+
+router.post(
+  '/unitstoword',
+  unitsToWord
+  );
 
 router.put(
     '/allowance',
@@ -114,5 +127,25 @@ router.get(
     '/changetoexcel/:start/:end',
     changeToExcel
     );
+
+router.post(
+    '/errorcheck',
+    checkError
+    );
+
+router.get(
+    '/error/excel/:date',
+    checkErrorToExcel
+    );
+
+router.get(
+    '/changeid/check/:num',
+    changeIdCheck
+    );
+
+router.post(
+    '/changeid',
+    saveUnitChangeId
+    );    
 
 module.exports = router;

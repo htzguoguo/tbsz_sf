@@ -5,9 +5,6 @@ const path = require( 'path' );
 const express = require( 'express' );
 
 
-
-
-
 module.exports = function (app) {
     /* GET home page. */
     const isDeveloping = process.env.NODE_ENV !== 'production';
@@ -32,16 +29,38 @@ module.exports = function (app) {
         app.use(middleware);
         app.use(webpackHotMiddleware(compiler));
 
-        console.log(path.join(__dirname, '../../build/index.html'));
+        
         app.get('/', function response(req, res) {
-            res.write(middleware.fileSystem.readFileSync(path.join(__dirname, '../../build/index.html')));
+            res.write(middleware.fileSystem.readFileSync(path.join('./', 'build', 'index.html')));
             res.end();
         });
     } else {
-        const staticPath = path.join( __dirname, '../../build' );
+
+
+
+        const staticPath = path.join( './' , 'build' );        
+        app.get('*.js.gz', function(req, res, next) {
+            //req.url = req.url + '.gz';
+            res.set('Content-Encoding', 'gzip');
+            res.set('Content-Type', 'text/javascript');
+            next();
+        });
+        app.get('*.css.gz', function(req, res, next) {
+            //req.url = req.url + '.gz';
+            res.set('Content-Encoding', 'gzip');
+            res.set('Content-Type', 'text/css');
+            next();
+        });
+
+        //app.use( express.static(path.join( './' , 'output', 'word' )));
+        
         app.use(express.static(staticPath));
+        //app.use(expressStaticGzip(staticPath));
+
+        
+
         app.get('/', function response(req, res) {
-            res.sendFile(path.join(__dirname, '../../build/index.html'));
+            res.sendFile(path.join('./', 'build', 'index.html'));
         });
     }
 };

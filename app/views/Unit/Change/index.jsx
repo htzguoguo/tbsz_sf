@@ -9,8 +9,8 @@ import {
     Col, Card , DatePicker,
     InputNumber, Icon, Radio } from 'antd';
  
-import moment from 'moment'; 
-import printJS from 'print-js';
+import moment from 'moment';
+
 import PHE from 'print-html-element';   
 const Option = Select.Option; 
 const FormItem = Form.Item;

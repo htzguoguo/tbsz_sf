@@ -35,7 +35,8 @@ config.node = {
 
 // Output files in the build/ folder
 config.output = {
-    path: path.join(__dirname, "../server/bin"),
+    // path: path.join(__dirname, "../server/bin"),
+    path: path.join(__dirname, ".."),
     filename: "[name].js",
 }
 

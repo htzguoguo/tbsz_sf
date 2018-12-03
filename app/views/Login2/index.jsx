@@ -60,7 +60,7 @@ const propTypes = {
                /*  message.success('Welcome ' + res.payload.data.name);*/
                  notification.success({
                      message: '提示',
-                     description: '欢迎登陆：' + res.payload.data.name,
+                     description: '欢迎登陆：' + res.payload.data.姓名,
                      duration: 3,
                  });
                  this.props.history.replace('/app/yght/list');

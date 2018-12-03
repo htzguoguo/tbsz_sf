@@ -2,10 +2,10 @@ import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import {
-    Table, Button, message, Icon,
-    notification, Popconfirm, Tooltip,
+    Table, Button, message,  
+    notification, Popconfirm,  
     Divider, Input, Row, Col, Radio,
-    Select, Card, Form, Alert 
+    Select,   Form, Alert 
 } from 'antd';
 import moment from 'moment';
 import api from '../../../api';
@@ -13,8 +13,7 @@ import {handleError} from "../../../utils/notification";
 import styles from './index.less';
 
 
-const Option = Select.Option;
-const Search = Input.Search;
+const Option = Select.Option; 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
@@ -61,10 +60,8 @@ class ContentLists extends Component {
             sorter : {},
             filters : {}
         };
+        const onEdit = this.onEdit.bind(this); 
         const onDelete = this.onDelete.bind(this);
-        
-        const onEdit = this.onEdit.bind(this);
-        this.onAlertClose = this.onAlertClose.bind(this);
         this.columns = [
             {
                 title: '编号',
@@ -79,28 +76,20 @@ class ContentLists extends Component {
                 sorter: (a, b) => a.户名.length - b.户名.length,
             },
             {
-                title: '上月表底',
-                dataIndex: '上月表底',
-                key: '上月表底',
-                sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
+                title: '年份',
+                dataIndex: '年',
+                key: '年',
+                sorter: (a, b) => parseFloat(a.年) - parseFloat(b.年)  
             },
             {
-                title: '本月表底',
-                dataIndex: '本月表底',
-                key: '本月表底',
-                sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底)  
+                title: '创建人',
+                dataIndex: '操作员',
+                key: '操作员',
             },
             {
-                title: '应收水费',
-                dataIndex: '应收水费',
-                key: '应收水费',
-                sorter: (a, b) => parseFloat(a.应收水费) - parseFloat(b.应收水费)  
-            },
-            {
-                title: '实收水费',
-                dataIndex: '实收水费',
-                key: '实收水费',
-                sorter: (a, b) => parseFloat(a.实收水费) - parseFloat(b.实收水费)  
+                title: '创建时间',
+                dataIndex: '操作时间',
+                key: '操作时间',               
             },
             {
                 title: '操作',
@@ -457,9 +446,10 @@ class ContentLists extends Component {
             </div>
         );
     }
-
-
 }
+
+
+
 let contentLists = Form.create({})(ContentLists);
 export default withRouter(contentLists)
 

@@ -4,9 +4,13 @@ const nzhcn = require("nzh/cn");
 const XlsxTemplate = require('xlsx-template');
 const fs = require("fs");
 const path = require("path");
+const moment = require('moment');
+const BigNumber = require('bignumber.js');
 const dateFormat = require('dateformat');
 const Helper = require( '../modules/http_helper' );
 const db = require('./tbszSqlConnection');
+const {sendSMS} = require('../modules/sms_helper');
+const {queryPersonAndNumber} = require('./unit');
 
 module.exports.queryWaterFee = queryWaterFee;
 
@@ -173,6 +177,23 @@ async function queryWaterFeesNum(req, res) {
     }
 }
 
+module.exports.queryWaterFeesYearlyByNum = queryWaterFeesYearlyByNum;
+async function queryWaterFeesYearlyByNum(req, res) {
+    let {num, year} = req.params;
+    try {
+        let sqlStat1 = `
+        select * from 水费基本表 where (年=:y) and (编号=:no) order by 月 desc
+        `;
+        let result = await db.query(
+            sqlStat1,
+            { replacements: {y : year, no : num }, type: db.QueryTypes.SELECT }
+        ); 
+        Helper.ResourceFound( res, result );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, { year, num } );
+    }
+}
+
 module.exports.queryFeeParas = paras;
 
 async function paras(req, res) {   
@@ -311,6 +332,16 @@ async function prepareWaterFees({year, month, commission, others, user}) {
         sqlUpdateFire,
         { replacements: {y : year, m : month }, type: db.QueryTypes.UPDATE }
     ); 
+    //更新水费单价
+    let sqlUpdatePrice = `
+    update 水费基本表 
+        set 单价=(SELECT B.单价 FROM 水费字典费用标准 B INNER JOIN 水费单位信息 A ON B.区号 = A.收费形式编号 Where A.编号=水费基本表.编号)
+        where (年=:y) and (月=:m)
+    `; 
+    await db.query(
+        sqlUpdatePrice,
+        { replacements: {y : year, m : month }, type: db.QueryTypes.UPDATE }
+    );
     //更改操作员和操作时间
     let sqlUpdateUserAndDate = `
     update 水费基本表 set 操作员=:user,操作时间=:dd
@@ -403,11 +434,7 @@ module.exports.waterFeeToExcel = toExcel;
 
 async function toExcel(req, res) {
     let {year, month, type} = req.params;
-    try {
-        // let wb = await waterFeeToExcel(year, month, type);
-        // var wbbuf = XLSX.write(wb, {
-        //     type: 'base64'
-        // });
+    try {        
         let wb = await waterFeeToExcel(year, month, type);
         res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']]);
         res.end( new Buffer(wb, 'base64') ); 
@@ -440,21 +467,29 @@ async function waterFeeToExcel(year, month, type) {
             { replacements: {y : year, m : month }, type: db.QueryTypes.SELECT }
         );
 
+        stat1.forEach(
+            (item, index) => {
+                item.水费合计 = `=S${index + 4}-M${index + 4}`
+            }
+        );
+        let len = stat1.length;
         stat1.push(
             {
                 编号 : '合计',
                 户名 : sum1[0].户 + '户',
                 装表地点 : '',
                 单价 : '',
+                排污费单价 : '',
                 超额水价 : '',
                 申请水量 : '',
+                水费合计 : `=SUM(R4:R${len + 3})`,
                 使用期限 : '',
                 剩余水量 : '',
                 ...sum1[0]
             }
         );
     }    
-    let data = fs.readFileSync(path.join(__dirname, 'assets', 'excel', '水费浏览.xlsx'));
+    let data = fs.readFileSync(path.join('./', 'assets', 'excel', '水费浏览.xlsx'));
     let template = new XlsxTemplate(data);
     // Replacements take place on first sheet
     let sheetNumber = 'Sheet1';
@@ -505,16 +540,24 @@ async function searchToExcelImp(obj) {
             from 水费报表查询
         `;
         let sum = await searchWaterFees(obj, sqlSum);
+        items.forEach(
+            (item, index) => {
+                item.水费合计 = `=U${index + 4}-O${index + 4}`
+            }
+        );
+        let len = items.length;
         items.push(
             {
                 编号 : '',
                 户名 : '',
                 装表地点 : '',
                 单价 : '',
+                排污费单价 : '',
                 年 : '合计',
                 月 : sum[0].户 + '户',
                 超额水价 : '',
                 申请水量 : '',
+                水费合计 : `=SUM(T4:T${len + 3})`,
                 使用期限 : '',
                 剩余水量 : '',
                 ...sum[0]
@@ -522,7 +565,7 @@ async function searchToExcelImp(obj) {
         );   
     }
     
-    let data = fs.readFileSync(path.join(__dirname, 'assets', 'excel', '水费查询.xlsx'));
+    let data = fs.readFileSync(path.join('./', 'assets', 'excel', '水费查询.xlsx'));
     //return buildExcel('Sheet2', data, values);
     let template = new XlsxTemplate(data);
     // Replacements take place on first sheet
@@ -538,25 +581,6 @@ async function searchToExcelImp(obj) {
     return template.generate({type: 'base64'});
 
 }
-
-// async function waterFeeToExcel(year, month, type) {
-//     let sqlStat1 = `
-//     Select * from 水费报表查询  where (年=:y) and (月=:m) Order by 编号
-//     `;
-//     let stat1 = await db.query(
-//         sqlStat1,
-//         { replacements: {y : year, m : month }, type: db.QueryTypes.SELECT }
-//     );
-//     const workbook  = XLSX.readFile(
-//         path.join( __dirname,`../assets/excel/charge.xls`),
-//         {cellStyles: true} );
-//     const first_sheet_name = workbook.SheetNames[0];    
-//     const worksheet = workbook.Sheets[first_sheet_name];
-//     worksheet['G2'] = {t: 's' /* type: string */, v: year /* value */};
-//     worksheet['I2'] = {t: 's' /* type: string */, v: month /* value */};
-//     worksheet['Q2'] = {t: 's' /* type: string */, v: dateFormat(new Date(), "yyyy-mm-dd") /* value */};     
-//     return workbook;
-// }
 
 module.exports.MoveWaterFeePosition = MoveWaterFeePosition;
 
@@ -611,7 +635,7 @@ async function calculateFee(obj) {
     let {
         编号, 年, 月, 本月表底, 上月表底,
         手续费, 其它, 减免水量, 减免单价, 
-        减排污费, 减其它
+        减排污费, 减其它, 老表水费
         } = obj;
     let FPlan, FOver, FPollute, FCharge,
         FMinusCharge, FMinusPollute, FTrueCharge ;    
@@ -622,6 +646,7 @@ async function calculateFee(obj) {
     let FMinusWater = parseFloat(减免水量);
     let FMinusStandard = parseFloat(减免单价);
     let FMinusOthers = parseFloat(减其它);
+    let FOldCharge =  parseFloat(老表水费);   
 
     let sqlfee = `
     SELECT 编号,用水量,手续费,其它,原申请水量,用水日期,使用期限,定额,单价,防火费,超计划,排污费单价,排污费超额,扣水单位编号 
@@ -695,7 +720,9 @@ async function calculateFee(obj) {
         );
         let tempSum = parseInt(result[0].sss);
         //定额 
-        FApplyWater = (FRation * 30);
+        //20181202定额调整为按照当月实际天数计算
+        //FApplyWater = (FRation * 30);
+        FApplyWater = (FRation * moment(`${年}-${月}`, "YYYY-MM").daysInMonth());
         //月用水量=月用水和-本月计算出的用水量+最新计算出的用水量
         FYearWater = tempSum - parseInt(currentFee.用水量) + IUse;
         //剩余水量
@@ -736,7 +763,9 @@ async function calculateFee(obj) {
     FMinusPollute = FMinusWater* FPollutePlan;
     //实收水费
     FTrueCharge = FCharge-FMinusCharge-FMinusPollute-FMinusOthers;
-
+    
+    //老表水费(20181025新增，对应于一个月份内更换水表的情况)
+    FTrueCharge = FTrueCharge + FOldCharge;
     result = {
         用水量 : IUse,
         计划水量 : FPlanWater,
@@ -755,6 +784,25 @@ async function calculateFee(obj) {
         实收水费 : parseFloat(FTrueCharge).toFixed(2)
     };
     return result;
+}
+
+module.exports.saveWaterFees =  saveWaterFees;
+
+async function saveWaterFees(req, res) {
+    let items = req.body || {};
+    try {
+        if(items && items.length > 0) {
+            for(let i = 0; i < items.length; i++) {
+                let item = items[i];
+                let calItem = await calculateFee(item);
+                item = Object.assign({}, item, calItem );
+                await saveWaterFee(item); 
+            }
+        }            
+        Helper.ResourceUpdated( res, {result : true, msg : 'ok'} );       
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, {result : false, msg : ex.message } );
+    }
 }
 
 module.exports.saveWaterFee =  save;
@@ -855,7 +903,9 @@ function convertLittle(money) {
     let stemp;
     let result = '';
     try {
-        stemp = (money * 100).toString().split('');
+        BigNumber.config({ DECIMAL_PLACES: 2 })
+        let bn = BigNumber(money);
+        stemp = bn.multipliedBy(100).toString().split('');
 
     }catch(err) {
         throw new Error('钱数不是合法的浮点数,请检查!');
@@ -885,6 +935,56 @@ async function deleteWaterFee(num, year, month) {
         { replacements: {no : num, y : year, m : month }, type: db.QueryTypes.SELECT }
     );
     return result;    
+}
+
+module.exports.CompletePayment =  CompletePayment;
+
+async function CompletePayment(req, res) {
+    let {num, year, month} = req.params;
+    try {
+        let result = await CompletePaymentImpt(num, year, month);
+        Helper.ResourceFound( res, [result] );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, { num, year, month } );
+    }
+}
+
+async function CompletePaymentImpt(num, year, month) {
+    let sqlUpdate = `
+    Update 水费基本表 set 欠费标志=:a2 where (编号=:num) and (年=:year) and (月=:month)
+    `;
+    let result = await db.query(
+        sqlUpdate,
+        { replacements: {num, year, month, a2 : '1'} ,  type: db.QueryTypes.UPDATE }
+    );
+    return result;
+}
+
+module.exports.sendOverUsageSMS = sendOverUsageSMS;
+
+async function sendOverUsageSMS(req, res) {
+    let obj = req.body || {};
+    try {         
+        let result = await sendOverUsageSMSImpt(obj);
+        Helper.ResourceFound( res, result );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, { obj} );
+    }
+}
+
+async function sendOverUsageSMSImpt(obj) {
+  let result = [];
+  let numbers = await queryPersonAndNumber([obj.编号]);
+  if(numbers && numbers.length > 0 && numbers[0].托收电话) {
+    let rrr = await sendSMS(
+      numbers[0].托收电话,
+        `贵企业用本月份水量已超计划, 超计划水量为[${Math.abs(obj.超额水量)}]。`
+        );
+    result.push({...obj, desc : rrr.data});    
+  }else {
+      result.push({...obj, desc : 'error:Missing recipient'});
+  }    
+  return result;
 }
 
 

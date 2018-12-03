@@ -4,12 +4,13 @@
 
 const Helper = require( '../modules/http_helper' );
 const express = require('express'),
-       router = express.Router();
-const menu = require('../data/menu');
+router = express.Router();
 
-router.get( '/', function ( req, res, next ) {
+
+router.get( '/:menu', function ( req, res, next ) {
     "use strict";
-    let id = Number(req.params.id);
+    let m = req.params.menu !== 'undefine' ? req.params.menu : 'operator';
+    const menu = require(`../data/${m}`);
     Helper.ResourceFound( res, menu );
 } );
 

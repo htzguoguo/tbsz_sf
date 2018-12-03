@@ -4,8 +4,11 @@
 
 var _ = require( 'underscore' ),
     Helper = require( './http_helper' ),
-    User = require( '../schema/user' ),
+    User = require( '../schema/userTBSZ' ),
     crispy = require( 'crispy-string' );
+
+
+const db = require('../schema/tbszSqlConnection');    
 
 // second ( 1 hour)
 var DEFAULT_EXPIRATION_TIME = 3600;
@@ -45,7 +48,7 @@ function expireToken( token ) {
     delete validTokens[ token ];
 }
 
-function authorize( data, req, res  ) {
+async function authorize( data, req, res  ) {
     var grantType = data.grant_type,
         username = data.username,
         password = data.password;
@@ -55,27 +58,65 @@ function authorize( data, req, res  ) {
     if ( !username || !password ) {
         return Helper.BadRequest( res, '用户名或者密码错误', { username :  username } );
     }
-    User.findAll({ where: {name : username} }).then(users => {
+    try {         
+        let sqlSelect = `
+        Select * from 人事操作权限 where 姓名=:username 
+        `;
+        let users = await db.query(sqlSelect, { replacements: {username}, type: db.QueryTypes.SELECT }
+        );
         if (users.length === 1) {
             let user = users[0];
-            user.checkPassword( password, function ( err, isMatch ) {
-                if ( isMatch ) {
-                    issueAuthorization( username, function ( token ) {
-                        Helper.ResourceFound( res, _.extend({
-                            status : 'online',
-                            desc : '0',
-                            user : user
-                        }, token) );
-                    } );
-                }else {
-                    Helper.ResourceNotFound( res , { username : username } , "密码错误");
-                }
-            } );
+            if ( user.密码 === password ) {
+                issueAuthorization( username, function ( token ) {
+                    Helper.ResourceFound( res, _.extend({
+                        status : 'online',
+                        desc : '0',
+                        user : user
+                    }, token) );
+                } );
+            }else {
+                Helper.ResourceNotFound( res , { username : username } , "密码错误");
+            }
         }else {
             Helper.ResourceNotFound( res , { username : username } , "用户名不存在");
         }
-    })
+    }catch(ex) {
+        Helper.ResourceNotFound( res , { username : username } , "用户名或者密码错误");
+    }
 }
+
+// function authorize( data, req, res  ) {
+//     var grantType = data.grant_type,
+//         username = data.username,
+//         password = data.password;
+//     if ( grantType !== 'password' ) {
+//         return Helper.BadRequest( res, '用户名或者密码错误', { username :  username } );
+//     }
+//     if ( !username || !password ) {
+//         return Helper.BadRequest( res, '用户名或者密码错误', { username :  username } );
+//     }
+//     User.findAll({ where: {姓名 : username} }).then(users => {
+//         console.log(users);
+//         if (users.length === 1) {
+//             let user = users[0];
+//             user.checkPassword( password, function ( err, isMatch ) {
+//                 if ( isMatch ) {
+//                     issueAuthorization( username, function ( token ) {
+//                         Helper.ResourceFound( res, _.extend({
+//                             status : 'online',
+//                             desc : '0',
+//                             user : user
+//                         }, token) );
+//                     } );
+//                 }else {
+//                     Helper.ResourceNotFound( res , { username : username } , "密码错误");
+//                 }
+//             } );
+//         }else {
+//             Helper.ResourceNotFound( res , { username : username } , "用户名不存在");
+//         }
+//     })
+// }
 
 function authenticate( token, callback ) {
     if ( _.has( validTokens, token ) ) {

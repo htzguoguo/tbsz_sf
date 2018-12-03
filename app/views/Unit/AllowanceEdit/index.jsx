@@ -9,10 +9,7 @@ import {
     Col, Radio, Alert, DatePicker,
     InputNumber, Icon } from 'antd';
 import moment from 'moment';
-const Option = Select.Option;
-const Search = Input.Search;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group; 
+const Option = Select.Option; 
 const FormItem = Form.Item;
 import api from '../../../api';
 import styles from './index.less';
@@ -238,7 +235,7 @@ class AllowanceEdit extends Component{
                     showIcon
                     />
                     <Divider dashed><h5>单位基本信息</h5></Divider> 
-                <Form id="allowanceEditForm" className={styles.searchParasForm} layout="horizontal" form={this.props.form}> 
+                    <Form id="allowanceEditForm" className={styles.searchParasForm} layout="horizontal" form={this.props.form}> 
                     <Row>                        
                         <Col span={8}>
                             <FormItem

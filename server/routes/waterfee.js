@@ -13,7 +13,10 @@ const {
         eraseZeroWaterFees,
         queryFeeParas,
         searchWaterFees,
-        searchToExcel
+        searchToExcel,
+        CompletePayment,
+        queryWaterFeesYearlyByNum,
+        sendOverUsageSMS
     } = require( "../schema/waterFee" );
 const router = express.Router();
 
@@ -37,6 +40,8 @@ router.get( '/feesstat/:year/:month/:type',  statisticsWaterFees);
 
 
 router.get( '/feesnum/:year/:month',  queryWaterFeesNum);
+
+router.get( '/feesyear/:num/:year',  queryWaterFeesYearlyByNum);
 
 router.get( '/feeparas',  queryFeeParas);
 
@@ -80,7 +85,15 @@ router.put(
     saveWaterFee
 );
 
+router.post(
+    '/payment/:num/:year/:month',
+    CompletePayment
+);
 
+router.post(
+  '/fees/sms',
+  sendOverUsageSMS
+);
 
 
 module.exports = router;

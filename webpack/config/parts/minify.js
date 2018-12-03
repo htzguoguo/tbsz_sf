@@ -9,9 +9,13 @@ module.exports = function () {
                 compress: {
                     warnings: false
                 },
+                minimize: true,
                 mangle : true,
                 comments : false
-            })
+            }),
+            new webpack.optimize.AggressiveMergingPlugin(),
+            new webpack.optimize.OccurrenceOrderPlugin(),
+            new webpack.optimize.DedupePlugin(),             
         ]
     };
 };

@@ -7,7 +7,9 @@ import route from '../route';
 import { HashRouter as Router } from 'react-router-dom';
 import { LocaleProvider } from 'antd';
 import CHS from 'antd/lib/locale-provider/zh_CN';
-
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
 export default class Root extends Component {
   render() {
     const { store } = this.props;

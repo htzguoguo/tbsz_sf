@@ -44,4 +44,8 @@ function initializeAuth() {
   setAuth( type, token );
 }
 
-export  {saveAuth, dropAuth};
+function getAuthString() {
+  return sessionStorage.getItem( 'token' );
+}
+
+export  {saveAuth, dropAuth, getAuthString};

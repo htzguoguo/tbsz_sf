@@ -7,16 +7,16 @@ const CacheControl = require( 'express-cache-control' );
 const cache = new CacheControl().middleware;
 const admin_oauth = require( './modules/oauth2-middleware' );
 
-const User = require('./schema/user');
+//const User = require('./schema/user');
 const defaultRoute = require( './routes/index' );
 const authrouter = require( './routes/auth' );
 const apirouter_v1 = require( './routes/api_v1' );
-
+const apirouter_v2 = require( './routes/api_v2' );
 
 const app = express();
-const port = process.env.PORT || 8180;
+const port = process.env.PORT || 8181;
 /*const staticPath = path.join( __dirname, 'build' );*/
-const adminUser = new User();
+//const adminUser = new User();
 
 
 app.use( bodyParser.json() );
@@ -33,8 +33,9 @@ app.use(session({
 defaultRoute(app);
 app.use( '/api/v1/auth',cache( 'minutes', 2 ), authrouter );
 app.use( '/api/v1',admin_oauth.authorizationRequired,  apirouter_v1 );
+app.use( '/api/v2', apirouter_v2 );
 
-
-adminUser.initAdminUser();
+//adminUser.initAdminUser();
 module.exports = app;
-app.listen( port );
+const server = app.listen( port );
+server.setTimeout(500000);
