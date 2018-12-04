@@ -27,21 +27,28 @@ module.exports = {
                             url: '/app/toll/take/0/0/0'
                         },
                         {
-                            key: 'sidebarsub112',
+                          key: 'sidebarsub112',
+                          name: '缴费确认',
+                          icon: 'user',
+                          matchurl : '/app/toll/payment',
+                          url: '/app/toll/payment',
+                        },
+                        {
+                            key: 'sidebarsub113',
                             name: '浏览月水费',
                             icon: 'user',
                             matchurl : '/app/toll/list',
                             url: '/app/toll/list'
                         },
                         {
-                            key: 'sidebarsub113',
+                            key: 'sidebarsub114',
                             name: '查询月水费',
                             icon: 'user',
                             matchurl : '/app/toll/search',
                             url: '/app/toll/search'
                         },
                         {
-                            key: 'sidebarsub114',
+                            key: 'sidebarsub115',
                             name: '自动创建月水费',
                             icon: 'user',
                             matchurl : '/app/toll/prepare',

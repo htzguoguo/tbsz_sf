@@ -2,6 +2,7 @@ import TakeToll from '../views/Toll/TakeToll';
 import ListToll from '../views/Toll/List';
 import PrepareToll from '../views/Toll/Prepare';
 import SearchToll from '../views/Toll/Search';
+import Payment from '../views/Toll/Payment';
 
 export const tollChildRoutes = [
     {
@@ -23,5 +24,10 @@ export const tollChildRoutes = [
         'path':'/app/toll/search',
         'component': SearchToll,
         'exactly': false
-    }
+    },
+    {
+      'path':'/app/toll/payment',
+      'component': Payment,
+      'exactly': false
+  }
 ];

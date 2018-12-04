@@ -11,6 +11,7 @@ const Helper = require( '../modules/http_helper' );
 const db = require('./tbszSqlConnection');
 const {sendSMS} = require('../modules/sms_helper');
 const {queryPersonAndNumber} = require('./unit');
+const {getPropertyFromArray} = require('../modules/object_helper');
 
 module.exports.queryWaterFee = queryWaterFee;
 
@@ -940,24 +941,29 @@ async function deleteWaterFee(num, year, month) {
 module.exports.CompletePayment =  CompletePayment;
 
 async function CompletePayment(req, res) {
-    let {num, year, month} = req.params;
+    let obj = req.body;
     try {
-        let result = await CompletePaymentImpt(num, year, month);
+        let result = await CompletePaymentImpt(obj);
         Helper.ResourceFound( res, [result] );
     }catch(ex) {
-        Helper.InternalServerError( res, ex, { num, year, month } );
+        Helper.InternalServerError( res, ex, obj );
     }
 }
 
-async function CompletePaymentImpt(num, year, month) {
-    let sqlUpdate = `
-    Update 水费基本表 set 欠费标志=:a2 where (编号=:num) and (年=:year) and (月=:month)
-    `;
-    let result = await db.query(
-        sqlUpdate,
-        { replacements: {num, year, month, a2 : '1'} ,  type: db.QueryTypes.UPDATE }
-    );
-    return result;
+async function CompletePaymentImpt(obj) {
+  let nums = getPropertyFromArray(obj, '编号')
+  let year = obj[0].年;
+  let month = obj[0].月;
+  let sqlUpdate = `
+  Update 水费基本表 set 欠费标志=:a2 where 
+    (编号 in (${nums.join(',')})) 
+    and (年=:year) and (月=:month)
+  `;
+  let result = await db.query(
+      sqlUpdate,
+      { replacements: { year, month, a2 : '1'} ,  type: db.QueryTypes.UPDATE }
+  );
+  return result;
 }
 
 module.exports.sendOverUsageSMS = sendOverUsageSMS;

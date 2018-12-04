@@ -86,7 +86,7 @@ router.put(
 );
 
 router.post(
-    '/payment/:num/:year/:month',
+    '/payment',
     CompletePayment
 );
 
