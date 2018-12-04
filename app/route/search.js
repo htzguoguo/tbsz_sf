@@ -3,6 +3,7 @@ import UnitSearch from '../views/Unit/Search';
 import StatToll from '../views/Stat/StatToll';
 import LackUnit from '../views/Stat/LackUnit';
 import ReminderList from '../views/Reminder/List';
+import UsageByUnit from '../views/Toll/UsageByUnit';
 
 export const searchChildRoutes = [
     {
@@ -29,5 +30,10 @@ export const searchChildRoutes = [
         'path':'/app/search/reminderlist',
         'component': ReminderList,
         'exactly': true
+    },
+    {
+      'path':'/app/search/usage/unit',
+      'component': UsageByUnit,
+      'exactly': true
     },
 ];

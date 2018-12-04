@@ -148,7 +148,14 @@ module.exports = {
                             url: '/app/search/toll'
                         },
                         {
-                            key: 'sidebarsub213',
+                          key: 'sidebarsub213',
+                          name: '单表查询',
+                          icon: 'user',
+                          matchurl : '/app/search/usage/unit',
+                          url: '/app/search/usage/unit',
+                      },
+                        {
+                            key: 'sidebarsub214',
                             name: '统计水费',
                             icon: 'user',
                             matchurl : '/app/search/stattoll',
