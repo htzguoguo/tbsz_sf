@@ -4,6 +4,7 @@ import StatToll from '../views/Stat/StatToll';
 import LackUnit from '../views/Stat/LackUnit';
 import ReminderList from '../views/Reminder/List';
 import UsageByUnit from '../views/Toll/UsageByUnit';
+import UsageByCompany from '../views/Toll/UsageByCompany';
 
 export const searchChildRoutes = [
     {
@@ -34,6 +35,11 @@ export const searchChildRoutes = [
     {
       'path':'/app/search/usage/unit',
       'component': UsageByUnit,
+      'exactly': true
+    },
+    {
+      'path':'/app/search/usage/company',
+      'component': UsageByCompany,
       'exactly': true
     },
 ];

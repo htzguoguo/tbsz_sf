@@ -4,6 +4,7 @@ import PrepareToll from '../views/Toll/Prepare';
 import SearchToll from '../views/Toll/Search';
 import Payment from '../views/Toll/Payment';
 
+
 export const tollChildRoutes = [
     {
         'path':'/app/toll/take/:num/:year/:month',

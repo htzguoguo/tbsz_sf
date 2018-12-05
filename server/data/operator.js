@@ -153,9 +153,16 @@ module.exports = {
                           icon: 'user',
                           matchurl : '/app/search/usage/unit',
                           url: '/app/search/usage/unit',
-                      },
+                        },
                         {
-                            key: 'sidebarsub214',
+                          key: 'sidebarsub214',
+                          name: '用水企业查询',
+                          icon: 'user',
+                          matchurl : '/app/search/usage/company',
+                          url: '/app/search/usage/company',
+                        },
+                        {
+                            key: 'sidebarsub215',
                             name: '统计水费',
                             icon: 'user',
                             matchurl : '/app/search/stattoll',

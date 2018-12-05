@@ -12,7 +12,9 @@ const db = require('./tbszSqlConnection');
 const {sendSMS} = require('../modules/sms_helper');
 const {queryPersonAndNumber} = require('./unit');
 const {getPropertyFromArray} = require('../modules/object_helper');
-
+const {plus} = require('../modules/math_helper');
+const {toExcel : toExc} = require('../modules/excel_helper');
+BigNumber.config({ DECIMAL_PLACES: 2 })
 module.exports.queryWaterFee = queryWaterFee;
 
 function queryWaterFee(num, year, month, res) {
@@ -992,6 +994,74 @@ async function sendOverUsageSMSImpt(obj) {
   }    
   return result;
 }
+
+module.exports.SearchFeesByCompany =  SearchFeesByCompany;
+
+async function SearchFeesByCompany(req, res) {
+    let obj = req.body;
+    try {
+        let result = await SearchFeesByCompanyImpt(obj);
+        Helper.ResourceFound( res, result );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, obj );
+    }
+}
+
+async function SearchFeesByCompanyImpt(obj) {
+  let items = await searchWaterFees(obj, 'Select * from 水费报表查询 ');
+  let dict = new Map();
+  items.forEach(
+      item => {
+          item.户名 = obj.户名.substring(1, obj.户名.length - 1);
+          item.上月表底 = '';
+          item.本月表底 = '';
+          let key = item.年 + item.月
+          if(dict.has(key)) {
+              let value = dict.get(key);
+              value.实际用水量 = plus(value.实际用水量 , item.实际用水量)
+              value.实际计划水费 = plus(value.实际计划水费 , item.实际计划水费)
+              value.超额水量 = plus(value.超额水量 , item.超额水量)
+              value.超额水费 = plus(value.超额水费 , item.超额水费)
+              value.防火费 = plus(value.防火费 , item.防火费)
+              value.手续费 = plus(value.手续费 , item.手续费)
+              value.减水费 = plus(value.减水费 , item.减水费)
+              value.实收水费 = plus(value.实收水费 , item.实收水费)
+              value.排污费 = plus(value.排污费 , item.排污费)
+              value.其它 = plus(value.其它 , item.其它)
+          }else {
+              dict.set(key, item)
+          }
+      }
+  ); 
+  let result = [];   
+  for(let item of dict){
+      result.push(item[1]);
+  }   
+  return result;
+}
+
+module.exports.searchByCompanyToExcel = searchByCompanyToExcel;
+
+async function searchByCompanyToExcel(req, res) {
+    let obj = req.body || {};
+    try {        
+        let wb = await searchByCompanyToExcelImp(obj);
+        res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']]);
+        res.end( new Buffer(wb, 'base64') ); 
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, {  } );
+    }
+}
+
+async function searchByCompanyToExcelImp(obj) {
+    let items = await SearchFeesByCompanyImpt(obj, 'Select * from 水费报表查询 ');
+    let values = {        
+        date : dateFormat(new Date(), "yyyy-mm-dd"),
+        items
+    };
+    return toExc('chargeyearcorp', 'Sheet2', values);
+}
+
 
 
 

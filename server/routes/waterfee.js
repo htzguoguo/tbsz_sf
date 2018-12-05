@@ -16,7 +16,9 @@ const {
         searchToExcel,
         CompletePayment,
         queryWaterFeesYearlyByNum,
-        sendOverUsageSMS
+        sendOverUsageSMS,
+        SearchFeesByCompany,
+        searchByCompanyToExcel
     } = require( "../schema/waterFee" );
 const router = express.Router();
 
@@ -72,6 +74,14 @@ router.post(
     '/feesearch',
     searchWaterFees
 );
+
+router.post(
+  '/feesbycompany',
+  SearchFeesByCompany
+);
+
+router.post( '/feesbycompanytoexcel',  searchByCompanyToExcel);
+
 
 router.post( '/feesearchtoexcel',  searchToExcel);
 

@@ -44,37 +44,41 @@ class UsageByUnit extends Component {
             {
                 title: '编号',
                 dataIndex: '编号',
-                key: '编号',                
                 sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
             },
             {
                 title: '户名',
                 dataIndex: '户名',
-                key: '户名',
                 sorter: (a, b) => a.户名.length - b.户名.length,
+            },
+            {
+              title: '年份',
+              dataIndex: '年',
+              sorter: (a, b) => parseInt(a.年) - parseInt(b.年),
+            },
+            {
+              title: '月份',
+              dataIndex: '月',
+              sorter: (a, b) => parseInt(a.月) - parseInt(b.月),
             },
             {
                 title: '上月表底',
                 dataIndex: '上月表底',
-                key: '上月表底',
                 sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
             },
             {
                 title: '本月表底',
                 dataIndex: '本月表底',
-                key: '本月表底',
                 sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底)  
             },
             {
                 title: '应收水费',
                 dataIndex: '应收水费',
-                key: '应收水费',
                 sorter: (a, b) => parseFloat(a.应收水费) - parseFloat(b.应收水费)  
             },
             {
                 title: '实收水费',
                 dataIndex: '实收水费',
-                key: '实收水费',
                 sorter: (a, b) => parseFloat(a.实收水费) - parseFloat(b.实收水费)  
             },
         ];

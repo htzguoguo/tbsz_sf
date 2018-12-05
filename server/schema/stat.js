@@ -864,9 +864,13 @@ async function ShuiSunToExcelImpt(date, userName) {
     let I = 1;
     items.forEach(
         item => {
-            FF[I]    = (parseFloat(item['购水量1']) + parseFloat(item['购水量2']))/10000;
-            FF[I+12] = parseFloat(item['供水量'])/10000;
-            I += 1;
+            let m = parseInt(item.月);
+            FF[m]    = (parseFloat(item['购水量1']) + parseFloat(item['购水量2']))/10000;
+            FF[m+12] = parseFloat(item['供水量'])/10000;
+
+            //FF[I]    = (parseFloat(item['购水量1']) + parseFloat(item['购水量2']))/10000;
+            //FF[I+12] = parseFloat(item['供水量'])/10000;
+            //I += 1;
         }
     );
     values['B4']   = parseFloat(FF[1]); //
