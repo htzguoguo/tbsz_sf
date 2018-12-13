@@ -48,4 +48,9 @@ export const unitChildRoutes = [
         'component': UnitSummary,
         'exactly': false
     },
+    {
+      'path':'/app/unit/changeid',
+      'component': ChangeID,
+      'exactly': false
+  },
 ];

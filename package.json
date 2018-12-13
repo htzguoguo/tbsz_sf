@@ -130,7 +130,6 @@
     "xlsx-template": "^0.3.1"
   },
   "dependencies": {
-    "@antv/g2": "^3.4.5",
     "antd": "^3.8.2",
     "axios": "^0.17.1",
     "print-html-element": "^0.5.1",
