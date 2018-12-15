@@ -778,6 +778,11 @@ async function calculateFee(obj) {
     FMinusCharge = FMinusWater* FMinusStandard;
     //减免排污费
     FMinusPollute = FMinusWater* FPollutePlan;
+    //20181215新增规则： 编号为2209，自动扣减排污费用、减免水量
+    if(编号 === '2209') {
+      FMinusPollute = FPollute;
+      FMinusWater = IUse;
+    }
     //实收水费
     FTrueCharge = FCharge-FMinusCharge-FMinusPollute-FMinusOthers;
     
@@ -799,7 +804,8 @@ async function calculateFee(obj) {
         减免水费 : FMinusCharge,
         减排污费 : FMinusPollute,
         实收水费 : parseFloat(FTrueCharge).toFixed(2),
-        老表水费 : FOldCharge
+        老表水费 : FOldCharge,
+        减免水量 : FMinusWater
     };
     return result;
 }
