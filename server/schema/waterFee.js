@@ -12,7 +12,7 @@ const db = require('./tbszSqlConnection');
 const {sendSMS} = require('../modules/sms_helper');
 const {queryPersonAndNumber} = require('./unit');
 const {getPropertyFromArray} = require('../modules/object_helper');
-const {plus} = require('../modules/math_helper');
+const {plus, minus} = require('../modules/math_helper');
 const {toExcel : toExc} = require('../modules/excel_helper');
 BigNumber.config({ DECIMAL_PLACES: 2 })
 module.exports.queryWaterFee = queryWaterFee;
@@ -22,10 +22,11 @@ function queryWaterFee(num, year, month, res) {
     SELECT A.编号, A.户名, A.区号, F.单价, D.单位性质编号, D.单位性质, E.抄表形式编号,E.抄表形式,F.排污费单价 FROM 水费单位信息 A RIGHT OUTER JOIN 水费字典单位性质 D ON A.单位性质编号 = D.单位性质编号 RIGHT OUTER JOIN 
     水费字典抄表形式 E ON A.抄表形式编号 = E.抄表形式编号 RIGHT OUTER JOIN 水费字典费用标准 F ON A.区号 = F.区号 where A.编号= :no
     `;
+    //20181214 增加“老表水费”字段
     let sqlFee = `
     SELECT 年,月,上月表底,本月表底,用水量,计划水量,计划水费,超额水量,超额水费,防火费,手续费
     ,实收水费,排污费,其它,申请水量,年用水量,剩余水量,减免水量,减免单价,减免水费,减排污费
-    ,减其它,应收水费, 欠费标志 from 水费基本表 where (编号=:no) and (年=:y) and (月=:m)
+    ,减其它,应收水费, 欠费标志, 老表水费 from 水费基本表 where (编号=:no) and (年=:y) and (月=:m)
     `;     
     Promise.all([
         db.query(
@@ -298,9 +299,16 @@ async function prepareWaterFees({year, month, commission, others, user}) {
     );
     //根据上月表底数生成本月表底数
     //从上月数生成本月数
+    //20181215调整欠费标志默认值，从现有已缴费状态调整为欠费状态
     let sqlInsert = `
-        Insert Into 水费基本表 (年,月,编号,户名,上月表底,本月表底,用水量,计划水量,计划水费,超额水量,超额水费,防火费,手续费,实收水费,排污费,其它,欠费标志,大写,操作员,操作时间,申请水量,年用水量,剩余水量) 
-            select :year, :month,编号,户名,本月表底,本月表底,0,0,0,0,0,0,手续费,0,0,:others,'1','','','',申请水量,0,0 from 水费基本表      
+        Insert Into 水费基本表 (年,月,编号,户名,上月表底,本月表底,用水量,计划水量, 
+          计划水费,超额水量,超额水费,防火费,手续费,实收水费,排污费,其它, 
+          欠费标志,大写,操作员,操作时间,申请水量,年用水量,剩余水量, 
+          减免水量,减免单价, 减免水费, 减排污费, 减其它)  
+            select :year, :month,编号,户名,本月表底,本月表底,0,0,0,0,0,0, 
+            手续费,0,0,:others,'2','','','',申请水量,0,0, 
+            0, 0, 0, 0, 0 
+            from 水费基本表      
             where (年=:y) and (月=:m)
         `;
     await db.query(
@@ -308,9 +316,14 @@ async function prepareWaterFees({year, month, commission, others, user}) {
         { replacements: {y : TempYear, m : TempMonth, year, month,  others }, type: db.QueryTypes.INSERT }
     );
     //从单位信息表中查找没有的信息
+    //20181215调整欠费标志默认值，从现有已缴费状态调整为欠费状态
     let sqlCheckNotExist = `
-    Insert Into 水费基本表 (年,月,编号,户名,上月表底,本月表底,用水量,计划水量,计划水费,超额水量,超额水费,防火费,手续费,实收水费,排污费,其它,大写,操作员,操作时间,申请水量,年用水量,剩余水量,欠费标志)
-        select :y, :m, 编号,户名,0,0,0,0,0,0,0,0, :commission, 0,0,0,'','','',申请水量,0,0, '1' from 水费单位信息
+    Insert Into 水费基本表 (年,月,编号,户名,上月表底,本月表底,用水量,计划水量,计划水费,超额水量,超额水费,防火费,
+      手续费,实收水费,排污费,其它,大写,操作员,操作时间,申请水量,年用水量,
+      剩余水量,欠费标志, 减免水量,减免单价, 减免水费, 减排污费, 减其它)
+        select :y, :m, 编号,户名,0,0,0,0,0,0,0,0, :commission, 
+        0,0,0,'','','',申请水量,0,0, '2', 0, 0, 0, 0, 0  
+        from 水费单位信息
         Where 编号 not in ( Select 编号 from 水费基本表 where (年=:y) and (月=:m))  and 节门状态='开'
         `;
     await db.query(
@@ -640,6 +653,7 @@ async function calculateFee(obj) {
         手续费, 其它, 减免水量, 减免单价, 
         减排污费, 减其它, 老表水费
         } = obj;
+    老表水费 = isFinite(老表水费) ? 老表水费 : 0;    
     let FPlan, FOver, FPollute, FCharge,
         FMinusCharge, FMinusPollute, FTrueCharge ;    
     let FRemainWater = 0; //剩余水量 
@@ -784,7 +798,8 @@ async function calculateFee(obj) {
         申请水量 : FApplyWater === 0 ? FRation*30 : FApplyWater,
         减免水费 : FMinusCharge,
         减排污费 : FMinusPollute,
-        实收水费 : parseFloat(FTrueCharge).toFixed(2)
+        实收水费 : parseFloat(FTrueCharge).toFixed(2),
+        老表水费 : FOldCharge
     };
     return result;
 }
@@ -797,9 +812,30 @@ async function saveWaterFees(req, res) {
         if(items && items.length > 0) {
             for(let i = 0; i < items.length; i++) {
                 let item = items[i];
-                let calItem = await calculateFee(item);
-                item = Object.assign({}, item, calItem );
-                await saveWaterFee(item); 
+                //20181214增加
+                //抄表器上报数据如果包含“老表上月表底”和“老表本月表底”，
+                //先把老表量加到新表数据里，
+                //然后计算水费
+                //再计算新表的水费
+                //总水费减去新表水费为老表水费
+                let {老表上月表底, 老表本月表底} = item;
+                if(老表上月表底 && 老表本月表底 && 
+                  isFinite(老表上月表底) && isFinite(老表本月表底) &&
+                  parseInt(老表本月表底) > parseInt(老表上月表底)) {
+                    let tempObj = Object.assign({}, item);
+                    tempObj.本月表底 = parseInt(tempObj.本月表底) +  parseInt(老表本月表底) - parseInt(老表上月表底);
+                    let calAll = await calculateFee(tempObj);
+                    let calNew = await calculateFee(item);
+                    calNew.老表水费 = minus(calAll.实收水费 , calNew.实收水费);
+                    calNew.实收水费 = calAll.实收水费;
+                    item = Object.assign({}, item, calNew );
+                    await saveWaterFee(item);
+                } else {
+                  let calItem = await calculateFee(item);
+                  calItem.老表水费 = 0;
+                  item = Object.assign({}, item, calItem );
+                  await saveWaterFee(item);
+                }
             }
         }            
         Helper.ResourceUpdated( res, {result : true, msg : 'ok'} );       
@@ -831,7 +867,8 @@ async function saveWaterFee(obj) {
         计划水量, 计划水费, 超额水量, 超额水费, 防火费,
         手续费, 实收水费, 排污费, 其它, 欠费标志,
         操作员, 申请水量, 年用水量, 剩余水量, 减免水量,
-        减免单价, 减免水费,  减其它, 减排污费, 应收水费
+        减免单价, 减免水费,  减其它, 减排污费, 应收水费,
+        老表水费
         } = obj;
     let sqlfee = `
     select 编号 from 水费基本表 where (编号=:no) and (年=:y) and (月=:m)           
@@ -870,6 +907,7 @@ async function saveWaterFee(obj) {
         a28 : parseFloat(减其它).toFixed(2),
         a29 : parseFloat(应收水费).toFixed(2),        
         a30 : parseFloat(减排污费).toFixed(2),
+        a31 : isFinite(老表水费) ? 老表水费 : 0
     };     
     let result = await db.query(
         sqlfee,
@@ -880,6 +918,7 @@ async function saveWaterFee(obj) {
         let sqlUpdate = `
         update 水费基本表 set  户名=:a4,上月表底=:a5,本月表底=:a6,用水量=:a7,计划水量=:a8,计划水费=:a9,超额水量=:a10,超额水费=:a11,防火费=:a12,手续费=:a13,实收水费=:a14,排污费=:a15,其它=:a16, 
         欠费标志=:a17,大写=:a18,小写=:a19,操作员=:a20,操作时间=:a21,申请水量=:a22,年用水量=:a23,剩余水量=:a24,减免水量=:a25,减免单价=:a26,减免水费=:a27,减其它=:a28,应收水费=:a29,减排污费=:a30
+        ,老表水费=:a31
             where (年=:a1) and (月=:a2) and (编号 =:a3)
         `;
         await db.query(
