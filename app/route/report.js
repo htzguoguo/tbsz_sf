@@ -1,5 +1,6 @@
 import Commission from '../views/Report/Commission';
 import Detail from '../views/Report/Detail';
+import Pollution from '../views/Report/Pollution';
 import ChargeMonth from '../views/Report/ChargeMonth';
 import ChargeYear from '../views/Report/ChargeYear';
 import Allowance from './../views/Report/Allowance';
@@ -14,6 +15,11 @@ export const reportChildRoutes = [
         'path':'/app/report/detail',
         'component': Detail,
         'exactly': true
+    },  
+    {
+      'path':'/app/report/pollution',
+      'component': Pollution,
+      'exactly': true
     },  
     {
         'path':'/app/report/chargemonth',

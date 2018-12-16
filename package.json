@@ -95,7 +95,6 @@
     "mocha": "^4.0.1",
     "node-uuid": "^1.4.8",
     "npm-install-webpack-plugin": "^4.0.5",
-    "nzh": "^1.0.3",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "phantomjs-polyfill": "0.0.2",
     "phantomjs-prebuilt": "^2.1.16",
@@ -132,6 +131,7 @@
   "dependencies": {
     "antd": "^3.8.2",
     "axios": "^0.17.1",
+    "nzh": "^1.0.3",
     "print-html-element": "^0.5.1",
     "print-js": "^1.0.47",
     "prop-types": "^15.6.2",

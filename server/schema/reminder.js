@@ -45,9 +45,9 @@ async function queryReminderImpt(ss, ee) {
                 value.年2 = parseInt(value.年1) < parseInt(item.年) ? item.年 : value.年1;
                 value.月2 = parseInt(value.年1) <= parseInt(item.年) 
                 && parseInt(value.月1) <= parseInt(item.月) ? item.月 : value.月1;
-                value.实收水费 += item.实收水费;
-                value.滞纳金 += pen;
-                value.合计 += addBy(item.实收水费, pen);
+                value.实收水费 = addBy(item.实收水费, value.实收水费);
+                value.滞纳金 = addBy(pen, value.滞纳金);
+                value.合计 = addBy(value.合计, addBy(item.实收水费, pen));
                 value.月数 += 1
             }else {
                 let pen = calPenalty(cur, item);
@@ -100,40 +100,6 @@ function calCompoundInterest(investment, rate, days) {
     }
     return futureValue;
 }
-
-// async function queryReminderImpt(ss, ee) {
-    //     let items, item;
-    //     let values = {
-    //         date : dateFormat(new Date(), "yyyy-mm-dd"),
-    //     };
-
-    //     // SELECT     编号, 户名, count(*), projIDs = replace
-    //     //                       ((SELECT 年+月 AS [data()]
-    //     //                           FROM  dbo.水费基本表
-    //     //                           WHERE  编号 = a.编号 and 户名 = a.户名 and 年+月 >= '199810' and 年+月 <= '201810' and 欠费标志 = '2'
-    //     //                           ORDER BY 年+月 FOR xml path('')), ' ', ';')
-    //     // FROM         dbo.水费基本表 a
-    //     // WHERE     年+月 >= '199810' and 年+月 <= '201810' and 欠费标志 = '2'  
-    //     // group by 编号, 户名 
-
-    //     let sqlSelect = `
-    //     select 编号, 户名, count(*) as 月数,
-    //         月份 = replace
-    //         ((SELECT 年+月 AS [data()]
-    //             FROM  dbo.水费基本表
-    //             WHERE  编号 = a.编号 and 户名 = a.户名 and 年+月 >=:date1 and 年+月 <=:date2 and 欠费标志 = '2'
-    //             ORDER BY 年+月 FOR xml path('')), ' ', ';')
-    //         ,sum(实收水费) as 合计
-    //         from dbo.水费基本表 a
-    //         where (年+月>=:date1) and (年+月<=:date2) and 欠费标志 = '2'
-    //         group by 编号, 户名 
-    //     `;
-    //     items = await db.query(
-    //         sqlSelect,
-    //         { replacements: {date1 : ss, date2 : ee}, type: db.QueryTypes.SELECT }
-    //     );
-    //     return items;
-// }
 
 module.exports.sendReminderSMS = sendReminderSMS;
 
