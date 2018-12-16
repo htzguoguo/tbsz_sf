@@ -10,7 +10,8 @@ import {
 import moment from 'moment';
 import api from '../../../api';
 import {handleError} from "../../../utils/notification";
-import styles from './index.less';
+import {feeColumns} from '../../../components/Table';
+import './index.less';
 
 
 const Option = Select.Option; 
@@ -63,54 +64,179 @@ class ContentLists extends Component {
         const onEdit = this.onEdit.bind(this); 
         const onDelete = this.onDelete.bind(this);
         this.columns = [
-            {
-                title: '编号',
-                dataIndex: '编号',
-                key: '编号',                
-                sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+          ...feeColumns,
+          {
+            title: '操作',
+            dataIndex: '编号',
+            key : '编号',
+            fixed: 'right',
+            width: 150,
+            render:function(text, record, index){
+                return (
+                    <span>                           
+                        <a onClick={onEdit.bind(this,text, record, index)}>单录  </a>
+                        <Divider type="vertical" />
+                        <Popconfirm title={`删除之后无法恢复,户名:${record.户名} 确认要删除吗?`} onConfirm={onDelete.bind(this,text, record, index)} onCancel={cancel}>
+                            <a >删除</a>
+                        </Popconfirm>
+                    </span>
+                )
             },
-            {
-                title: '户名',
-                dataIndex: '户名',
-                key: '户名',
-                sorter: (a, b) => a.户名.length - b.户名.length,
-            },
-            {
-                title: '年份',
-                dataIndex: '年',
-                key: '年',
-                sorter: (a, b) => parseFloat(a.年) - parseFloat(b.年)  
-            },
-            {
-                title: '创建人',
-                dataIndex: '操作员',
-                key: '操作员',
-            },
-            {
-                title: '创建时间',
-                dataIndex: '操作时间',
-                key: '操作时间',               
-            },
-            {
-                title: '操作',
-                dataIndex: '编号',
-                key : '编号',
-                render:function(text, record, index){
-                    return (
-                        <span>                           
-                            <a onClick={onEdit.bind(this,text, record, index)}>单录  </a>
-                            <Divider type="vertical" />
-                            <Popconfirm title={`删除之后无法恢复,户名:${record.户名} 确认要删除吗?`} onConfirm={onDelete.bind(this,text, record, index)} onCancel={cancel}>
-                                <a >删除</a>
-                            </Popconfirm>
-                        </span>
-                    )
-                } ,
-                width: '15%'
-            }
-
-
+          }
         ];
+        // this.columns = [
+        //     {
+        //         title: '编号',
+        //         dataIndex: '编号',
+        //         key: '编号', 
+        //         width: 90,
+        //         fixed: 'left',               
+        //         sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+        //     },
+        //     {
+        //         title: '户名',
+        //         dataIndex: '户名',
+        //         width: 300,
+        //         sorter: (a, b) => a.户名.length - b.户名.length,
+        //     },
+        //     {
+        //       title: '用水地点',
+        //       dataIndex: '装表地点',
+        //       width: 150,
+        //     },
+        //     {
+        //       title: '上月表底',
+        //       dataIndex: '上月表底',
+        //       width: 120,
+        //       sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
+        //     },
+        //     {
+        //       title: '本月表底',
+        //       dataIndex: '本月表底',
+        //       width: 120,
+        //       className: 'special-field',
+        //       sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底),
+        //     }, 
+        //     {
+        //       title: '用水量',
+        //       dataIndex: '用水量',
+        //       width: 120,
+        //       sorter: (a, b) => parseFloat(a.用水量) - parseFloat(b.用水量)  
+        //     },
+        //     {
+        //       title: '计划水量',
+        //       dataIndex: '计划水量',
+        //       width: 120,
+        //       sorter: (a, b) => parseFloat(a.计划水量) - parseFloat(b.计划水量)  
+        //     },
+        //     {
+        //       title: '单价',
+        //       dataIndex: '单价',
+        //       width: 120,
+        //     }, 
+        //     {
+        //         title: '计划水费',
+        //         dataIndex: '计划水费',
+        //         width: 120,
+        //         sorter: (a, b) => parseFloat(a.计划水费) - parseFloat(b.计划水费)  
+        //     },
+        //     {
+        //       title: '超额水量',
+        //       dataIndex: '超额水量',
+        //       width: 120,
+        //       sorter: (a, b) => parseFloat(a.超额水量) - parseFloat(b.超额水量)  
+        //     },
+        //     {
+        //       title: '超计划',
+        //       dataIndex: '超计划',
+        //       width: 120,
+        //     },
+        //     {
+        //       title: '超额水费',
+        //       dataIndex: '超额水费',
+        //       width: 120,
+        //       sorter: (a, b) => parseFloat(a.超额水费) - parseFloat(b.超额水费)  
+        //     },
+        //     {
+        //       title: '防火费',
+        //       dataIndex: '防火费',
+        //       width: 120,
+        //     },
+        //     {
+        //       title: '手续费',
+        //       dataIndex: '手续费',
+        //       width: 120,
+        //     },
+        //     {
+        //       title: '排污费',
+        //       dataIndex: '排污费',
+        //       width: 120,
+        //       className: 'special-field',
+        //     },
+        //     {
+        //       title: '其它',
+        //       dataIndex: '其它',
+        //       width: 120,
+        //     },
+        //     {
+        //         title: '应收水费',
+        //         dataIndex: '应收水费', 
+        //         width: 120,              
+        //     },
+        //     {
+        //         title: '减免水量',
+        //         dataIndex: '减免水量',
+        //         width: 120,
+        //         className: 'special-field',
+        //     },
+        //     {
+        //       title: '减免单价',
+        //       dataIndex: '减免单价',
+        //       width: 120,
+        //       className: 'special-field',
+        //     },
+        //     {
+        //       title: '减免水费',
+        //       dataIndex: '减免水费',
+        //       width: 120,
+        //     }, 
+        //     {
+        //       title: '减排污费',
+        //       dataIndex: '减排污费',
+        //       width: 120,
+        //     },
+        //     {
+        //       title: '减其它',
+        //       dataIndex: '减其它',
+        //       width: 120,
+        //       className: 'special-field',
+        //     }, 
+        //     {
+        //       title: '实收水费',
+        //       dataIndex: '实收水费',
+        //       width: 120,
+        //     },
+        //     {
+        //         title: '操作',
+        //         dataIndex: '编号',
+        //         key : '编号',
+        //         fixed: 'right',
+        //         width: 150,
+        //         render:function(text, record, index){
+        //             return (
+        //                 <span>                           
+        //                     <a onClick={onEdit.bind(this,text, record, index)}>单录  </a>
+        //                     <Divider type="vertical" />
+        //                     <Popconfirm title={`删除之后无法恢复,户名:${record.户名} 确认要删除吗?`} onConfirm={onDelete.bind(this,text, record, index)} onCancel={cancel}>
+        //                         <a >删除</a>
+        //                     </Popconfirm>
+        //                 </span>
+        //             )
+        //         } ,
+        //     }
+
+
+        // ];
         this.radioFilter = '';
         this.searchFilter = '';
     }
@@ -435,13 +561,16 @@ class ContentLists extends Component {
                 {/* { showStat ? this.showStatistics() : null } */}
                 {/* {this.showStatistics()} */}
                 <Divider></Divider>
-                <Table columns={this.columns}                     
-                    rowKey={record => parseInt(record.编号)}
-                    dataSource={this.state.data}
-                    pagination={this.state.pagination}
-                    loading={this.state.loading}
-                    bordered
-                    footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
+                <Table 
+                  columns={this.columns}                     
+                  rowKey={record => parseInt(record.编号)}
+                  dataSource={this.state.data}
+                  // pagination={this.state.pagination}
+                  pagination={false}
+                  loading={this.state.loading}
+                  scroll={{ x: 2600,  y: 600  }}
+                  bordered
+                  footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
                 />
             </div>
         );

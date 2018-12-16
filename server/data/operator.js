@@ -20,6 +20,13 @@ module.exports = {
                     icon: 'user',
                     child : [
                         {
+                          key: 'sidebarsub115',
+                          name: '自动创建月水费',
+                          icon: 'user',
+                          matchurl : '/app/toll/prepare',
+                          url: '/app/toll/prepare'
+                        },  
+                        {
                             key: 'sidebarsub111',
                             name: '录入月水费',
                             icon: 'user',
@@ -46,14 +53,7 @@ module.exports = {
                             icon: 'user',
                             matchurl : '/app/toll/search',
                             url: '/app/toll/search'
-                        },
-                        {
-                            key: 'sidebarsub115',
-                            name: '自动创建月水费',
-                            icon: 'user',
-                            matchurl : '/app/toll/prepare',
-                            url: '/app/toll/prepare'
-                        },                       
+                        },                  
                     ]
                 },
                 {
@@ -163,7 +163,7 @@ module.exports = {
                         },
                         {
                             key: 'sidebarsub215',
-                            name: '统计水费',
+                            name: '统计购水量',
                             icon: 'user',
                             matchurl : '/app/search/stattoll',
                             url: '/app/search/stattoll'

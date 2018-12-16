@@ -12,7 +12,7 @@ import moment from 'moment';
 import api from '../../../api';
 import {handleError} from "../../../utils/notification";
 import styles from './index.less';
-
+import {unitColumns} from '../../../components/Table';
 
 const { MonthPicker } = DatePicker;
 const Option = Select.Option; 
@@ -50,60 +50,61 @@ class SearchUnits extends Component {
             pagination : {},
             sorter : {},
             filters : {}
-        };    
-        this.columns = [
-            {
-                title: '编号',
-                dataIndex: '编号',
-                key: '编号',                
-                sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
-            },
-            {
-                title: '户名',
-                dataIndex: '户名',
-                key: '户名',
-                sorter: (a, b) => a.户名.length - b.户名.length,
-            },
-            {
-                title: '开户行行名',
-                dataIndex: '开户行行名',
-                key: '开户行行名',
-                sorter: (a, b) => a.户名.length - b.户名.length, 
-            },
-            {
-                title: '账号',
-                dataIndex: '账号',
-                key: '账号',                
-            },
-            {
-                title: '联系人',
-                dataIndex: '联系人',
-                key: '联系人',                
-            },
-            {
-                title: '电话',
-                dataIndex: '实收水费',
-                key: '实收水费',                
-            },
-            {
-                title: '用水日期',
-                dataIndex: '用水日期',
-                key: '用水日期',
-                sorter: (a, b) => parseFloat(a.用水日期) - parseFloat(b.用水日期)  
-            },
-            {
-                title: '使用期限',
-                dataIndex: '使用期限',
-                key: '使用期限',
-                sorter: (a, b) => parseFloat(a.使用期限) - parseFloat(b.使用期限)  
-            },
-            {
-                title: '装表日期',
-                dataIndex: '装表日期',
-                key: '装表日期',
-                sorter: (a, b) => parseFloat(a.装表日期) - parseFloat(b.装表日期)  
-            }            
-        ];
+        };  
+        this.columns = unitColumns;  
+        // this.columns = [
+        //     {
+        //         title: '编号',
+        //         dataIndex: '编号',
+        //         key: '编号',                
+        //         sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+        //     },
+        //     {
+        //         title: '户名',
+        //         dataIndex: '户名',
+        //         key: '户名',
+        //         sorter: (a, b) => a.户名.length - b.户名.length,
+        //     },
+        //     {
+        //         title: '开户行行名',
+        //         dataIndex: '开户行行名',
+        //         key: '开户行行名',
+        //         sorter: (a, b) => a.户名.length - b.户名.length, 
+        //     },
+        //     {
+        //         title: '账号',
+        //         dataIndex: '账号',
+        //         key: '账号',                
+        //     },
+        //     {
+        //         title: '联系人',
+        //         dataIndex: '联系人',
+        //         key: '联系人',                
+        //     },
+        //     {
+        //         title: '电话',
+        //         dataIndex: '实收水费',
+        //         key: '实收水费',                
+        //     },
+        //     {
+        //         title: '用水日期',
+        //         dataIndex: '用水日期',
+        //         key: '用水日期',
+        //         sorter: (a, b) => parseFloat(a.用水日期) - parseFloat(b.用水日期)  
+        //     },
+        //     {
+        //         title: '使用期限',
+        //         dataIndex: '使用期限',
+        //         key: '使用期限',
+        //         sorter: (a, b) => parseFloat(a.使用期限) - parseFloat(b.使用期限)  
+        //     },
+        //     {
+        //         title: '装表日期',
+        //         dataIndex: '装表日期',
+        //         key: '装表日期',
+        //         sorter: (a, b) => parseFloat(a.装表日期) - parseFloat(b.装表日期)  
+        //     }            
+        // ];
         this.radioFilter = '';
         this.searchFilter = '';
     }
@@ -456,7 +457,9 @@ class SearchUnits extends Component {
                 <Table columns={this.columns}                     
                     rowKey={record => parseInt(record.编号)}
                     dataSource={this.state.data}
-                    pagination={this.state.pagination}
+                    // pagination={this.state.pagination}
+                    pagination={false}
+                    scroll={{ x: 2600,  y: 600  }}
                     loading={this.state.loading}
                     bordered
                     footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}

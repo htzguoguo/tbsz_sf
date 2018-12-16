@@ -18,7 +18,7 @@ const { MonthPicker } = DatePicker;
 const Option = Select.Option;
 
 const FormItem = Form.Item;
-
+import {feeColumns} from '../../../components/Table';
 const monthFormat = 'YYYYMM';
 const formItemLayout = {
     labelCol: { span: 5 },
@@ -42,44 +42,9 @@ class SearchWaterFees extends Component {
             filters : {}
         }; 
 
-        const onEdit = this.onEdit.bind(this);        
+        const onEdit = this.onEdit.bind(this); 
         this.columns = [
-            {
-                title: '编号',
-                dataIndex: '编号',
-                key: '编号',                
-                sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
-            },
-            {
-                title: '户名',
-                dataIndex: '户名',
-                key: '户名',
-                sorter: (a, b) => a.户名.length - b.户名.length,
-            },
-            {
-                title: '上月表底',
-                dataIndex: '上月表底',
-                key: '上月表底',
-                sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
-            },
-            {
-                title: '本月表底',
-                dataIndex: '本月表底',
-                key: '本月表底',
-                sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底)  
-            },
-            {
-                title: '应收水费',
-                dataIndex: '应收水费',
-                key: '应收水费',
-                sorter: (a, b) => parseFloat(a.应收水费) - parseFloat(b.应收水费)  
-            },
-            {
-                title: '实收水费',
-                dataIndex: '实收水费',
-                key: '实收水费',
-                sorter: (a, b) => parseFloat(a.实收水费) - parseFloat(b.实收水费)  
-            },
+          ...feeColumns,
             {
                 title: '操作',
                 dataIndex: '编号',
@@ -91,9 +56,61 @@ class SearchWaterFees extends Component {
                         </span>
                     )
                 } ,
-                width: '15%'
+                fixed: 'right',
+                width: 100,
             }
-        ];
+        ];       
+        // this.columns = [
+        //     {
+        //         title: '编号',
+        //         dataIndex: '编号',
+        //         key: '编号',                
+        //         sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+        //     },
+        //     {
+        //         title: '户名',
+        //         dataIndex: '户名',
+        //         key: '户名',
+        //         sorter: (a, b) => a.户名.length - b.户名.length,
+        //     },
+        //     {
+        //         title: '上月表底',
+        //         dataIndex: '上月表底',
+        //         key: '上月表底',
+        //         sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
+        //     },
+        //     {
+        //         title: '本月表底',
+        //         dataIndex: '本月表底',
+        //         key: '本月表底',
+        //         sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底)  
+        //     },
+        //     {
+        //         title: '应收水费',
+        //         dataIndex: '应收水费',
+        //         key: '应收水费',
+        //         sorter: (a, b) => parseFloat(a.应收水费) - parseFloat(b.应收水费)  
+        //     },
+        //     {
+        //         title: '实收水费',
+        //         dataIndex: '实收水费',
+        //         key: '实收水费',
+        //         sorter: (a, b) => parseFloat(a.实收水费) - parseFloat(b.实收水费)  
+        //     },
+        //     {
+        //         title: '操作',
+        //         dataIndex: '编号',
+        //         key : '编号',
+        //         render:function(text, record, index){
+        //             return (
+        //                 <span>                           
+        //                     <a onClick={onEdit.bind(this,text, record, index)}>单录  </a>                            
+        //                 </span>
+        //             )
+        //         } ,
+        //         width: '15%'
+        //     }
+        // ];
         this.radioFilter = '';
         this.searchFilter = '';
     }
@@ -1160,6 +1177,7 @@ class SearchWaterFees extends Component {
                     dataSource={this.state.data}
                     pagination={this.state.pagination}
                     loading={this.state.loading}
+                    scroll={{ x: 2600,  y: 600  }}
                     bordered
                     footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
                 />

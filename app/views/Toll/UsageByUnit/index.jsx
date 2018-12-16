@@ -8,7 +8,7 @@ import {
     Select,  Form,  
     DatePicker,  InputNumber, Checkbox
 } from 'antd';
-import { Chart, Tooltip, Axis, Bar } from 'viser-react';
+import { Chart, Tooltip, Axis, Bar, Line, Point } from 'viser-react';
 import moment from 'moment';
 import api from '../../../api';
 import {handleError} from "../../../utils/notification";
@@ -96,10 +96,15 @@ class UsageByUnit extends Component {
             api.post('/water/feesearch', values).then((dt) => {
                 let data = dt.data;
                 const pagination = this.state.pagination;             
-                pagination.total = data.length;             
+                pagination.total = data.length;   
+                data.sort(
+                  (a, b) =>   parseInt(a.月) - parseInt(b.月)
+                ).sort(
+                  (a, b) => parseInt(a.年) - parseInt(b.年)  
+                )          
                 this.setState({
                     loading: false,
-                    data: dt.data,
+                    data, 
                     pagination,
                 });
                 notification.success({
@@ -238,16 +243,7 @@ class UsageByUnit extends Component {
         日期 : `${item.年}年${item.月}月`,
         用水量 : item.用水量
       }));
-      // const data = [
-      //   { year: '1951 年', sales: 38 },
-      //   { year: '1952 年', sales: 52 },
-      //   { year: '1956 年', sales: 61 },
-      //   { year: '1957 年', sales: 145 },
-      //   { year: '1958 年', sales: 48 },
-      //   { year: '1959 年', sales: 38 },
-      //   { year: '1960 年', sales: 38 },
-      //   { year: '1962 年', sales: 38 },
-      // ];
+      
       const scale = [{
         dataKey: '用水量',
         tickInterval: 20,
@@ -256,7 +252,9 @@ class UsageByUnit extends Component {
         <Chart forceFit height={400} data={items} scale={scale}>
           <Tooltip />
           <Axis />
-          <Bar position="日期*用水量" />
+          {/* <Bar position="日期*用水量" /> */}
+          <Line position="日期*用水量" />
+          <Point position="日期*用水量" shape="circle"/>
         </Chart>
       );
     }
