@@ -7,14 +7,14 @@ import {
     Radio, Input,
     Divider,  Row, Col,
     Form, Select,
-    DatePicker
+    DatePicker, Table,
 } from 'antd';
 import moment from 'moment';
 
 import api from '../../../api';
 import {monthFormat, dateFormat, formItemLayout, convertPropertiesToMoment, formatDatePickerValue} from '../../../utils/format';
 import {handleError, showNotification} from "../../../utils/notification";
-
+import {feeColumns} from '../../../components/Table';
 import print from '../../../assets/css/print.less';
 import styles from './index.less';
 
@@ -29,13 +29,72 @@ class ChargeMonth extends Component {
     constructor(props){
         super(props);        
         this.state = {
-            loading1: false
+          data: [],
+          pagination: {},
+          loading: false,
+          loading1: false
         };
+        this.columns = feeColumns;
         this.today = moment(new Date(), 'YYYYMMDD');
     } 
 
     componentDidMount() {
     }
+
+    validatesPara = (values) => {
+      values.月份 = values.月份 ? values.月份.format("YYYYMM") : '';       
+      values.user = this.props.user.truename;
+      if(!values.num1 || values.num1.length !== 4 || !isFinite(values.num1)) {
+          showNotification('error', '输入的起始编号不正确，请重新输入！')
+          this.props.form.validateFieldsAndScroll(['num1']);
+          return false;
+      }
+      if(!values.num2 || values.num2.length !== 4 || !isFinite(values.num2)) {
+          showNotification('error', '输入的终止编号不正确，请重新输入！')
+          this.props.form.validateFieldsAndScroll(['num2']);
+          return false;
+      }
+      return true;
+    }
+
+    onSearch = (e) => {
+      e.preventDefault();
+      this.props.form.validateFields((err, values) => {
+          if (!err) {
+            this.setState({ loading: true });
+            if (!this.validatesPara(values)) {
+              return
+            }
+            api.post(
+              `/report/chargemonth/query`, 
+              values,
+              {            
+                  responseType: 'json'
+              }
+            ).then((dt) => {
+                let data = dt.data;
+                const pagination = this.state.pagination;
+                pagination.total = data.length;             
+                this.setState({
+                    loading: false,
+                    data: data,
+                    pagination,
+                });
+            }).catch(
+                err => {
+                    handleError(err);
+                    const pagination = this.state.pagination;
+                    pagination.total = 0;             
+                    this.setState({
+                        loading: false,
+                        data: [],
+                        pagination,
+                    });
+                }
+            ); 
+          }
+      });
+    };
 
     onToExcel = (e, index, flag, fileName) => {
         e.preventDefault();
@@ -81,7 +140,8 @@ class ChargeMonth extends Component {
 
     renderSearchButtons = () =>
     <Col span={5}>
-        <Button onClick={(e) => this.onToExcel(e, 1, 'chargemonth', '天保市政公司水费统计表')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出</Button>
+      <Button type="primary" onClick={this.onSearch} icon="search">搜索</Button>
+      <Button onClick={(e) => this.onToExcel(e, 1, 'chargemonth', '天保市政公司水费统计表')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出</Button>
     </Col>
 
     renderAdvancedForm() {
@@ -179,6 +239,17 @@ class ChargeMonth extends Component {
                     </div>
                     {this.renderAdvancedForm()}
                     <Divider></Divider>
+                    <Table 
+                      columns={this.columns}                     
+                      rowKey={record => parseInt(record.编号)}
+                      dataSource={this.state.data}
+                      // pagination={this.state.pagination}
+                      pagination={false}
+                      loading={this.state.loading}
+                      scroll={{ x: 2600,  y: 600  }}
+                      bordered
+                      footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
+                    />
                 </div>
         </div>
         );

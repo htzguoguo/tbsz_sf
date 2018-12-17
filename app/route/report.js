@@ -2,6 +2,7 @@ import Commission from '../views/Report/Commission';
 import Detail from '../views/Report/Detail';
 import Pollution from '../views/Report/Pollution';
 import ChargeMonth from '../views/Report/ChargeMonth';
+import ChargeMonthDynamic from '../views/Report/ChargeMonthDynamic';
 import ChargeYear from '../views/Report/ChargeYear';
 import Allowance from './../views/Report/Allowance';
 import CommissionTemp from '../views/Report/CommissionTemp';
@@ -26,6 +27,11 @@ export const reportChildRoutes = [
         'component': ChargeMonth,
         'exactly': true
     }, 
+    {
+      'path':'/app/report/chargemonthdynamic',
+      'component': ChargeMonthDynamic,
+      'exactly': true
+  }, 
     {
         'path':'/app/report/chargeyear',
         'component': ChargeYear,

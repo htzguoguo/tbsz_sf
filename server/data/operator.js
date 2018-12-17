@@ -227,28 +227,35 @@ module.exports = {
                           url: '/app/report/pollution'
                         },
                         {
-                            key: 'sidebarsub314',
+                          key: 'sidebarsub314',
+                          name: '统计汇总',
+                          icon: 'user',
+                          matchurl : '/app/report/chargemonthdynamic',
+                          url: '/app/report/chargemonthdynamic'
+                        },
+                        {
+                            key: 'sidebarsub315',
                             name: '月汇总表',
                             icon: 'user',
                             matchurl : '/app/report/chargemonth',
                             url: '/app/report/chargemonth'
                         },
                         {
-                            key: 'sidebarsub315',
+                            key: 'sidebarsub316',
                             name: '年汇总表',
                             icon: 'user',
                             matchurl : '/app/report/chargeyear',
                             url: '/app/report/chargeyear'
                         },
                         {
-                            key: 'sidebarsub316',
+                            key: 'sidebarsub317',
                             name: '贴费汇总表',
                             icon: 'user',
                             matchurl : '/app/report/allowance',
                             url: '/app/report/allowance'
                         },
                         {
-                            key: 'sidebarsub317',
+                            key: 'sidebarsub318',
                             name: '委托收款报表_临时',
                             icon: 'user',
                             matchurl : '/app/report/commissiontemp',

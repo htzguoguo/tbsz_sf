@@ -66,6 +66,36 @@ async function queryDetailImpt(date, kind) {
     return result;
 }
 
+module.exports.queryChargeMonth = queryChargeMonth;
+
+async function queryChargeMonth(req, res) {
+  let obj = req.body || {};
+    try {         
+        let result = await queryChargeMonthImpt(obj);
+        Helper.ResourceFound( res, result );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, obj );
+    }
+}
+
+async function queryChargeMonthImpt(obj) {
+  let result;
+  let date = obj.月份;
+  let year = date.slice(0, 4);
+  let month = date.slice(4);
+  let sqlSelect = `
+  SELECT * FROM 水费报表查询  where (年=:year) and (月=:month) 
+      and (编号>=:num1)  and  (编号<=:num2) 
+      ${obj.kind === '1' ? `and (区号<>'8')` : `and (区号='8')`}
+      Order by 编号
+  `;
+  result = await db.query(
+      sqlSelect,
+      { replacements: {year, month, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
+  );
+    return result;
+}
+
 module.exports.ChargeMonthToExcel = ChargeMonthToExcel;
 
 async function ChargeMonthToExcel(req, res) {
@@ -84,22 +114,12 @@ async function ChargeMonthToExcelImpt(obj) {
     let date = obj.月份;
     let year = date.slice(0, 4);
     let month = date.slice(4);
+    items = await queryChargeMonthImpt(obj);
     let values = {
         date : dateFormat(new Date(), "yyyy-mm-dd"),
         year : year,
         month : month,
-
     };
-    let sqlSelect = `
-    SELECT * FROM 水费报表查询  where (年=:year) and (月=:month) 
-        and (编号>=:num1)  and  (编号<=:num2) 
-        ${obj.kind === '1' ? `and (区号<>'8')` : `and (区号='8')`}
-        Order by 编号
-    `;
-    items = await db.query(
-        sqlSelect,
-        { replacements: {year, month, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
-    );
     let len = items.length;
     if(len > 0) {
         items.forEach(
@@ -134,25 +154,21 @@ async function ChargeMonthToExcelImpt(obj) {
     return toExcel('charge', 'Sheet1', values);
 }
 
-module.exports.ChargeYearByCorpToExcel = ChargeYearByCorpToExcel;
+module.exports.queryChargeYearByCorp = queryChargeYearByCorp;
 
-async function ChargeYearByCorpToExcel(req, res) {
-    let obj = req.body || {};
-    try {       
-        let wb = await ChargeYearByCorpToExcelImpt(obj);
-        res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']]);
-        res.end( new Buffer(wb, 'base64') ); 
+async function queryChargeYearByCorp(req, res) {
+  let obj = req.body || {};
+    try {         
+        let result = await queryChargeYearByCorpImpt(obj);
+        Helper.ResourceFound( res, result );
     }catch(ex) {
-        Helper.InternalServerError( res, ex, {  } );
+        Helper.InternalServerError( res, ex, obj );
     }
 }
 
-async function ChargeYearByCorpToExcelImpt(obj) {
-    let items, item;
-    let values = {
-        date : dateFormat(new Date(), "yyyy-mm-dd"),
-    };
-    let sqlSelect = `
+async function queryChargeYearByCorpImpt(obj) {
+  let items;
+  let sqlSelect = `
     Select 年,户名,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
         sum(减水费) as 减水费,sum(实收水费) as 实收水费,sum(排污费) as 排污费,sum(其它) as 其它 from 水费报表查询
         where (年+月>=:date1) and (年+月<=:date2)
@@ -189,7 +205,67 @@ async function ChargeYearByCorpToExcelImpt(obj) {
     let result = [];   
     for(let item of dict){
         result.push(item[1]);
-    }    
+    } 
+    return result; 
+}
+
+module.exports.ChargeYearByCorpToExcel = ChargeYearByCorpToExcel;
+
+async function ChargeYearByCorpToExcel(req, res) {
+    let obj = req.body || {};
+    try {       
+        let wb = await ChargeYearByCorpToExcelImpt(obj);
+        res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']]);
+        res.end( new Buffer(wb, 'base64') ); 
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, {  } );
+    }
+}
+
+async function ChargeYearByCorpToExcelImpt(obj) {
+    let items, item;
+    let values = {
+        date : dateFormat(new Date(), "yyyy-mm-dd"),
+    };
+    // let sqlSelect = `
+    // Select 年,户名,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
+    //     sum(减水费) as 减水费,sum(实收水费) as 实收水费,sum(排污费) as 排污费,sum(其它) as 其它 from 水费报表查询
+    //     where (年+月>=:date1) and (年+月<=:date2)
+    //     and (编号>=:num1)  and  (编号<=:num2)
+    //     group by 年,户名 
+    // `;
+    // items = await db.query(
+    //     sqlSelect,
+    //     { replacements: {date1 : obj.date1, date2 : obj.date2, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
+    // );
+    
+    // let dict = new Map();
+    // items.forEach(
+    //     item => {
+    //         let key = removeStringRear(item.户名);
+    //         item.户名 = key;
+    //         if(dict.has(key)) {
+    //             let value = dict.get(key);
+    //             value.实际用水量 += item.实际用水量;
+    //             value.实际计划水费 += item.实际计划水费;
+    //             value.超额水量 += item.超额水量;
+    //             value.超额水费 += item.超额水费;
+    //             value.防火费 += item.防火费;
+    //             value.手续费 += item.手续费;
+    //             value.减水费 += item.减水费;
+    //             value.实收水费 += item.实收水费;
+    //             value.排污费 += item.排污费;
+    //             value.其它 += item.其它;
+    //         }else {
+    //             dict.set(key, item)
+    //         }
+    //     }
+    // ); 
+    // let result = [];   
+    // for(let item of dict){
+    //     result.push(item[1]);
+    // }  
+    let result = await queryChargeYearByCorpImpt(obj);  
     let len = result.length;
     if(len > 0) {
         result.push(
@@ -248,24 +324,25 @@ async function ChargeYearByMeterToExcelImpt(obj) {
     let values = {
         date : dateFormat(new Date(), "yyyy-mm-dd"),
     };
-    let sqlSelect = `
-    Select 年,编号,户名,装表地点,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
-        sum(减水费) as 减水费,sum(实收水费) as 实收水费,sum(排污费) as 排污费,sum(其它) as 其它 from 水费报表查询
-        where (年+月>=:date1) and (年+月<=:date2)
-        and (编号>=:num1)  and  (编号<=:num2)
-        group by 年,编号,户名,装表地点 order by 编号
-    `;
     // let sqlSelect = `
-    // Select 年,编号,户名,装表地点,sum(上月表底)as 上月表底,sum(本月表底)as 本月表底,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
+    // Select 年,编号,户名,装表地点,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
     //     sum(减水费) as 减水费,sum(实收水费) as 实收水费,sum(排污费) as 排污费,sum(其它) as 其它 from 水费报表查询
     //     where (年+月>=:date1) and (年+月<=:date2)
     //     and (编号>=:num1)  and  (编号<=:num2)
     //     group by 年,编号,户名,装表地点 order by 编号
     // `;
-    items = await db.query(
-        sqlSelect,
-        { replacements: {date1 : obj.date1, date2 : obj.date2, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
-    );
+    // // let sqlSelect = `
+    // // Select 年,编号,户名,装表地点,sum(上月表底)as 上月表底,sum(本月表底)as 本月表底,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
+    // //     sum(减水费) as 减水费,sum(实收水费) as 实收水费,sum(排污费) as 排污费,sum(其它) as 其它 from 水费报表查询
+    // //     where (年+月>=:date1) and (年+月<=:date2)
+    // //     and (编号>=:num1)  and  (编号<=:num2)
+    // //     group by 年,编号,户名,装表地点 order by 编号
+    // // `;
+    // items = await db.query(
+    //     sqlSelect,
+    //     { replacements: {date1 : obj.date1, date2 : obj.date2, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
+    // );
+    items = await queryChargeYearByMeterImpt(obj);
     let len = items.length;
     if(len > 0) {
         items.push(
@@ -289,6 +366,35 @@ async function ChargeYearByMeterToExcelImpt(obj) {
     values.items = items;   
     return toExcel('chargeyear', 'Sheet2', values);
 }
+
+module.exports.queryChargeYearByMeter = queryChargeYearByMeter;
+
+async function queryChargeYearByMeter(req, res) {
+  let obj = req.body || {};
+    try {         
+        let result = await queryChargeYearByMeterImpt(obj);
+        Helper.ResourceFound( res, result );
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, obj );
+    }
+}
+
+async function queryChargeYearByMeterImpt(obj) {
+  let result;
+  let sqlSelect = `
+    Select 年,编号,户名,装表地点,sum(实际用水量) as 实际用水量,sum(实际计划水费) as 实际计划水费,sum(超额水量) as 超额水量,sum(超额水费) as 超额水费,sum(防火费) as 防火费,sum(手续费) as 手续费,
+        sum(减水费) as 减水费,sum(实收水费) as 实收水费,sum(排污费) as 排污费,sum(其它) as 其它 from 水费报表查询
+        where (年+月>=:date1) and (年+月<=:date2)
+        and (编号>=:num1)  and  (编号<=:num2)
+        group by 年,编号,户名,装表地点 order by 编号
+    `;
+    result = await db.query(
+        sqlSelect,
+        { replacements: {date1 : obj.date1, date2 : obj.date2, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
+    );
+    return result;
+}
+
 
 module.exports.queryAllowance = queryAllowance;
 

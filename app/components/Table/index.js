@@ -132,6 +132,154 @@ export const  feeColumns = [
   },
 ];
 
+export const  chargeYearlyByMeterColumns = [
+  {
+    title: '编号',
+    dataIndex: '编号',
+    key: '编号', 
+    width: 90,
+    sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+  },
+  {
+      title: '户名',
+      dataIndex: '户名',
+      width: 300,
+      sorter: (a, b) => a.户名.length - b.户名.length,
+  },
+  {
+    title: '年份',
+    dataIndex: '年',
+    width: 90,
+  },
+  {
+    title: '装表地点',
+    dataIndex: '装表地点',
+    width: 150,
+  },
+  {
+    title: '实际用水量',
+    dataIndex: '实际用水量',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.实际用水量) - parseFloat(b.实际用水量)  
+  },
+  {
+    title: '实际计划水费',
+    dataIndex: '实际计划水费',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.实际计划水费) - parseFloat(b.实际计划水费),
+  }, 
+  {
+    title: '超额水量',
+    dataIndex: '超额水量',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.超额水量) - parseFloat(b.超额水量)  
+  },
+  {
+    title: '超额水费',
+    dataIndex: '超额水费',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.超额水费) - parseFloat(b.超额水费)  
+  },
+  {
+    title: '防火费',
+    dataIndex: '防火费',
+    width: 120,
+  }, 
+  {
+      title: '手续费',
+      dataIndex: '手续费',
+      width: 150,
+  },
+  {
+    title: '排污费',
+    dataIndex: '排污费',
+    width: 150,
+  },
+  {
+    title: '其它',
+    dataIndex: '其它',
+    width: 120,
+  },
+  {
+    title: '减水费',
+    dataIndex: '减水费',
+    width: 150,
+  },
+  {
+    title: '实收水费',
+    dataIndex: '实收水费',
+    width: 120,
+  },
+];
+
+export const  chargeYearlyByCorpColumns = [
+  {
+      title: '户名',
+      dataIndex: '户名',
+      width: 300,
+      sorter: (a, b) => a.户名.length - b.户名.length,
+  },
+  {
+    title: '年份',
+    dataIndex: '年',
+    width: 90,
+  },
+  {
+    title: '实际用水量',
+    dataIndex: '实际用水量',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.实际用水量) - parseFloat(b.实际用水量)  
+  },
+  {
+    title: '实际计划水费',
+    dataIndex: '实际计划水费',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.实际计划水费) - parseFloat(b.实际计划水费),
+  }, 
+  {
+    title: '超额水量',
+    dataIndex: '超额水量',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.超额水量) - parseFloat(b.超额水量)  
+  },
+  {
+    title: '超额水费',
+    dataIndex: '超额水费',
+    width: 150,
+    sorter: (a, b) => parseFloat(a.超额水费) - parseFloat(b.超额水费)  
+  },
+  {
+    title: '防火费',
+    dataIndex: '防火费',
+    width: 120,
+  }, 
+  {
+      title: '手续费',
+      dataIndex: '手续费',
+      width: 150,
+  },
+  {
+    title: '排污费',
+    dataIndex: '排污费',
+    width: 150,
+  },
+  {
+    title: '其它',
+    dataIndex: '其它',
+    width: 120,
+  },
+  {
+    title: '减水费',
+    dataIndex: '减水费',
+    width: 150,
+  },
+  {
+    title: '实收水费',
+    dataIndex: '实收水费',
+    width: 120,
+  },
+];
+
 export const  unitColumns = [
   {
     title: '编号',
