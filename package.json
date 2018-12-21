@@ -135,7 +135,7 @@
     "print-html-element": "^0.5.1",
     "print-js": "^1.0.47",
     "prop-types": "^15.6.2",
-    "react": "^16.1.1",
+    "react": "^16.6.3",
     "react-dom": "^16.1.1",
     "react-intl": "^2.4.0",
     "react-redux": "^5.0.6",

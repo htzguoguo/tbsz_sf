@@ -48,7 +48,7 @@ class PaymentList extends Component {
                 title: '编号',
                 dataIndex: '编号',
                 key: '编号',
-                width : '15%',
+                width : '10%',
                 sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号),
                 filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
                     <div className="custom-filter-dropdown">
@@ -87,36 +87,49 @@ class PaymentList extends Component {
             {
               title: '户名',
               dataIndex: '户名',
-              key: '户名',
+              width : '30%', 
               sorter: (a, b) => a.户名.length - b.户名.length,
           },
           {
               title: '上月表底',
               dataIndex: '上月表底',
-              key: '上月表底',
+              width : '15%', 
               sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
           },
           {
               title: '本月表底',
               dataIndex: '本月表底',
-              key: '本月表底',
+              width : '15%', 
               sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底)  
           },
           {
               title: '应收水费',
               dataIndex: '应收水费',
-              key: '应收水费',
+              width : '15%',
               sorter: (a, b) => parseFloat(a.应收水费) - parseFloat(b.应收水费)  
           },
           {
               title: '实收水费',
               dataIndex: '实收水费',
-              key: '实收水费',
+              width : '15%', 
               sorter: (a, b) => parseFloat(a.实收水费) - parseFloat(b.实收水费)  
           },
         ];
         this.selectedItems = [];
         this.today = moment(new Date(), 'YYYYMMDD');
+    }
+
+    componentDidMount() {
+      this.fetchParameters();
+    } 
+
+    fetchParameters = () => {
+      api.get(`unit/unitparas`, {            
+          responseType: 'json'
+      }).then((data) => {
+          data = data.data;            
+          this.setState({...data});           
+      }).catch(this.handleError); 
     }
 
     handleSearch = (selectedKeys, confirm) => () => {
@@ -209,6 +222,7 @@ class PaymentList extends Component {
 
     renderAdvancedForm() {
         const { getFieldDecorator } = this.props.form;
+        const {chargekinds} = this.state;
         return (
         <Form id="searchParasForm" className={styles.searchParasForm}  layout="horizontal" form={this.props.form}>
             <Row  >
@@ -225,7 +239,7 @@ class PaymentList extends Component {
                         )}  
                     </FormItem>
                 </Col>
-                <Col span={6}>
+                <Col span={4}>
                     <FormItem
                     label="编号" 
                     {...formItemLayout}                      
@@ -265,11 +279,26 @@ class PaymentList extends Component {
                             <Input />                                
                         )}                       
                     </FormItem>
-                </Col> 
-                <Col span={4}>
-                    <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 4 }}  type="primary">查询</Button>
                 </Col>
                 <Col span={4}>
+                    <FormItem
+                            {...formItemLayout}
+                            label="收费形式"
+                        >
+                            {getFieldDecorator(
+                                '收费形式'
+                            )(
+                                <Select 
+                                onChange={this.onKindChange}                                        
+                                style={{ width: '100%' }}
+                                > 
+                                {chargekinds.map(d => <Option key={d.收费形式编号}>{d.收费形式编号}-{d.收费形式}</Option>)}                                       
+                                </Select>
+                            )}
+                    </FormItem>           
+                </Col>
+                <Col span={6}>
+                      <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 4 }}  type="primary">查询</Button>         
                     <Button  type="primary" 
                     loading={this.state.loading2} 
                     onClick={() => {this.onHandlePayment(2)}} 

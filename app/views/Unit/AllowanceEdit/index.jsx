@@ -176,11 +176,9 @@ class AllowanceEdit extends Component{
         }).catch(this.handleError);
     }
 
-    handleNext = () => { 
-        console.log(parseInt(this.props.form.getFieldValue('编号')) >= 0);        
+    handleNext = () => {        
         let num = parseInt(this.props.form.getFieldValue('编号')) >= 0 ?
-                    this.props.form.getFieldValue('编号') : this.selectedNum;
-        console.log(num);            
+                    this.props.form.getFieldValue('编号') : this.selectedNum;                  
         api.get(`unit/allowance/next/${num}`, {            
             responseType: 'json'
         }).then((data) => {

@@ -234,12 +234,12 @@ class ChargeYear extends Component {
     render() {
         const {category} = this.state;
         let columns = [];
+        
         if(category === 'meter') {
           columns = chargeYearlyByMeterColumns;
         }else if(category === 'corp') {
           columns = chargeYearlyByCorpColumns;
         }
-        console.log('columns', columns);
         return (  
             <div>
                 <div className="ant-row" style={{marginTop:20}}>                
@@ -256,7 +256,7 @@ class ChargeYear extends Component {
                       // pagination={this.state.pagination}
                       pagination={false}
                       loading={this.state.loading}
-                      scroll={{ x: 2600,  y: 600  }}
+                      scroll={{ x: 1950,  y: 600  }}
                       bordered
                       footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
                     />

@@ -20,16 +20,16 @@ function cancel() {
 const rowSelection = {
 
     onChange(selectedRowKeys, selectedRows) {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+       
     },
 
     onSelect(record, selected, selectedRows) {
-        console.log(record, selected, selectedRows);
+       
     },
 
     onSelectAll(selected, selectedRows, changeRows) {
 
-        console.log(selected, selectedRows, changeRows);
+      
     }
 };
 
@@ -112,8 +112,7 @@ class ContentLists extends Component {
         pager.current = pagination.current;
         this.setState({
             pagination: pager
-        });
-        console.log('filters',filters,'sorter',sorter);
+        });       
         this.fetch({
             results: pagination.pageSize,
             page: pagination.current,
@@ -137,8 +136,7 @@ class ContentLists extends Component {
             const pagination = this.state.pagination;
             // Read total count from server
             // pagination.total = data.totalCount;
-            pagination.total = data.count;
-            console.log('data', data, pagination.total);
+            pagination.total = data.count;           
             this.setState({
                 loading: false,
                 data: data.data,
@@ -153,9 +151,8 @@ class ContentLists extends Component {
     handleOk() {
         this.setState({ loading1: true });
         setTimeout(() => {
-            this.setState({ loading1: false, visible: false });
-            console.log('ok');
-            openNotification();
+            this.setState({ loading1: false, visible: false });           
+            //openNotification();
         }, 2000);
     }
 
@@ -213,8 +210,7 @@ class ContentLists extends Component {
             }
         }else {
             this.searchFilter = value.replace(/^\s+|\s+$/g,'');
-        }
-        console.log(this.radioFilter, this.searchFilter);
+        }       
         let data = this.filter(_data, this.radioFilter);
         data = this.filter(data, this.searchFilter);
         const pagination = this.state.pagination;

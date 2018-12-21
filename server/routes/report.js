@@ -4,13 +4,14 @@ const {
     queryCommission, queryDetail, queryChargeMonth,
     ChargeMonthToExcel, queryChargeYearByCorp, queryChargeYearByMeter,
     ChargeYearByMeterToExcel, ChargeYearByCorpToExcel,
-    queryAllowance, AllowanceToExcel   
+    queryAllowance, AllowanceToExcel, ChargeDynamicMonthToExcel   
 } = require('../schema/report');
 
 router.get('/commission/:date', queryCommission);
 router.get('/detail/:date/:kind', queryDetail);
 router.post('/chargemonth/query', queryChargeMonth);
 router.post('/chargemonth/excel', ChargeMonthToExcel);
+router.post('/chargedynamicmonth/excel', ChargeDynamicMonthToExcel);
 router.post('/chargeyear/excel/meter', ChargeYearByMeterToExcel);
 router.post('/chargeyear/excel/corp', ChargeYearByCorpToExcel);
 router.post('/chargeyear/query/meter', queryChargeYearByMeter);

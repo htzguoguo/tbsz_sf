@@ -251,7 +251,7 @@ async function SaveTearDownImpt(obj) {
     let t = dateFormat(new Date(), "yyyy-mm-dd");
     if(result.length > 0) {
         let sqlUpdate = `
-        update 终止供水合同表 set  操作员=:a1,操作时间=:a2,文件=:a3,完成时间=:a4,状态=:a5
+        update 终止供水合同表 set  通知人=:a1,操作时间=:a2,文件=:a3,完成时间=:a4,状态=:a5
             where 编号=:a7 
         `;
         await db.query(
@@ -267,7 +267,7 @@ async function SaveTearDownImpt(obj) {
         ); 
     }else {
         let sqlInsert = `
-        Insert Into 终止供水合同表 (编号,户名,操作员,操作时间,状态,完成时间,文件)
+        Insert Into 终止供水合同表 (编号,户名,通知人,操作时间,状态,完成时间,文件)
             Values (:a1,:a2,:a3,:a4,:a5,:a6,:a7)                
         `;
         await db.query(
@@ -287,12 +287,14 @@ async function SaveTearDownImpt(obj) {
 
 async function TearDownToWordImpt(obj) { 
     let num = obj.编号;
+    let user = obj.user;
     let items = await queryUnitByDownNumImpt(num);
     let result = {};
     if(items && items.length > 0) {
         let values = {};
         values.items = [];
         let item = items[0];
+        values.通知人 = user;
         values.户名 = item.户名 ? item.户名 : '';
         for(let i = 1; i <= items.length; i++) {
             values.items.push(
@@ -316,11 +318,11 @@ module.exports.queryTearDownByNum = queryTearDownByNum;
 function queryTearDownByNum(num, res) {
     if(num !== 'undefined') {
         let sqlBasic = `
-        Select * from 终止供水合同表  where (编号=:a1) 
+        Select * from 终止供水合同表  where (编号=:a1) or (户名 like :a2)
         `;
         db.query(
         sqlBasic,
-        { replacements: {a1 : num }, type: db.QueryTypes.SELECT }
+        { replacements: {a1 : num, a2 : `%${num}%` }, type: db.QueryTypes.SELECT }
         ).then(items => {
             if (items.length > 0) {
                 Helper.ResourceFound( res, items );
@@ -356,27 +358,30 @@ function queryTearDownByNum(num, res) {
 module.exports.TearDownComplete = TearDownComplete;
 
 async function TearDownComplete(req, res) { 
-    let { num } = req.params;   
-    try {         
-        let result = await TearDownCompleteImpt(num);
-        Helper.ResourceFound( res, result );
-    }catch(ex) {
-        Helper.InternalServerError( res, ex, {} );
-    }
+  let obj = req.body || {};
+  try {         
+      let result = await TearDownCompleteImpt(obj);
+      Helper.ResourceFound( res, result );
+  }catch(ex) {
+      Helper.InternalServerError( res, ex, {} );
+  }
 }
 
-async function TearDownCompleteImpt(num) {
+async function TearDownCompleteImpt(obj) {
     let t = dateFormat(new Date(), "yyyy-mm-dd");
     let sqlUpdate = `
-        update 终止供水合同表 set  完成时间=:a1,状态=:a2
-            where 编号=:a3 
+        update 终止供水合同表 set  完成时间=:a1,状态=:a2,处理结果=:a3,经办人=:a4
+            where 编号=:a5 
         `;
     await db.query(
         sqlUpdate,
         { replacements: {
             a1 : t,
             a2 : '完成',
-            a3 : num,
+            a3 : obj.处理结果,
+            a4 : obj.经办人,
+            a5 : obj.编号,
+
         }, type: db.QueryTypes.UPDATE }
     ); 
 }

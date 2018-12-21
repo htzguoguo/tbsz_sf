@@ -15,6 +15,7 @@ const { MonthPicker } = DatePicker;
 import moment from 'moment';
 const FormItem = Form.Item;
 import api from '../../../api';
+import './index.less';
 
 const monthFormat = 'YYYYMM';
 
@@ -32,8 +33,8 @@ class TakeToll extends Component{
         this.onDateChange = this.onDateChange.bind(this);
         this.handlePayment = this.handlePayment.bind(this);
         this.handleCalculateFee = this.handleCalculateFee.bind(this);
-        this.selectedYear = this.isEdit ? this.year : moment().year('YYYY');
-        this.selectedMonth = this.isEdit ? this.month : moment().month('MM');
+        this.selectedYear = this.isEdit ? this.year : moment().format('YYYY');
+        this.selectedMonth = this.isEdit ? this.month : moment().format('MM');
         this.selectedNum = this.isEdit ? this.num : '0002';
         this.selectType = '3';
         this.state = {
@@ -952,6 +953,60 @@ class TakeToll extends Component{
                             )}
                         </FormItem>      
                     </Col>
+
+                    <Col span={8}>
+                        <FormItem
+                            {...formItemLayout}
+                            labelCol={{span: 5}}
+                            validateStatus="warning"
+                            label="减排污费水量">
+                            {getFieldDecorator('减免排污费水量', {                               
+                                initialValue : '0'
+                            })(
+                                <InputNumber                                    
+                                    min={0}
+                                    precision={0} 
+                                    style={{ width: '100%' }}                                   
+                                />
+                            )}
+                        </FormItem>            
+                    </Col>
+                    <Col span={8}>
+                        <FormItem
+                            {...formItemLayout}
+                            labelCol={{span: 5}}
+                            validateStatus="warning"
+                            label="减排污费单价">
+                            {getFieldDecorator('减免排污费单价', {                                
+                                initialValue : '0'
+                            })(
+                                <InputNumber                                     
+                                    min={0}
+                                    precision={2}  
+                                    style={{ width: '100%' }}                                  
+                                />
+                            )}
+                        </FormItem>   
+                    </Col>
+                    <Col span={8}> 
+                        <FormItem
+                            {...formItemLayout} 
+                            labelCol={{span: 5}}
+                            validateStatus="warning"
+                            label="减排污费"
+                            >                              
+                                {getFieldDecorator('减排污费', {                               
+                                    initialValue : '0'
+                                })(
+                                    <InputNumber                                     
+                                        min={0}
+                                        precision={2}  
+                                        style={{ width: '100%' }}                                  
+                                    />
+                                )} 
+                        </FormItem>                                      
+                    </Col>
+
                     <Col span={8}>
                         <FormItem
                             {...formItemLayout}
@@ -969,7 +1024,7 @@ class TakeToll extends Component{
                             )}
                         </FormItem>            
                     </Col>
-                    <Col span={3}>
+                    {/* <Col span={3}>
                         <FormItem
                         {...formItemLayout}
                                                     
@@ -980,23 +1035,8 @@ class TakeToll extends Component{
                                     <Checkbox>减排污费</Checkbox>
                                 )} 
                         </FormItem>                                            
-                    </Col>                                               
-                    <Col span={5}> 
-                        <FormItem
-                            {...formItemLayout} 
-                            validateStatus="warning"
-                            >                              
-                                {getFieldDecorator('减排污费', {                               
-                                    initialValue : '0'
-                                })(
-                                    <InputNumber                                     
-                                        min={0}
-                                        precision={2}  
-                                        style={{ width: '100%' }}                                  
-                                    />
-                                )} 
-                        </FormItem>                                      
-                    </Col>                     
+                    </Col>                                                */}
+                                         
                     <Col span={8}>
                         <FormItem
                             {...formItemLayout}

@@ -261,7 +261,6 @@ class UsageByUnit extends Component {
 
     render() {  
         const {data} = this.state;
-        console.log('data.length', data.length);          
         return (           
             <div className="ant-row" >                
                 <Divider></Divider>

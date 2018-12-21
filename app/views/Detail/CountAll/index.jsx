@@ -49,7 +49,7 @@ class CountAll extends Component {
                 key: '年累计收入量'
             },
             {
-                title: '排污费',
+                title: '实缴排污费',
                 dataIndex: '排污费',
                 key: '排污费'
             },

@@ -21,7 +21,7 @@ module.exports = {
                     child : [
                         {
                           key: 'sidebarsub115',
-                          name: '自动创建月水费',
+                          name: '创建月水费',
                           icon: 'user',
                           matchurl : '/app/toll/prepare',
                           url: '/app/toll/prepare'
@@ -49,7 +49,7 @@ module.exports = {
                         },
                         {
                             key: 'sidebarsub114',
-                            name: '查询月水费',
+                            name: '水费综合查询',
                             icon: 'user',
                             matchurl : '/app/toll/search',
                             url: '/app/toll/search'
@@ -63,7 +63,7 @@ module.exports = {
                     child : [
                         {
                             key: 'sidebarsub121',
-                            name: '录入单位基本信息',
+                            name: '录入企业信息',
                             icon: 'user',
                             matchurl : '/app/unit/entry',
                             url: '/app/unit/entry'
@@ -77,7 +77,7 @@ module.exports = {
                         },
                         {
                             key: 'sidebarsub123',
-                            name: '单位信息查询',
+                            name: '用水企业信息查询',
                             icon: 'user',
                             matchurl : '/app/unit/search',
                             url: '/app/unit/search'
@@ -98,7 +98,7 @@ module.exports = {
                         },
                         {
                             key: 'sidebarsub126',
-                            name: '浏览过户信息',
+                            name: '过户信息查询',
                             icon: 'user',
                             matchurl : '/app/unit/changebrowse',
                             url: '/app/unit/changebrowse'
@@ -135,28 +135,28 @@ module.exports = {
                     child : [
                         {
                             key: 'sidebarsub211',
-                            name: '单位信息查询',
+                            name: '用水企业信息查询',
                             icon: 'user',
                             matchurl : '/app/search/unit',
                             url: '/app/search/unit'
                         },
                         {
                             key: 'sidebarsub212',
-                            name: '水费信息查询',
+                            name: '水费综合查询',
                             icon: 'user',
                             matchurl : '/app/search/toll',
                             url: '/app/search/toll'
                         },
                         {
                           key: 'sidebarsub213',
-                          name: '单表查询',
+                          name: '单表用水曲线图',
                           icon: 'user',
                           matchurl : '/app/search/usage/unit',
                           url: '/app/search/usage/unit',
                         },
                         {
                           key: 'sidebarsub214',
-                          name: '用水企业查询',
+                          name: '企业用水曲线图',
                           icon: 'user',
                           matchurl : '/app/search/usage/company',
                           url: '/app/search/usage/company',
