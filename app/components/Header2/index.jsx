@@ -124,23 +124,24 @@ class Header extends React.Component {
                 <div className='header'>
                     <div className='headerWrapper'>
                         <div className='logo'>
-                            <img src="./assets/images/logo.svg" height="40px" alt=""/>
+                                天保市政水费收费管理系统
                         </div>
                         <Menu theme="dark"
                             mode="horizontal"
                             onClick={this.menuClickHandle}
                             selectedKeys={[activeKey]}
                             defaultSelectedKeys={[activeKey]}
-                            style={{lineHeight: '64px',float:'left', background : '#404040'}}>
+                            style={{}}>
                             {menu}
-                        </Menu>
-                        <div className='userInfo'>
+                            <div className='userInfo'>
                             <Dropdown overlay={adminPanle}>
                                 <a className="ant-dropdown-link">
-                                    <Avatar icon="user"  size="default"  style={{backgroundColor: '#87d068', verticalAlign: 'middle'}}>{username}</Avatar> <Icon type="down" />
+                                    <Avatar icon="user"  size="default"  >{username}</Avatar> <Icon type="down" />
                                 </a>
                             </Dropdown>
                         </div>
+                        </Menu>
+
                     </div>
                 </div>
             </div>

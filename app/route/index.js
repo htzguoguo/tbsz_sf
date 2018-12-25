@@ -6,7 +6,8 @@ import { Route, Switch } from 'react-router-dom';
 
 // import Layout from '../views/Layout1';
 import LayoutWithSideBar from '../views/LayoutWithSideBar';
-import Login from '../views/Login3';
+import home from '../views/home';
+import Login from '../views/Login4';
 import {tollChildRoutes} from './toll';
 import {unitChildRoutes} from './unit';
 import {yghtChildRoutes} from './yght';
@@ -16,6 +17,7 @@ import {detailChildRoutes} from './detail';
 import {collectionChildRoutes} from './collection';
 import {dictChildRoutes} from './dict';
 import {contractChildRoutes} from './contract';
+
 
 export const childRoutes = [
   ...tollChildRoutes,
@@ -32,7 +34,7 @@ export const childRoutes = [
 const routes = (
   <Switch>
     <Route path="/login" component={Login}/>
-    <Route path="/app" component={LayoutWithSideBar}/>
+     <Route path="/app" component={home}/>{/*菜单页入口 */}
     <Route path="/" component={Login}/>
   </Switch>
 );

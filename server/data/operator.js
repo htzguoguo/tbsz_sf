@@ -10,7 +10,7 @@ module.exports = {
         {
             key: 'menu1',
             name: '录入管理',
-            icon: 'home',
+            icon: 'form',
             baseurl : '/app/toll',
             url: '/app/toll/take/0/0/0',
             child : [
@@ -124,7 +124,7 @@ module.exports = {
         {
             key: 'menu2',
             name: '查询管理',
-            icon: 'user',
+            icon: 'file-search',
             baseurl : '/app/search',
             url: '/app/search/unit',
             child : [
@@ -196,7 +196,7 @@ module.exports = {
         {
             key: 'menu3',
             name: '报表管理',
-            icon: 'laptop',
+            icon: 'bar-chart',
             baseurl : '/app/report',
             url: '/app/report/commission',
             child : [
@@ -268,7 +268,7 @@ module.exports = {
         {
             key: 'menu4',
             name: '明细管理',
-            icon: 'notification',
+            icon: 'file-protect',
             baseurl : '/app/detail',
             url: '/app/detail/allowance',
             child : [
@@ -327,7 +327,7 @@ module.exports = {
         {
             key: 'menu5',
             name: '托收管理',
-            icon: 'notification',
+            icon: 'money-collect',
             baseurl : '/app/collection',
             url: '/app/collection/outputbank',
             child : [
@@ -392,7 +392,7 @@ module.exports = {
         {
             key: 'menu6',
             name: '字典管理',
-            icon: 'notification',
+            icon: 'book',
             baseurl : '/app/dict',
             url: '/app/dict/usekind',
             child : [
@@ -443,7 +443,7 @@ module.exports = {
         {
             key: 'menu7',
             name: '文档管理',
-            icon: 'notification',
+            icon: 'copy',
             baseurl : '/app/contract',
             url: '/app/contract/creation',
             child : [
