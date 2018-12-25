@@ -26,7 +26,7 @@ function queryWaterFee(num, year, month, res) {
     let sqlFee = `
     SELECT 年,月,上月表底,本月表底,用水量,计划水量,计划水费,超额水量,超额水费,防火费,手续费
     ,实收水费,排污费,其它,申请水量,年用水量,剩余水量,减免水量,减免单价,减免水费,减排污费
-    ,减其它,应收水费, 欠费标志, 老表水费 from 水费基本表 where (编号=:no) and (年=:y) and (月=:m)
+    ,减其它,应收水费, 欠费标志, 老表水费, 减免排污费水量, 减免排污费单价 from 水费基本表 where (编号=:no) and (年=:y) and (月=:m)
     `;     
     Promise.all([
         db.query(
@@ -56,8 +56,39 @@ function queryWaterFee(num, year, month, res) {
 
 module.exports.queryWaterFees = queryWaterFees;
 
-function queryWaterFees(year, month, type, res) {
-    let sqlBasic = `
+async function queryWaterFees(year, month, type, res) {
+  try {
+      let result = await queryWaterFeesImpt(year, month, type);
+      Helper.ResourceFound( res, result );
+  }catch(ex) {
+      Helper.InternalServerError( res, ex, {year, month, type} );
+  }
+    // let sqlBasic = `
+    // Select * from 水费修改计算  where (年=:y) and (月=:m) 
+    // `;
+    // if (type === '1') {
+    //     sqlBasic += `and (抄表形式编号='1')`;
+    // }else if (type === '2') {
+    //     sqlBasic += ` and (抄表形式编号='2')`;
+    // }
+    // db.query(
+    // sqlBasic,
+    // { replacements: {y : year, m : month }, type: db.QueryTypes.SELECT }
+    // ).then(items => {
+    //     if (items.length > 0) {
+    //         Helper.ResourceFound( res, items );
+    //     }else {
+    //         Helper.ResourceNotFound( res , {y : year, m : month });
+    //     }
+    // }).catch(
+    //     error => {
+    //         Helper.InternalServerError( res, error, {y : year, m : month } );
+    //     }
+    // ); 
+}
+
+async function queryWaterFeesImpt(year, month, type) {
+  let sqlBasic = `
     Select * from 水费修改计算  where (年=:y) and (月=:m) 
     `;
     if (type === '1') {
@@ -65,20 +96,11 @@ function queryWaterFees(year, month, type, res) {
     }else if (type === '2') {
         sqlBasic += ` and (抄表形式编号='2')`;
     }
-    db.query(
+  let result = await  db.query(
     sqlBasic,
     { replacements: {y : year, m : month }, type: db.QueryTypes.SELECT }
-    ).then(items => {
-        if (items.length > 0) {
-            Helper.ResourceFound( res, items );
-        }else {
-            Helper.ResourceNotFound( res , {y : year, m : month });
-        }
-    }).catch(
-        error => {
-            Helper.InternalServerError( res, error, {y : year, m : month } );
-        }
-    ); 
+    )
+  return result;  
 }
 
 module.exports.searchWaterFees = search;
@@ -86,7 +108,7 @@ module.exports.searchWaterFees = search;
 async function search(req, res) {
     let obj = req.body || {};
     try {
-        let result = await searchWaterFees(obj, 'Select * from 水费报表查询 ');
+        let result = await searchWaterFeesImpt(obj, 'Select * from 水费报表查询 ');
         Helper.ResourceFound( res, result );
     }catch(ex) {
         Helper.InternalServerError( res, ex, obj );
@@ -121,7 +143,9 @@ function buildWhereCheck(obj, key, para, where) {
     }
 }
 
-async function searchWaterFees(obj, s){
+module.exports.searchWaterFeesImpt = searchWaterFeesImpt;
+
+async function searchWaterFeesImpt(obj, s){
     let sql = s;
     let params = {};
     let where = [];
@@ -300,14 +324,16 @@ async function prepareWaterFees({year, month, commission, others, user}) {
     //根据上月表底数生成本月表底数
     //从上月数生成本月数
     //20181215调整欠费标志默认值，从现有已缴费状态调整为欠费状态
+    //20181217新增“减免排污费水量”，“减免排污费单价”字段
     let sqlInsert = `
         Insert Into 水费基本表 (年,月,编号,户名,上月表底,本月表底,用水量,计划水量, 
           计划水费,超额水量,超额水费,防火费,手续费,实收水费,排污费,其它, 
           欠费标志,大写,操作员,操作时间,申请水量,年用水量,剩余水量, 
-          减免水量,减免单价, 减免水费, 减排污费, 减其它)  
+          减免水量,减免单价, 减免水费, 减排污费, 减其它,减免排污费水量,
+          减免排污费单价, 老表水费)  
             select :year, :month,编号,户名,本月表底,本月表底,0,0,0,0,0,0, 
             手续费,0,0,:others,'2','','','',申请水量,0,0, 
-            0, 0, 0, 0, 0 
+            0, 0, 0, 0, 0, 0, 0, 0
             from 水费基本表      
             where (年=:y) and (月=:m)
         `;
@@ -385,9 +411,12 @@ module.exports.statisticsWaterFees = statistics;
 
 async function statistics(req, res) {
     let {year, month, type} = req.params;
+    let items = req.body || {};
     try {
-        let result = await statisticsWaterFee(year, month, type);
-        Helper.ResourceFound( res, [result] );
+      await saveWaterFeesImpt(items);
+      let summary = await statisticsWaterFee(year, month, type);
+      let data = await queryWaterFeesImpt(year, month, type);
+      Helper.ResourceFound( res, {summary, data} );
     }catch(ex) {
         Helper.InternalServerError( res, ex, { year, month, type } );
     }
@@ -461,7 +490,10 @@ async function toExcel(req, res) {
 
 async function waterFeeToExcel(year, month, type) {
     let sqlStat1 = `
-    Select * from 水费报表查询  where (年=:y) and (月=:m) Order by 编号
+    Select * from 水费报表查询  where (年=:y) and (月=:m) 
+      ${type === '1' ? "and (抄表形式编号='1')" : ''}
+      ${type === '2' ? "and (抄表形式编号='2')" : ''} 
+      Order by 编号
     `;
     let stat1 = await db.query(
         sqlStat1,
@@ -477,6 +509,8 @@ async function waterFeeToExcel(year, month, type) {
         sum(减水费) as 减水费, sum(实收水费) as 实收水费
             from 水费报表查询
             where (年=:y) and (月=:m)
+            ${type === '1' ? "and (抄表形式编号='1')" : ''}
+            ${type === '2' ? "and (抄表形式编号='2')" : ''}
         `;
         let sum1 = await db.query(
             sqlSum,
@@ -544,7 +578,7 @@ async function searchToExcel(req, res) {
 }
 
 async function searchToExcelImp(obj) {
-    let items = await searchWaterFees(obj, 'Select * from 水费报表查询 ');
+    let items = await searchWaterFeesImpt(obj, 'Select * from 水费报表查询 ');
     if(items.length > 0) {
         let sqlSum = `
         Select  count(*) as 户, sum(上月表底) as 上月表底, sum(本月表底) as 本月表底,
@@ -555,7 +589,7 @@ async function searchToExcelImp(obj) {
         sum(减水费) as 减水费, sum(实收水费) as 实收水费
             from 水费报表查询
         `;
-        let sum = await searchWaterFees(obj, sqlSum);
+        let sum = await searchWaterFeesImpt(obj, sqlSum);
         items.forEach(
             (item, index) => {
                 item.水费合计 = `=U${index + 4}-O${index + 4}`
@@ -651,9 +685,12 @@ async function calculateFee(obj) {
     let {
         编号, 年, 月, 本月表底, 上月表底,
         手续费, 其它, 减免水量, 减免单价, 
-        减排污费, 减其它, 老表水费
+        减排污费, 减其它, 老表水费,
+        减免排污费单价, 减免排污费水量
         } = obj;
-    老表水费 = isFinite(老表水费) ? 老表水费 : 0;    
+    老表水费 = 老表水费 && isFinite(老表水费) ? 老表水费 : 0;  
+    减免排污费单价 = 减免排污费单价 && isFinite(减免排污费单价) ? 减免排污费单价 : 0; 
+    减免排污费水量 = 减免排污费水量 && isFinite(减免排污费水量) ? 减免排污费水量 : 0; 
     let FPlan, FOver, FPollute, FCharge,
         FMinusCharge, FMinusPollute, FTrueCharge ;    
     let FRemainWater = 0; //剩余水量 
@@ -743,7 +780,8 @@ async function calculateFee(obj) {
         //月用水量=月用水和-本月计算出的用水量+最新计算出的用水量
         FYearWater = tempSum - parseInt(currentFee.用水量) + IUse;
         //剩余水量
-        FRemainWater = FRation*30- FYearWater;
+        //FRemainWater = FRation*30- FYearWater;
+        FRemainWater = (FRation * moment(`${年}-${月}`, "YYYY-MM").daysInMonth()) - FYearWater;
         if(年 + 月 > SSdate.slice(0, 6)) {
             FOverWater = IUse;//全部为超额水
             FPlanWater = 0;//计划用水
@@ -777,11 +815,14 @@ async function calculateFee(obj) {
     //减免水费
     FMinusCharge = FMinusWater* FMinusStandard;
     //减免排污费
-    FMinusPollute = FMinusWater* FPollutePlan;
+    //20181217调整计算排污费规则
+    //FMinusPollute = FMinusWater* FPollutePlan;
+    FMinusPollute = 减免排污费单价 * 减免排污费水量;
     //20181215新增规则： 编号为2209，自动扣减排污费用、减免水量
     if(编号 === '2209') {
       FMinusPollute = FPollute;
-      FMinusWater = IUse;
+      减免排污费水量 = IUse;
+      减免排污费单价 = FPollutePlan;
     }
     //实收水费
     FTrueCharge = FCharge-FMinusCharge-FMinusPollute-FMinusOthers;
@@ -802,52 +843,60 @@ async function calculateFee(obj) {
         剩余水量 : FRemainWater,
         申请水量 : FApplyWater === 0 ? FRation*30 : FApplyWater,
         减免水费 : FMinusCharge,
-        减排污费 : FMinusPollute,
+        减排污费 : parseFloat(FMinusPollute).toFixed(2),
         实收水费 : parseFloat(FTrueCharge).toFixed(2),
         老表水费 : FOldCharge,
-        减免水量 : FMinusWater
+        减免水量 : FMinusWater,
+        减免排污费水量,
+        减免排污费单价
     };
     return result;
 }
+
+
 
 module.exports.saveWaterFees =  saveWaterFees;
 
 async function saveWaterFees(req, res) {
     let items = req.body || {};
     try {
-        if(items && items.length > 0) {
-            for(let i = 0; i < items.length; i++) {
-                let item = items[i];
-                //20181214增加
-                //抄表器上报数据如果包含“老表上月表底”和“老表本月表底”，
-                //先把老表量加到新表数据里，
-                //然后计算水费
-                //再计算新表的水费
-                //总水费减去新表水费为老表水费
-                let {老表上月表底, 老表本月表底} = item;
-                if(老表上月表底 && 老表本月表底 && 
-                  isFinite(老表上月表底) && isFinite(老表本月表底) &&
-                  parseInt(老表本月表底) > parseInt(老表上月表底)) {
-                    let tempObj = Object.assign({}, item);
-                    tempObj.本月表底 = parseInt(tempObj.本月表底) +  parseInt(老表本月表底) - parseInt(老表上月表底);
-                    let calAll = await calculateFee(tempObj);
-                    let calNew = await calculateFee(item);
-                    calNew.老表水费 = minus(calAll.实收水费 , calNew.实收水费);
-                    calNew.实收水费 = calAll.实收水费;
-                    item = Object.assign({}, item, calNew );
-                    await saveWaterFee(item);
-                } else {
-                  let calItem = await calculateFee(item);
-                  calItem.老表水费 = 0;
-                  item = Object.assign({}, item, calItem );
-                  await saveWaterFee(item);
-                }
-            }
-        }            
+        await saveWaterFeesImpt(items)           
         Helper.ResourceUpdated( res, {result : true, msg : 'ok'} );       
     }catch(ex) {
         Helper.InternalServerError( res, ex, {result : false, msg : ex.message } );
     }
+}
+
+async function saveWaterFeesImpt(items) {
+  if(items && items.length > 0) {
+    for(let i = 0; i < items.length; i++) {
+        let item = items[i];
+        //20181214增加
+        //抄表器上报数据如果包含“老表上月表底”和“老表本月表底”，
+        //先把老表量加到新表数据里，
+        //然后计算水费
+        //再计算新表的水费
+        //总水费减去新表水费为老表水费
+        let {老表上月表底, 老表本月表底} = item;
+        if(老表上月表底 && 老表本月表底 && 
+          isFinite(老表上月表底) && isFinite(老表本月表底) &&
+          parseInt(老表本月表底) > parseInt(老表上月表底)) {
+            let tempObj = Object.assign({}, item);
+            tempObj.本月表底 = parseInt(tempObj.本月表底) +  parseInt(老表本月表底) - parseInt(老表上月表底);
+            let calAll = await calculateFee(tempObj);
+            let calNew = await calculateFee(item);
+            calNew.老表水费 = minus(calAll.实收水费 , calNew.实收水费);
+            calNew.实收水费 = calAll.实收水费;
+            item = Object.assign({}, item, calNew );
+            await saveWaterFee(item);
+        } else {
+          let calItem = await calculateFee(item);
+          calItem.老表水费 = 0;
+          item = Object.assign({}, item, calItem );
+          await saveWaterFee(item);
+        }
+    }
+} 
 }
 
 module.exports.saveWaterFee =  save;
@@ -868,13 +917,14 @@ async function save(req, res) {
 }
 
 async function saveWaterFee(obj) {
+  //20181218 增加'减免排污费水量','减免排污费单价'字段保存
     let {
         编号, 年, 月, 户名, 上月表底, 本月表底, 用水量,
         计划水量, 计划水费, 超额水量, 超额水费, 防火费,
         手续费, 实收水费, 排污费, 其它, 欠费标志,
         操作员, 申请水量, 年用水量, 剩余水量, 减免水量,
         减免单价, 减免水费,  减其它, 减排污费, 应收水费,
-        老表水费
+        老表水费, 减免排污费水量, 减免排污费单价
         } = obj;
     let sqlfee = `
     select 编号 from 水费基本表 where (编号=:no) and (年=:y) and (月=:m)           
@@ -901,7 +951,7 @@ async function saveWaterFee(obj) {
         a17 : 欠费标志 ? '2' : '1',
         a18 : nzhcn.toMoney(parseFloat(实收水费).toFixed(2)),//转换成大写
         a19 : convertLittle(parseFloat(实收水费).toFixed(2)),//转换成小写
-        a20 : 操作员,
+        a20 : 操作员 ? 操作员 : '',
         a21 : dateFormat(new Date(), "yyyy-mm-dd"),
         a22 : parseFloat(申请水量).toFixed(2),
         a23 : parseFloat(年用水量).toFixed(2),
@@ -913,7 +963,9 @@ async function saveWaterFee(obj) {
         a28 : parseFloat(减其它).toFixed(2),
         a29 : parseFloat(应收水费).toFixed(2),        
         a30 : parseFloat(减排污费).toFixed(2),
-        a31 : isFinite(老表水费) ? 老表水费 : 0
+        a31 : 老表水费 && isFinite(老表水费) ? 老表水费 : 0,
+        a32 : 减免排污费水量 && isFinite(减免排污费水量) ? 减免排污费水量 : 0,
+        a33 : 减免排污费单价 && isFinite(减免排污费单价) ? 减免排污费单价 : 0,
     };     
     let result = await db.query(
         sqlfee,
@@ -924,7 +976,7 @@ async function saveWaterFee(obj) {
         let sqlUpdate = `
         update 水费基本表 set  户名=:a4,上月表底=:a5,本月表底=:a6,用水量=:a7,计划水量=:a8,计划水费=:a9,超额水量=:a10,超额水费=:a11,防火费=:a12,手续费=:a13,实收水费=:a14,排污费=:a15,其它=:a16, 
         欠费标志=:a17,大写=:a18,小写=:a19,操作员=:a20,操作时间=:a21,申请水量=:a22,年用水量=:a23,剩余水量=:a24,减免水量=:a25,减免单价=:a26,减免水费=:a27,减其它=:a28,应收水费=:a29,减排污费=:a30
-        ,老表水费=:a31
+        ,老表水费=:a31,减免排污费水量=:a32, 减免排污费单价=:a33
             where (年=:a1) and (月=:a2) and (编号 =:a3)
         `;
         await db.query(
@@ -935,7 +987,7 @@ async function saveWaterFee(obj) {
     } else {
         let sqlInsert = `
         Insert Into 水费基本表 (年,月,编号,户名,上月表底,本月表底,用水量,计划水量,计划水费,超额水量,超额水费,防火费,手续费,实收水费,排污费,其它,欠费标志,大写,小写,操作员,操作时间,申请水量,年用水量,剩余水量,
-            减免水量,减免单价,减免水费,减其它,应收水费,减排污费 )
+            减免水量,减免单价,减免水费,减其它,应收水费,减排污费,减免排污费水量, 减免排污费单价  )
             Values (:a1,:a2,:a3,:a4,:a5,:a6,:a7,:a8,:a9,:a10,:a11,:a12,:a13,:a14,:a15,:a16,:a17,:a18,:a19,:a20,:a21,:a22,:a23,:a24,:a25,:a26,:a27,:a28,:a29,:a30 )                
         `;
         await db.query(
@@ -1053,7 +1105,7 @@ async function SearchFeesByCompany(req, res) {
 }
 
 async function SearchFeesByCompanyImpt(obj) {
-  let items = await searchWaterFees(obj, 'Select * from 水费报表查询 ');
+  let items = await searchWaterFeesImpt(obj, 'Select * from 水费报表查询 ');
   let dict = new Map();
   items.forEach(
       item => {

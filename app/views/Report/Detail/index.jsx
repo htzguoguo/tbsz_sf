@@ -12,9 +12,8 @@ import {
 import moment from 'moment';
 import PHE from 'print-html-element';
 import api from '../../../api';
-import {monthFormat,  formItemLayout, } from '../../../utils/format';
+import {monthFormat} from '../../../utils/format';
 import {handleError} from "../../../utils/notification";
-
 import print from '../../../assets/css/print.less';
 import styles from './index.less';
 const Option = Select.Option;
@@ -23,7 +22,10 @@ const FormItem = Form.Item;
 function cancel() {
     message.error('点击了取消');
 }
-
+const formItemLayout = {
+  labelCol: { span: 5 },
+  wrapperCol: { span: 16 },
+};
 class Detail extends Component {
     constructor(props){
         super(props);        
@@ -64,9 +66,9 @@ class Detail extends Component {
     } 
 
     componentDidMount() {
-        let date = this.props.form.getFieldValue('月份');
-        date = date.format("YYYYMM");
-        this.fetchItems(date, '5');
+        // let date = this.props.form.getFieldValue('月份');
+        // date = date.format("YYYYMM");
+        // this.fetchItems(date, '5');
         this.fetchParameters();
     } 
 
@@ -116,22 +118,64 @@ class Detail extends Component {
         );  
     }
 
-    onMonthChange = (date, dateString) => {
-        date = date.format("YYYYMM");
-        let kind = this.props.form.getFieldValue('收费形式编号');
-        kind = kind ? kind : '5';
-        this.fetchItems(date, kind);
-    }
+    onSearch = (e) => {
+      e.preventDefault();        
+      this.props.form.validateFields((err, values) => {
+          this.setState({ loading: true });
+          values.起始年月 = values.起始年月 ? values.起始年月.format("YYYYMM") : '';
+          values.终止年月 = values.终止年月 ? values.终止年月.format("YYYYMM") : '';
+          api.post('/water/feesearch', values)
+          .then((dt) => {
+            let data = dt.data;
+            const pagination = this.state.pagination;             
+            pagination.total = data.length;             
+            this.setState({
+                loading: false,
+                data: data,
+                pagination,
+            });
+            notification.success({
+                message: '提示',
+                description: `成功获取${data.length}条记录`,
+                duration: 3,
+            });
+          }).catch(
+            err => {
+                handleError(err);
+                const pagination = this.state.pagination;
+                pagination.total = 0;             
+                this.setState({
+                    loading: false,
+                    data: [],
+                    pagination,
+                });
+                notification.success({
+                    message: '提示',
+                    description: `没有满足条件的记录,请重试。`,
+                    duration: 3,
+                });
+            }
+        )
+          }); 
+  }
 
-    onKindChange = (value) => {
-        let date = this.props.form.getFieldValue('月份');
-        date = date.format("YYYYMM");
-        this.fetchItems(date, value);  
-    }
+    // onMonthChange = (date, dateString) => {
+    //     date = date.format("YYYYMM");
+    //     let kind = this.props.form.getFieldValue('收费形式编号');
+    //     kind = kind ? kind : '5';
+    //     this.fetchItems(date, kind);
+    // }
+
+    // onKindChange = (value) => {
+    //     let date = this.props.form.getFieldValue('月份');
+    //     date = date.format("YYYYMM");
+    //     this.fetchItems(date, value);  
+    // }
 
     renderSearchButtons = () =>
-    <Col span={6}>
-        <Button   onClick={() => {PHE.printHtml(document.getElementById('printForm1').innerHTML)}} icon="printer" style={{ marginLeft: 8, marginTop: 4 }}   >打印</Button>
+    <Col span={4}>
+        <Button onClick={this.onSearch} icon="search" type="primary">查询</Button>
+        <Button onClick={() => {PHE.printHtml(document.getElementById('printForm1').innerHTML)}} icon="printer" style={{ marginLeft: 8, marginTop: 4 }}   >打印</Button>
     </Col>
 
     renderAdvancedForm() {
@@ -141,8 +185,49 @@ class Detail extends Component {
         const userName = user ? user.姓名 : ''; 
         return (
         <Form id="searchParasForm" className={styles.searchParasForm}  layout="horizontal" form={this.props.form}>
-            <Row  >              
-                <Col span={6}>
+            <Row  > 
+              <Col span={8}>
+                    <FormItem
+                    label="年月" 
+                    {...formItemLayout}                     
+                    >
+                    <Col span={11}>
+                        {getFieldDecorator(
+                            '起始年月',
+                            {initialValue : moment(new Date(), monthFormat)}
+                        )(
+                            <MonthPicker format={monthFormat}/>                                
+                        )}
+                    </Col>
+                    <Col span={2}  >
+                        <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                        -
+                        </span>
+                    </Col>
+                    <Col span={11}>
+                        {getFieldDecorator(
+                            '终止年月',
+                            {initialValue : moment(new Date(), monthFormat)}
+                        )(
+                            <MonthPicker format={monthFormat}/> 
+                        )}
+                    </Col>
+                    </FormItem>
+                </Col>
+                <Col span={4}>
+                        <FormItem
+                        label="户名"  
+                        {...formItemLayout}                 
+                        >                        
+                            {getFieldDecorator(
+                                '户名',
+                                {initialValue : ''}
+                            )(
+                                <Input />                                
+                            )}                       
+                        </FormItem>
+                </Col>                   
+                {/* <Col span={6}>
                     <FormItem
                     label="月份" 
                     {...formItemLayout}                      
@@ -154,17 +239,16 @@ class Detail extends Component {
                             <MonthPicker onChange={this.onMonthChange} placeholder="" format={monthFormat} />
                         )}  
                     </FormItem>
-                </Col> 
-                <Col span={6}>
+                </Col>  */}
+                <Col span={4}>
                     <FormItem
                             {...formItemLayout}
                             label="收费形式"
                         >
                             {getFieldDecorator(
-                                '收费形式编号'
+                                '收费形式'
                             )(
-                                <Select 
-                                onChange={this.onKindChange}                                        
+                                <Select                                
                                 style={{ width: '100%' }}
                                 > 
                                 {chargekinds.map(d => <Option key={d.收费形式编号}>{d.收费形式编号}-{d.收费形式}</Option>)}                                       
@@ -173,7 +257,7 @@ class Detail extends Component {
                     </FormItem>           
                 </Col> 
 
-                <Col span={6}>
+                <Col span={4}>
                     <FormItem
                     label="制单"  
                     {...formItemLayout}                 
@@ -196,10 +280,13 @@ class Detail extends Component {
         this.setState({ selectedRowKeys, selectedRows });
     }
 
-    renderPrintFeeForm(item) {
+    renderPrintFeeForm(item, i) {
         let name = this.props.form.getFieldValue('制单');
+        let isPaging = (i + 1) % 3 === 0;
+        let str = isPaging ? "noborder print-container-fitcontent paging" : "noborder print-container-fitcontent";
         return (
-            <div key={'pt' + item.编号} className="noborder print-container-h paging "  >
+            //<div key={'pt' + item.编号} className="noborder print-container-h paging "  >
+            <div key={'pt' + item.编号} className={str}  > 
                 <table style={{marginTop : '10mm'}} className="printtable  page-4-h">
                     <tr>
                         <td style={{height: '10mm', colSpan : '2'}}>
@@ -370,7 +457,7 @@ class Detail extends Component {
                 <div  id="printForm1">
                     {
                         selectedRows.map(
-                            (item, i) => this.renderPrintFeeForm(item)
+                            (item, i) => this.renderPrintFeeForm(item, i)
                         )
                     }                       
                 </div>

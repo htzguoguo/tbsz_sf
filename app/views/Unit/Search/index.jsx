@@ -459,7 +459,7 @@ class SearchUnits extends Component {
                     dataSource={this.state.data}
                     // pagination={this.state.pagination}
                     pagination={false}
-                    scroll={{ x: 2600,  y: 600  }}
+                    scroll={{ x: 3210,  y: 600  }}
                     loading={this.state.loading}
                     bordered
                     footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}

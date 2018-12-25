@@ -6,7 +6,7 @@ const {
     ReminderToWord
 } = require('../schema/reminder');
 
-router.get('/items/:ss/:ee', queryReminder);
+router.post('/items', queryReminder);
 
 router.post('/sms', sendReminderSMS);
 

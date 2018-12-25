@@ -122,8 +122,7 @@ class InputDisk extends Component {
                     self.fileName = info.file.response.name; 
                     message.success(`文件上传成功.`);
                     let date = self.props.form.getFieldValue('date');
-                    let txt = self.props.form.getFieldValue('crossdate');
-                    console.log(date.year(), date.month(), txt);
+                    let txt = self.props.form.getFieldValue('crossdate');                    
                     if (date.format("YYYY-MM")  !== copy(txt,1,7)  ){
                         confirm({
                             title: '提示',

@@ -263,8 +263,7 @@ class UnitChangeNameEntry extends Component{
             vvv,
             ['过户日期'],
             'YYYY-MM-DD'
-        );
-        console.log('vvv', vvv);
+        );       
         formatDatePickerValue(
             vvv,
             ['使用期限', '使用期限n', '用水日期', '用水日期n'],

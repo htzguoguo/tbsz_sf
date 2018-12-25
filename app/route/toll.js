@@ -1,5 +1,6 @@
 import TakeToll from '../views/Toll/TakeToll';
 import ListToll from '../views/Toll/List';
+import EditTable from '../views/Toll/EditTable';
 import PrepareToll from '../views/Toll/Prepare';
 import SearchToll from '../views/Toll/Search';
 import Payment from '../views/Toll/Payment';

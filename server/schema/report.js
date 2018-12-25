@@ -2,6 +2,8 @@ const dateFormat = require('dateformat');
 const Helper = require( '../modules/http_helper' );
 const db = require('./tbszSqlConnection');
 const {toExcel} = require('../modules/excel_helper');
+const {plus, minus} = require('../modules/math_helper');
+const {searchWaterFeesImpt} = require('./waterFee');
 module.exports.queryCommission = queryCommission;
 
 async function queryCommission(req, res) {
@@ -94,6 +96,73 @@ async function queryChargeMonthImpt(obj) {
       { replacements: {year, month, num1 : obj.num1, num2 : obj.num2}, type: db.QueryTypes.SELECT }
   );
     return result;
+}
+
+module.exports.ChargeDynamicMonthToExcel = ChargeDynamicMonthToExcel;
+
+async function ChargeDynamicMonthToExcel(req, res) {
+    let obj = req.body || {};
+    try {       
+        let wb = await ChargeDynamicMonthToExcelImpt(obj);
+        res.writeHead(200, [['Content-Type',  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']]);
+        res.end( new Buffer(wb, 'base64') ); 
+    }catch(ex) {
+        Helper.InternalServerError( res, ex, {  } );
+    }
+}
+
+const letters = ['A', 'B', 'C', 'D', 'E',
+  'F', 'G', 'H', 'I', 'J', 'K', 'L',
+  'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+  'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+];
+
+async function ChargeDynamicMonthToExcelImpt(obj) {
+    let items, item;
+    let date = obj.月份;
+    let fields = obj.数据项 ? obj.数据项 : [];
+    let year = date.slice(0, 4);
+    let month = date.slice(4);
+    items = await queryChargeMonthImpt(obj);
+    let values = {
+        date : dateFormat(new Date(), "yyyy-mm-dd"),
+        year : year,
+        month : month,
+    };
+    let len = items.length;
+    fields.forEach(
+      (field, ind) => {
+        values[`field${ind+1}`] = field;
+      }
+    );
+    let data = [];
+    if(len > 0) {
+      for(let i = 0; i < len; i++) {
+        let item = items[i];
+        fields.forEach(
+          (field, ind) => {
+            item[`value${ind+1}`] = item[field];
+          }
+        );
+      } 
+        let sum = {
+          编号 : '合计',
+          户名 : `${len}户`,
+          装表地点 : '',
+          排污费单价 : '',
+          上月表底 : ``,
+          本月表底 : ``,
+        };
+        fields.forEach(
+          (field, ind) => {
+            sum[`value${ind+1}`] = `=SUM(${letters[ind + 5]}4:${letters[ind + 5]}${len + 3})`;
+          }
+        );
+        items.push(sum);
+    }
+    
+    values.items = items;   
+    return toExcel('dynamiccharge', 'Sheet1', values);
 }
 
 module.exports.ChargeMonthToExcel = ChargeMonthToExcel;
@@ -190,13 +259,13 @@ async function queryChargeYearByCorpImpt(obj) {
                 value.实际用水量 += item.实际用水量;
                 value.实际计划水费 += item.实际计划水费;
                 value.超额水量 += item.超额水量;
-                value.超额水费 += item.超额水费;
-                value.防火费 += item.防火费;
-                value.手续费 += item.手续费;
-                value.减水费 += item.减水费;
-                value.实收水费 += item.实收水费;
-                value.排污费 += item.排污费;
-                value.其它 += item.其它;
+                value.超额水费 = plus(value.超额水费, item.超额水费);
+                value.防火费 =  plus(value.防火费, item.防火费);
+                value.手续费 =  plus(value.手续费, item.手续费);
+                value.减水费 =  plus(value.减水费, item.减水费);
+                value.实收水费 =  plus(value.实收水费, item.实收水费);
+                value.排污费 =  plus(value.排污费, item.排污费);
+                value.其它 =  plus(value.其它, item.其它);
             }else {
                 dict.set(key, item)
             }

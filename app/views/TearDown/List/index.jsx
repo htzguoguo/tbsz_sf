@@ -9,10 +9,13 @@ import {
 } from 'antd';
 import moment from 'moment';
 import api from '../../../api';
+import {formItemLayout} from '../../../utils/format';
 import {handleError} from "../../../utils/notification";
 import styles from './index.less';
 const Search = Input.Search;
 const confirm = Modal.confirm;
+const FormItem = Form.Item;
+const { TextArea } = Input;
 class TearDownList extends Component {
 
     constructor(props) {
@@ -27,7 +30,8 @@ class TearDownList extends Component {
             loading: false,
             loading1: false,
             visible: false,
-            showStat : false    
+            showStat : false,
+            modalVisible: false,
         };
         this.store = {
             pagination : {},
@@ -37,6 +41,7 @@ class TearDownList extends Component {
         const downloadFile = this.downloadFile.bind(this);
         const handleTaskDone = this.handleTaskDone.bind(this); 
         const handleDelete = this.handleDelete.bind(this);
+        let self = this;
         this.columns = [
             {
                 title: '编号',
@@ -50,8 +55,8 @@ class TearDownList extends Component {
                 sorter: (a, b) => a.户名.length - b.户名.length,
             },
             {
-                title: '创建人',
-                dataIndex: '操作员',
+                title: '通知人',
+                dataIndex: '通知人',
             },
             {
                 title: '状态',
@@ -65,11 +70,19 @@ class TearDownList extends Component {
                 },
             },
             {
-                title: '合同申请时间',
+                title: '申请时间',
                 dataIndex: '操作时间',
             },
+            { 
+              title: '处理结果',
+              dataIndex: '处理结果',
+            },
+            { 
+              title: '经办人',
+              dataIndex: '经办人',
+            },
             {
-                title: '合同完成时间',
+                title: '完成时间',
                 dataIndex: '完成时间',
             },
             {
@@ -82,17 +95,22 @@ class TearDownList extends Component {
                     if(record.状态 !==  '完成') {
                         element.push(<Divider type="vertical" />);
                         element.push(<a onClick={() => {
-                            confirm({
-                                title: '系统提示:',
-                                content: `"确定[${record.户名}]终止供水合同已经完成？`,
-                                onOk() {
-                                    handleTaskDone(text, record, index);
-                                }, 
-                                onCancel() {
-                                },                   
-                                okText : "确认",
-                                cancelText : "取消"
-                            });   
+                            // confirm({
+                            //     title: '系统提示:',
+                            //     content: `"确定[${record.户名}]终止供水合同已经完成？`,
+                            //     onOk() {
+                            //         handleTaskDone(text, record, index);
+                            //     }, 
+                            //     onCancel() {
+                            //     },                   
+                            //     okText : "确认",
+                            //     cancelText : "取消"
+                            // }); 
+                            self.record = record;
+                            self.props.form.setFieldsValue(record);
+                                self.setState({                                                               
+                                    modalVisible: true,
+                                });      
                         }}>完成合同</a>);
                         element.push(<Divider type="vertical" />);
                         element.push(<a onClick={() => {
@@ -127,25 +145,32 @@ class TearDownList extends Component {
         this.onContractSearch();
     }
 
-    handleTaskDone(text, record, index) {
-        api.put(`contract/teardown/${record.编号}`)
-        .then((data) => { 
-            notification.success({
-                message: '提示',
-                description: `${record.户名}的终止供水合同完成。`,
-                duration: 3,
-            });                    
-            this.onContractSearch(this.selectedNum);                   
-        })
-        .catch(
-            err => {                       
-                notification.error({
-                    message: '提示',
-                    description: `${record.户名}的终止供水合同不成功，请重试。"`,
-                    duration: 3,
-                });
-            }
-        );
+    handleTaskDone() {
+      this.props.form.validateFields((err, values) => {
+        if (!err) {
+          api.put(`contract/teardown`, values)
+          .then((data) => { 
+              notification.success({
+                  message: '提示',
+                  description: `${values.户名}的终止供水合同完成。`,
+                  duration: 3,
+              }); 
+              this.setState({modalVisible : false});                   
+              this.onContractSearch(this.selectedNum);                   
+          })
+          .catch(
+              err => { 
+                this.setState({modalVisible : false});                      
+                  notification.error({
+                      message: '提示',
+                      description: `${values.户名}的终止供水合同不成功，请重试。"`,
+                      duration: 3,
+                  });
+              }
+          );
+        }
+    }); 
+        
     }
 
     downloadFile(text, record, index) {
@@ -190,7 +215,7 @@ class TearDownList extends Component {
 
     onContractSearch(num) {
         this.selectedNum = num;
-        api.get(`contract/teardown/${num}`, {            
+        api.get(`contract/teardown/${num ? num : 'undefined'}`, {            
             responseType: 'json'
         }).then((dt) => {
             let data = dt.data;
@@ -214,6 +239,77 @@ class TearDownList extends Component {
         });
     }
 
+    renderCompleteForm = () => {
+      const { getFieldDecorator } = this.props.form;
+      const {mode} = this.state;
+      return (
+          <Modal
+              title='完成合同'
+              centered
+              visible={this.state.modalVisible}
+              okText="确认"
+              cancelText="取消"
+              onOk={() => {
+                  this.setState({modalVisible : true});
+                  this.handleTaskDone();
+                  if(mode === 'add') {                       
+                      this.handleAdd();
+                  }else {
+                      this.handleEdit();
+                  }
+              }}
+              onCancel={() => this.setState({modalVisible : false})}
+          >
+              <Form id="searchParasForm"   form={this.props.form}>
+                <FormItem
+                      label="编号" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '编号',
+                              {initialValue : ''}
+                          )(
+                              <Input disabled={true}></Input>
+                          )}  
+                </FormItem>
+                <FormItem
+                      label="户名" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '户名',
+                              {initialValue : ''}
+                          )(
+                            <Input disabled={true}></Input>
+                          )}  
+                </FormItem>
+                <FormItem
+                    label="经办人" 
+                    {...formItemLayout}                      
+                    >
+                        {getFieldDecorator(
+                            '经办人',
+                            {initialValue : ''}
+                        )(
+                            <Input  ></Input>
+                        )}  
+                </FormItem>
+                <FormItem
+                    label="处理结果" 
+                    {...formItemLayout}                      
+                    >
+                        {getFieldDecorator(
+                            '处理结果',
+                            {initialValue : ''}
+                        )(
+                          <TextArea rows={4} />
+                        )}  
+                </FormItem>
+              </Form>
+          </Modal>
+          );
+  }
+
     render() {
         return (           
             <div className="ant-row" style={{marginTop:20}}>                
@@ -223,11 +319,11 @@ class TearDownList extends Component {
                     </div>
                 </div>
                 <Row>
-                <Col span={5}>
+                <Col span={10}>
                         <Search
                             ref={input => this.Search = input}
-                            placeholder="企业编号"
-                            defaultValue={this.selectedNum}
+                            placeholder="编号/户名"
+                            defaultValue={''}
                             onSearch={(e => {
                                 this.onContractSearch(e);
                             })}
@@ -235,6 +331,7 @@ class TearDownList extends Component {
                         />
                     </Col>
                 </Row>
+                {this.renderCompleteForm()}
                 <Divider></Divider>
                 <Table columns={this.columns}                     
                     rowKey={record => parseInt(record.编号)}

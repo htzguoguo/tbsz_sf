@@ -1177,7 +1177,7 @@ class SearchWaterFees extends Component {
                     dataSource={this.state.data}
                     pagination={this.state.pagination}
                     loading={this.state.loading}
-                    scroll={{ x: 2600,  y: 600  }}
+                    scroll={{ x: 3370,  y: 600  }}
                     bordered
                     footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
                 />

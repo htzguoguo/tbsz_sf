@@ -1,3 +1,5 @@
+
+//width=3270
 export const  feeColumns = [
   {
     title: '编号',
@@ -29,12 +31,14 @@ export const  feeColumns = [
     dataIndex: '本月表底',
     width: 150,
     className: 'special-field',
+    editable: true,
     sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底),
   }, 
   {
     title: '用水量',
     dataIndex: '用水量',
     width: 150,
+    editable: true,
     sorter: (a, b) => parseFloat(a.用水量) - parseFloat(b.用水量)  
   },
   {
@@ -82,7 +86,7 @@ export const  feeColumns = [
     width: 120,
   },
   {
-    title: '排污费',
+    title: '实缴排污费',
     dataIndex: '排污费',
     width: 120,
     className: 'special-field',
@@ -101,12 +105,14 @@ export const  feeColumns = [
       title: '减免水量',
       dataIndex: '减免水量',
       width: 120,
+      editable: true,
       className: 'special-field',
   },
   {
     title: '减免单价',
     dataIndex: '减免单价',
     width: 120,
+    editable: true,
     className: 'special-field',
   },
   {
@@ -126,12 +132,19 @@ export const  feeColumns = [
     className: 'special-field',
   }, 
   {
+    title: '水费合计',
+    width: 120,
+    render: (value, row, index) => parseFloat(row['实收水费'] - row['排污费']).toFixed(2)
+  }, 
+  {
     title: '实收水费',
     dataIndex: '实收水费',
     width: 120,
+    
   },
 ];
 
+//width=1950
 export const  chargeYearlyByMeterColumns = [
   {
     title: '编号',
@@ -188,12 +201,12 @@ export const  chargeYearlyByMeterColumns = [
   {
       title: '手续费',
       dataIndex: '手续费',
-      width: 150,
+      width: 120,
   },
   {
-    title: '排污费',
+    title: '实缴排污费',
     dataIndex: '排污费',
-    width: 150,
+    width: 120,
   },
   {
     title: '其它',
@@ -203,7 +216,7 @@ export const  chargeYearlyByMeterColumns = [
   {
     title: '减水费',
     dataIndex: '减水费',
-    width: 150,
+    width: 120,
   },
   {
     title: '实收水费',
@@ -212,6 +225,7 @@ export const  chargeYearlyByMeterColumns = [
   },
 ];
 
+//width=1710
 export const  chargeYearlyByCorpColumns = [
   {
       title: '户名',
@@ -256,12 +270,12 @@ export const  chargeYearlyByCorpColumns = [
   {
       title: '手续费',
       dataIndex: '手续费',
-      width: 150,
+      width: 120,
   },
   {
-    title: '排污费',
+    title: '实缴排污费',
     dataIndex: '排污费',
-    width: 150,
+    width: 120,
   },
   {
     title: '其它',
@@ -271,15 +285,18 @@ export const  chargeYearlyByCorpColumns = [
   {
     title: '减水费',
     dataIndex: '减水费',
-    width: 150,
+    width: 120,
   },
   {
     title: '实收水费',
     dataIndex: '实收水费',
     width: 120,
+    render: (value, row, index) => parseFloat(value).toFixed(2)
   },
 ];
 
+
+//width=3210
 export const  unitColumns = [
   {
     title: '编号',

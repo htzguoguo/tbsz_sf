@@ -9,28 +9,33 @@ const {toWord} = require('../modules/word_helper');
 const PENALTY_RATE = 0.005;
 module.exports.queryReminder = queryReminder;
 BigNumber.config({ DECIMAL_PLACES: 2 })
+
 async function queryReminder(req, res) {
-    let { ss, ee } = req.params;
+  let obj = req.body || {};
     try {         
-        let result = await queryReminderImpt(ss, ee);
+        let result = await queryReminderImpt(obj);
         Helper.ResourceFound( res, result );
     }catch(ex) {
-        Helper.InternalServerError( res, ex, { ss, ee } );
+        Helper.InternalServerError( res, ex, obj );
     }
 }
 
-async function queryReminderImpt(ss, ee) {
+async function queryReminderImpt(obj) {
+  let date1 = obj.date1;
+  let date2 = obj.date2;
+  let num = obj.编号;
     let items;
     const cur = moment();
     let sqlSelect = `
     select 编号, 户名, 年, 月, 实收水费
         from dbo.水费基本表
         where (年+月>=:date1) and (年+月<=:date2) and 欠费标志 = '2'
+        ${num && num.length > 0 ? `and (编号=${num})` : ''}
         order by 编号, 年,月
     `;
     items = await db.query(
         sqlSelect,
-        { replacements: {date1 : ss, date2 : ee}, type: db.QueryTypes.SELECT }
+        { replacements: {date1, date2}, type: db.QueryTypes.SELECT }
     );
     let dict = new Map();
     items.forEach(

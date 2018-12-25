@@ -165,7 +165,7 @@ class ReminderList extends Component {
             this.setState({ loading: true });
             values.date1 = values.date1 ? values.date1.format("YYYYMM") : '';
             values.date2 = values.date2 ? values.date2.format("YYYYMM") : '';
-            api.get(`/reminder/items/${values.date1}/${values.date2}`).then((dt) => {
+            api.post(`/reminder/items`, values).then((dt) => {
                 let data = dt.data;
                 const pagination = this.state.pagination;             
                 pagination.total = data.length;             
@@ -262,19 +262,30 @@ class ReminderList extends Component {
                         )}  
                     </FormItem>
                 </Col>
-                <Col span={5}>
-                    <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 4 }}  type="primary">查询</Button>
+                <Col span={6}>
+                    <FormItem
+                    label="编号" 
+                    {...formItemLayout}                      
+                    >                  
+                        {getFieldDecorator(
+                            '编号',
+                            {initialValue : ''}
+                        )(
+                            <Input        />                                
+                        )}
+                    </FormItem>
                 </Col>
-                <Col  span={8}>
-                    <Button  type="primary" onClick={() => this.handleModalVisible(true)} icon="message" style={{ marginLeft: 8, marginTop: 4 }}   >短信催缴</Button>
-                    <Button  type="primary" 
-                    loading={this.state.loading1} 
-                    onClick={() => {this.reminderToWord(1, 'reminder' ,'催款通知')}} 
-                    icon="exclamation-circle" style={{ marginLeft: 8, marginTop: 4 }}   >催款通知</Button>
-                    <Button  type="primary" 
-                    loading={this.state.loading2} 
-                    onClick={() => {this.reminderToWord(2, 'suspension' ,'停水通知')}} 
-                    icon="poweroff" style={{ marginLeft: 8, marginTop: 4 }}   >停水通知</Button>
+                <Col  span={10}>
+                  <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 4 }}  type="primary">查询</Button>
+                  <Button  type="primary" onClick={() => this.handleModalVisible(true)} icon="message" style={{ marginLeft: 8, marginTop: 4 }}   >短信催缴</Button>
+                  <Button  type="primary" 
+                  loading={this.state.loading1} 
+                  onClick={() => {this.reminderToWord(1, 'reminder' ,'催款通知')}} 
+                  icon="exclamation-circle" style={{ marginLeft: 8, marginTop: 4 }}   >催款通知</Button>
+                  <Button  type="primary" 
+                  loading={this.state.loading2} 
+                  onClick={() => {this.reminderToWord(2, 'suspension' ,'停水通知')}} 
+                  icon="poweroff" style={{ marginLeft: 8, marginTop: 4 }}   >停水通知</Button>
                 </Col> 
             </Row>
         </Form>

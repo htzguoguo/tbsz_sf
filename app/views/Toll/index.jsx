@@ -70,8 +70,7 @@ class Toll extends Component {
         Array.isArray(menuItems) && menuItems.map((item, i) => {            
             if(this.isActive(item.url, this.props.history)){
                 activeKey = 'sidebarsub'+ (i + 1).toString()
-                openKey = 'sub1' 
-                console.log(activeKey, openKey, i);
+                openKey = 'sub1'                 
             }
         });
       

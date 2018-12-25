@@ -102,7 +102,7 @@ class TearDown extends Component {
         units = units || [];
         return units.map(
             (unit, index) => 
-                <p key={index}>表号{index + 1}:<span style={{marginLeft:'10px', color : 'red'}}><b>{unit.编号}</b></span></p>
+                <span key={index}>表号{index + 1}:<span style={{marginLeft:'10px', color : 'red'}}><b>{unit.编号}</b></span></span>
         );
     }
 
@@ -121,7 +121,7 @@ class TearDown extends Component {
                             <FormItem>
                                 {getFieldDecorator(
                                     '编号',
-                                    {initialValue : '0002'}
+                                    {initialValue : ''}
                             )(
                                 <Input addonBefore="编号:"  placeholder="" />                              
                                 )}

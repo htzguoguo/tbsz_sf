@@ -32,7 +32,7 @@ router.get( '/teardown/:num', function ( req, res, next ) {
     queryTearDownByNum(num, res);
 } );
 
-router.put('/teardown/:num', TearDownComplete);
+router.put('/teardown', TearDownComplete);
 
 router.delete('/contracts/:num/:year', deleteContract);
 

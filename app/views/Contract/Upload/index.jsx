@@ -67,8 +67,7 @@ class UploadFiles extends Component {
     onUploadFiles = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            let files = values.fileList;
-            console.log('files', files);
+            let files = values.fileList;           
             values.files = files.map(
                 file => file.response.name
             );

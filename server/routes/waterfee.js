@@ -38,7 +38,8 @@ router.get( '/fees/:year/:month/:type', function ( req, res, next ) {
     queryWaterFees(year, month, type, res);
 } );
 
-router.get( '/feesstat/:year/:month/:type',  statisticsWaterFees);
+//router.get( '/feesstat/:year/:month/:type',  statisticsWaterFees);
+router.post( '/feesstat/:year/:month/:type',  statisticsWaterFees);
 
 
 router.get( '/feesnum/:year/:month',  queryWaterFeesNum);

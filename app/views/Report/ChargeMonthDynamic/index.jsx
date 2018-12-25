@@ -35,7 +35,39 @@ class ChargeMonthDynamic extends Component {
           loading: false,
           loading1: false
         };
-        this.columns = feeColumns;
+        this.columns = [
+          {
+            title: '编号',
+            dataIndex: '编号',
+            key: '编号', 
+            width: 100,
+            sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+          },
+          {
+              title: '户名',
+              dataIndex: '户名',
+              width: 200,
+              sorter: (a, b) => a.户名.length - b.户名.length,
+          },
+          {
+            title: '用水地点',
+            dataIndex: '装表地点', 
+            width: 150,            
+          },
+          {
+            title: '上月表底',
+            dataIndex: '上月表底',
+            width: 150,             
+            sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
+          },
+          {
+            title: '本月表底',
+            dataIndex: '本月表底',           
+            editable: true,
+            width: 150,
+            sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底),
+          }, 
+        ];
         this.today = moment(new Date(), 'YYYYMMDD');
     } 
 
@@ -66,6 +98,7 @@ class ChargeMonthDynamic extends Component {
             if (!this.validatesPara(values)) {
               return
             }
+            values.kind = '1';
             api.post(
               `/report/chargemonth/query`, 
               values,
@@ -106,6 +139,7 @@ class ChargeMonthDynamic extends Component {
         if (!this.validatesPara(values)) {
           return
         }
+        values.kind = '1';
         api.post(
             `/report/${flag}/excel`, 
             values,
@@ -132,7 +166,7 @@ class ChargeMonthDynamic extends Component {
     renderSearchButtons = () =>
     <Col offset={20} span={4}>
       <Button type="primary" onClick={this.onSearch} icon="search">搜索</Button>
-      <Button onClick={(e) => this.onToExcel(e, 1, 'chargemonth', '天保市政公司水费统计表')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出</Button>
+      <Button onClick={(e) => this.onToExcel(e, 1, 'chargedynamicmonth', '天保市政公司水费统计表')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出</Button>
     </Col>
 
     renderAdvancedForm() {
@@ -190,8 +224,7 @@ class ChargeMonthDynamic extends Component {
                     wrapperCol= {{span: 21}}
                     >                        
                         {getFieldDecorator(
-                            '数据项',
-                            {initialValue : ['用水量']}
+                            '数据项',                           
                         )(
                           <Select
                             mode="multiple"
@@ -222,29 +255,39 @@ class ChargeMonthDynamic extends Component {
         );
     }
     render() {
-        const { loading} = this.state;
-        return (  
-            <div>
-                <div className="ant-row" style={{marginTop:20}}>
-                    {this.renderAdvancedForm()}
-                    <Divider></Divider>
-                    <Table 
-                      columns={this.columns}                     
-                      rowKey={record => parseInt(record.编号)}
-                      dataSource={this.state.data}
-                      // pagination={this.state.pagination}
-                      pagination={false}
-                      loading={this.state.loading}
-                      scroll={{ x: 2600,  y: 600  }}
-                      bordered
-                      footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
-                    />
-                </div>
-        </div>
-        );
+      let fields = this.props.form.getFieldValue('数据项');
+      let dynamicColumns = (fields && fields.map(
+        field => {
+          let obj = {
+            title: field,
+            dataIndex: field,
+            width: 150,
+          };
+          return obj;
+        }
+      )) || [];
+      let columns = [...this.columns, ...dynamicColumns];
+      const { loading} = this.state;
+      return (  
+          <div>
+              <div className="ant-row" style={{marginTop:20}}>
+                  {this.renderAdvancedForm()}
+                  <Divider></Divider>
+                  <Table 
+                    columns={columns}                     
+                    rowKey={record => parseInt(record.编号)}
+                    dataSource={this.state.data}
+                    // pagination={this.state.pagination}
+                    pagination={false}
+                    loading={this.state.loading}
+                    scroll={{  y: 600  }}
+                    bordered
+                    footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
+                  />
+              </div>
+      </div>
+      );
     }
-
-
 }
 
 ChargeMonthDynamic.propTypes = {

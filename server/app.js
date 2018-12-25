@@ -18,7 +18,7 @@ const port = process.env.PORT || 8181;
 /*const staticPath = path.join( __dirname, 'build' );*/
 //const adminUser = new User();
 
-
+app.use(bodyParser({limit: '50mb'}))
 app.use( bodyParser.json() );
 app.use( bodyParser.urlencoded( { extended : false } ) );
 app.use(cookieParser('login'));

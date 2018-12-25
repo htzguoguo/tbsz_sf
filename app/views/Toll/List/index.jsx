@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import {
     Table, Button, message,  
-    notification, Popconfirm,  
-    Divider, Input, Row, Col, Radio,
-    Select,   Form, Alert 
+    notification, Popconfirm, Modal, 
+    Divider, Input, InputNumber, Row, Col, Radio,
+    Select,   Form, Alert, DatePicker 
 } from 'antd';
 import moment from 'moment';
 import api from '../../../api';
-import {handleError} from "../../../utils/notification";
-import {feeColumns} from '../../../components/Table';
+import {monthFormat, } from '../../../utils/format';
+import {handleError, showNotification} from "../../../utils/notification";
 import './index.less';
-
-
+const confirm = Modal.confirm;
+const { MonthPicker } = DatePicker;
 const Option = Select.Option; 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -23,37 +23,22 @@ let _data = [];
 function cancel() {
     message.error('点击了取消');
 }
-
-// 通过 rowSelection 对象表明需要行选择
-const rowSelection = {
-
-    onChange(selectedRowKeys, selectedRows) {
-         
-    },
-
-    onSelect(record, selected, selectedRows) {
-         
-    },
-
-    onSelectAll(selected, selectedRows, changeRows) {
-
-         
-    }
+const formItemLayout = {
+  labelCol: { span: 5 },
+  wrapperCol: { span: 19 },
 };
-
 class ContentLists extends Component {
     constructor(props){
         super(props);
-        this.selectedYear = 2017;
-        this.selectedMonth = '07';
-        this.selectedNum = '0002';
         this.selectedType = '3';
+        this.tempData = []
         this.state = {
             data: [],
+            editingKey: '',
             pagination: {},
             loading: false,
             loading1: false,
-            visible: false,
+            modalVisible: false,
             showStat : false    
         };
         this.store = {
@@ -63,6 +48,150 @@ class ContentLists extends Component {
         };
         const onEdit = this.onEdit.bind(this); 
         const onDelete = this.onDelete.bind(this);
+
+        const  feeColumns = [
+          {
+            title: '编号',
+            dataIndex: '编号',
+            key: '编号', 
+            width: 90,
+            fixed: 'left',               
+            sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
+          },
+          {
+              title: '户名',
+              dataIndex: '户名',
+              width: 300,
+              sorter: (a, b) => a.户名.length - b.户名.length,
+          },
+          {
+            title: '用水地点',
+            dataIndex: '装表地点',
+            width: 150,
+          },
+          {
+            title: '上月表底',
+            dataIndex: '上月表底',
+            width: 150,
+            sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
+          },
+          {
+            title: '本月表底',
+            dataIndex: '本月表底',
+            width: 150,
+            className: 'special-field',
+            render: (text, record) => this.renderColumns(text, record, '本月表底'),
+            sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底),
+          }, 
+          {
+            title: '用水量',
+            dataIndex: '用水量',
+            width: 150,
+            sorter: (a, b) => parseFloat(a.用水量) - parseFloat(b.用水量)  
+          },
+          {
+            title: '计划水量',
+            dataIndex: '计划水量',
+            width: 150,
+            sorter: (a, b) => parseFloat(a.计划水量) - parseFloat(b.计划水量)  
+          },
+          {
+            title: '单价',
+            dataIndex: '单价',
+            width: 120,
+          }, 
+          {
+              title: '计划水费',
+              dataIndex: '计划水费',
+              width: 150,
+              sorter: (a, b) => parseFloat(a.计划水费) - parseFloat(b.计划水费)  
+          },
+          {
+            title: '超额水量',
+            dataIndex: '超额水量',
+            width: 150,
+            sorter: (a, b) => parseFloat(a.超额水量) - parseFloat(b.超额水量)  
+          },
+          {
+            title: '超计划',
+            dataIndex: '超计划',
+            width: 120,
+          },
+          {
+            title: '超额水费',
+            dataIndex: '超额水费',
+            width: 150,
+            sorter: (a, b) => parseFloat(a.超额水费) - parseFloat(b.超额水费)  
+          },
+          {
+            title: '防火费',
+            dataIndex: '防火费',
+            width: 120,
+          },
+          {
+            title: '手续费',
+            dataIndex: '手续费',
+            width: 120,
+          },
+          {
+            title: '实缴排污费',
+            dataIndex: '排污费',
+            width: 120,
+            className: 'special-field',
+          },
+          {
+            title: '其它',
+            dataIndex: '其它',
+            width: 120,
+          },
+          {
+              title: '应收水费',
+              dataIndex: '应收水费', 
+              width: 120,              
+          },
+          {
+              title: '减免水量',
+              dataIndex: '减免水量',
+              width: 120,
+              editable: true,
+              className: 'special-field',
+          },
+          {
+            title: '减免单价',
+            dataIndex: '减免单价',
+            width: 120,
+            editable: true,
+            className: 'special-field',
+          },
+          {
+            title: '减免水费',
+            dataIndex: '减免水费',
+            width: 120,
+          }, 
+          {
+            title: '减排污费',
+            dataIndex: '减排污费',
+            width: 120,
+          },
+          {
+            title: '减其它',
+            dataIndex: '减其它',
+            width: 120,
+            className: 'special-field',
+          }, 
+          {
+            title: '水费合计',
+            width: 120,
+            render: (value, row, index) => parseFloat(row['实收水费'] - row['排污费']).toFixed(2)
+          }, 
+          {
+            title: '实收水费',
+            dataIndex: '实收水费',
+            width: 120,
+            
+          },
+        ];
+
         this.columns = [
           ...feeColumns,
           {
@@ -72,7 +201,8 @@ class ContentLists extends Component {
             fixed: 'right',
             width: 150,
             render:function(text, record, index){
-                return (
+              // const { editable } = record;
+              const normal = (
                     <span>                           
                         <a onClick={onEdit.bind(this,text, record, index)}>单录  </a>
                         <Divider type="vertical" />
@@ -80,166 +210,77 @@ class ContentLists extends Component {
                             <a >删除</a>
                         </Popconfirm>
                     </span>
-                )
+                );
+              // const edit = (
+              //   <span>
+              //     <a onClick={() => this.save(record.key)}>Save</a>
+              //     <Popconfirm title="Sure to cancel?" onConfirm={() => this.cancel(record.key)}>
+              //       <a>Cancel</a>
+              //     </Popconfirm>
+              //   </span>
+              // );
+              // return (
+              //   <div className="editable-row-operations">
+              //   {editable ? edit : normal};
+              // </div>
+              // );
+              return normal;
             },
           }
-        ];
-        // this.columns = [
-        //     {
-        //         title: '编号',
-        //         dataIndex: '编号',
-        //         key: '编号', 
-        //         width: 90,
-        //         fixed: 'left',               
-        //         sorter: (a, b) => parseInt(a.编号) - parseInt(b.编号)                 
-        //     },
-        //     {
-        //         title: '户名',
-        //         dataIndex: '户名',
-        //         width: 300,
-        //         sorter: (a, b) => a.户名.length - b.户名.length,
-        //     },
-        //     {
-        //       title: '用水地点',
-        //       dataIndex: '装表地点',
-        //       width: 150,
-        //     },
-        //     {
-        //       title: '上月表底',
-        //       dataIndex: '上月表底',
-        //       width: 120,
-        //       sorter: (a, b) => parseFloat(a.上月表底) - parseFloat(b.上月表底)  
-        //     },
-        //     {
-        //       title: '本月表底',
-        //       dataIndex: '本月表底',
-        //       width: 120,
-        //       className: 'special-field',
-        //       sorter: (a, b) => parseFloat(a.本月表底) - parseFloat(b.本月表底),
-        //     }, 
-        //     {
-        //       title: '用水量',
-        //       dataIndex: '用水量',
-        //       width: 120,
-        //       sorter: (a, b) => parseFloat(a.用水量) - parseFloat(b.用水量)  
-        //     },
-        //     {
-        //       title: '计划水量',
-        //       dataIndex: '计划水量',
-        //       width: 120,
-        //       sorter: (a, b) => parseFloat(a.计划水量) - parseFloat(b.计划水量)  
-        //     },
-        //     {
-        //       title: '单价',
-        //       dataIndex: '单价',
-        //       width: 120,
-        //     }, 
-        //     {
-        //         title: '计划水费',
-        //         dataIndex: '计划水费',
-        //         width: 120,
-        //         sorter: (a, b) => parseFloat(a.计划水费) - parseFloat(b.计划水费)  
-        //     },
-        //     {
-        //       title: '超额水量',
-        //       dataIndex: '超额水量',
-        //       width: 120,
-        //       sorter: (a, b) => parseFloat(a.超额水量) - parseFloat(b.超额水量)  
-        //     },
-        //     {
-        //       title: '超计划',
-        //       dataIndex: '超计划',
-        //       width: 120,
-        //     },
-        //     {
-        //       title: '超额水费',
-        //       dataIndex: '超额水费',
-        //       width: 120,
-        //       sorter: (a, b) => parseFloat(a.超额水费) - parseFloat(b.超额水费)  
-        //     },
-        //     {
-        //       title: '防火费',
-        //       dataIndex: '防火费',
-        //       width: 120,
-        //     },
-        //     {
-        //       title: '手续费',
-        //       dataIndex: '手续费',
-        //       width: 120,
-        //     },
-        //     {
-        //       title: '排污费',
-        //       dataIndex: '排污费',
-        //       width: 120,
-        //       className: 'special-field',
-        //     },
-        //     {
-        //       title: '其它',
-        //       dataIndex: '其它',
-        //       width: 120,
-        //     },
-        //     {
-        //         title: '应收水费',
-        //         dataIndex: '应收水费', 
-        //         width: 120,              
-        //     },
-        //     {
-        //         title: '减免水量',
-        //         dataIndex: '减免水量',
-        //         width: 120,
-        //         className: 'special-field',
-        //     },
-        //     {
-        //       title: '减免单价',
-        //       dataIndex: '减免单价',
-        //       width: 120,
-        //       className: 'special-field',
-        //     },
-        //     {
-        //       title: '减免水费',
-        //       dataIndex: '减免水费',
-        //       width: 120,
-        //     }, 
-        //     {
-        //       title: '减排污费',
-        //       dataIndex: '减排污费',
-        //       width: 120,
-        //     },
-        //     {
-        //       title: '减其它',
-        //       dataIndex: '减其它',
-        //       width: 120,
-        //       className: 'special-field',
-        //     }, 
-        //     {
-        //       title: '实收水费',
-        //       dataIndex: '实收水费',
-        //       width: 120,
-        //     },
-        //     {
-        //         title: '操作',
-        //         dataIndex: '编号',
-        //         key : '编号',
-        //         fixed: 'right',
-        //         width: 150,
-        //         render:function(text, record, index){
-        //             return (
-        //                 <span>                           
-        //                     <a onClick={onEdit.bind(this,text, record, index)}>单录  </a>
-        //                     <Divider type="vertical" />
-        //                     <Popconfirm title={`删除之后无法恢复,户名:${record.户名} 确认要删除吗?`} onConfirm={onDelete.bind(this,text, record, index)} onCancel={cancel}>
-        //                         <a >删除</a>
-        //                     </Popconfirm>
-        //                 </span>
-        //             )
-        //         } ,
-        //     }
-
-
-        // ];
+        ];     
         this.radioFilter = '';
         this.searchFilter = '';
     }
+
+    renderColumns(text, record, column) {
+      return (
+        <span>
+          {/* <a href="javascript:void(0);" onClick={(e) => this.onRowClick(record, e)}>
+            {text}
+          </a> */}
+          <span onClick={(e) => this.onRowClick(record, e)}>{text}</span>
+        </span>
+      );
+    }
+    // handleChange(value, key, column) {
+    //   const newData =  this.tempData;
+    //   let target = newData.filter(item => key === item.key)[0];
+    //   if (target) {
+    //     target = {
+    //       key
+    //     }
+    //     newData.push(target);
+    //   }
+    //   target[column] = value;
+    // }
+    // save(key) {
+    //   const newData = [...this.state.data];
+    //   const target = newData.filter(item => key === item.key)[0];
+    //   if (target) {
+    //     delete target.editable;
+    //     this.setState({ data: newData });
+    //     this.cacheData = newData.map(item => ({ ...item }));
+    //   }
+    // }
+    // cancel(key) {
+    //   const newData = [...this.state.data];
+    //   const target = newData.filter(item => key === item.key)[0];
+    //   if (target) {
+    //     Object.assign(target, this.cacheData.filter(item => key === item.key)[0]);
+    //     delete target.editable;
+    //     this.setState({ data: newData });
+    //   }
+    // }
+
+    // edit(key) {
+    //   const newData = [...this.state.data];
+    //   const target = newData.filter(item => key === item.key)[0];
+    //   if (target) {
+    //     target.editable = true;
+    //     this.setState({ data: newData });
+    //   }
+    // }
+
     handleTableChange(pagination, filters, sorter) {
       /*  this.store.pagination = pagination;
         this.store.sorter = sorter;
@@ -269,6 +310,7 @@ class ContentLists extends Component {
             const pagination = this.state.pagination;
             // Read total count from server
             // pagination.total = data.totalCount;
+             
             pagination.total = data.length;             
             this.setState({
                 loading: false,
@@ -290,11 +332,11 @@ class ContentLists extends Component {
     }    
 
     componentDidMount() {
-        this.fetch({
-            year : this.selectedYear,
-            month : this.selectedMonth,
-            type : this.selectedType
-        });
+        // this.fetch({
+        //     year : this.selectedYear,
+        //     month : this.selectedMonth,
+        //     type : this.selectedType
+        // });
     }
 
     onEdit(text, record, index) {
@@ -309,6 +351,8 @@ class ContentLists extends Component {
     onDelete(text, record, index) {
         this.props.form.validateFields((err, values) => {
             if (!err) {
+              values.年 = values.date.format("YYYY");
+              values.月 = values.date.format("MM");
                 api.delete(`/water/fee/${text}/${values.年}/${values.月}`)
                 .then((data) => { 
                     notification.success({
@@ -349,14 +393,16 @@ class ContentLists extends Component {
     onSearch = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-            if (!err) {
-                this.fetch({
-                    year : values.年,
-                    month : values.月,
-                    type : values.抄表形式
-                }                    
-                );
-            }
+          values.年 = values.date.format("YYYY");
+          values.月 = values.date.format("MM");
+          if (!err) {
+              this.fetch({
+                  year : values.年,
+                  month : values.月,
+                  type : values.抄表形式
+              }                    
+              );
+          }
         });
     };
 
@@ -365,6 +411,8 @@ class ContentLists extends Component {
         this.setState({ loading: true });
         this.props.form.validateFields((err, values) => {
             if (!err) {
+              values.年 = values.date.format("YYYY");
+          values.月 = values.date.format("MM");
                 api.get(
                     `water/feestoexcel/${values.年}/${values.月}/${values.抄表形式}`, 
                     {            
@@ -395,29 +443,43 @@ class ContentLists extends Component {
         e.preventDefault();
         this.setState({ loading: true });
         this.props.form.validateFields((err, values) => {
-            if (!err) {
-
-                api.get(`water/feesstat/${values.年}/${values.月}/${values.抄表形式}`, 
-            {            
-                responseType: 'json'
-            }).then((dt) => {
-                let data = dt.data[0];
-                this.setState({
-                    loading: false,
-                    showStat : true,
-                    stat : `总水量： ${data.总水量}； 临时户：${data.临时户}，水量：${data.临时户水量}, 水费:${data.临时户水费}；
-                    正式户：${data.正式户}，水量：${data.正式户水量}, 水费：${data.正式户水费} `
-                });
-            }).catch(
-            err => {
-                handleError(err);                         
-                this.setState({
-                    loading: false,
-                    showStat : false          
-                });
-            }
-        );  
-            }
+          values.年 = values.date.format("YYYY");
+          values.月 = values.date.format("MM");
+          if (!err) {
+              api.post(`water/feesstat/${values.年}/${values.月}/${values.抄表形式}`, 
+              this.state.data,
+          {            
+              responseType: 'json'
+          }).then((dt) => {
+              let result = dt.data;
+              let summary = result.summary;
+              let data = result.data;
+              notification.success({
+                message: '提示',
+                description: `水费数据计算完成完成。"`,
+                duration: 3,
+            });
+              this.setState({
+                  loading: false,
+                  showStat : true,
+                  data,
+                  stat : `总水量： ${summary.总水量}； 临时户：${summary.临时户}，水量：${summary.临时户水量}, 水费:${summary.临时户水费}；
+                  正式户：${summary.正式户}，水量：${summary.正式户水量}, 水费：${summary.正式户水费} `
+              });
+          }).catch(
+          err => {
+            notification.error({
+              message: '提示',
+              description: `水费数据修改不成功，请重试。"`,
+              duration: 3,
+          });                         
+              this.setState({
+                  loading: false,
+                  showStat : false          
+              });
+          }
+          );  
+          }
         });
     }
 
@@ -443,6 +505,28 @@ class ContentLists extends Component {
         this.handleTableChange(this.store.pagination, this.store.filters, this.store.sorter);
     };
 
+    onRowClick = (record,  event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.props.form.setFieldsValue(record);
+      this.record = record;
+      this.setState({               
+        modalVisible: true,
+    }); 
+    }
+
+    handleSave = () => {
+      this.props.form.validateFields((err, values) => {
+        if (!err) {
+            let record = {...this.record, ...values};            
+            const newData = this.state.data;
+            let ind = newData.findIndex(item => record.编号 === item.编号);            
+            newData[ind] = record;
+            this.setState({modalVisible : false, data: newData});
+        }
+      });
+    }
+
     onDeptFilter = (ele) => {
         let value = ele.target.value;
         if (value === 'all') {
@@ -452,10 +536,113 @@ class ContentLists extends Component {
         this.handleTableChange(this.store.pagination, this.store.filters, this.store.sorter);
     };
 
+    renderEditForm = () => {
+      const { getFieldDecorator } = this.props.form;
+      const {mode} = this.state;
+      return (
+          <Modal
+              title='修改'
+              centered
+              visible={this.state.modalVisible}
+              okText="确认"
+              cancelText="取消"
+              onOk={() => {
+                  this.handleSave();
+              }}
+              onCancel={() => this.setState({modalVisible : false})}
+          >
+              <Form id="searchParasForm"  form={this.props.form}>
+                  <FormItem
+                      label="本月表底" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '本月表底',
+                              {initialValue : '0'}
+                          )(
+                              <Input></Input>
+                          )}  
+                  </FormItem>
+                  <FormItem
+                      label="减免水量" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '减免水量',
+                              {initialValue : '0'}
+                          )(
+                              <Input></Input>
+                          )}  
+                  </FormItem>
+                  <FormItem
+                      label="减免单价" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '减免单价',
+                              {initialValue : '0'}
+                          )(
+                              <Input></Input>
+                          )}  
+                  </FormItem>
+                  <FormItem
+                      label="减排污费水量" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '减免排污费水量',
+                              {initialValue : '0'}
+                          )(
+                              <Input></Input>
+                          )}  
+                  </FormItem>
+                  <FormItem
+                      label="减排污费单价" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '减免排污费水量',
+                              {initialValue : '0'}
+                          )(
+                              <Input></Input>
+                          )}  
+                  </FormItem>
+                  <FormItem
+                      label="减其它" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              '减其它',
+                              {initialValue : '0'}
+                          )(
+                              <Input></Input>
+                          )}  
+                  </FormItem>
+              </Form>
+          </Modal>
+          );
+  }
+
+    renderEditableTable = () => {
+      return (<Table
+        columns={this.columns}
+        rowKey={record => parseInt(record.编号)}
+        dataSource={this.state.data}
+        // pagination={this.state.pagination}
+        pagination={false}
+        loading={this.state.loading}
+        scroll={{ x: 3420,  y: 600  }}
+        bordered
+        // onRow={(record, index) => ({
+        //   onClick: (event) => { this.onRowClick(record, index, event) } 
+        // })}
+        footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
+      />)
+    }
+
     render() {  
         const { getFieldDecorator } = this.props.form; 
-        const {showStat, stat} = this.state;  
-         
+        const {showStat, stat} = this.state;
         return (           
             <div className="ant-row" style={{marginTop:20}}>                
                 <div className='console-title-border console-title'>
@@ -463,96 +650,46 @@ class ContentLists extends Component {
                         <h5>水费列表</h5>
                     </div>
                 </div>
-                <Form   layout="inline">
-                    <Row>                         
-                            <FormItem                            
-                            label="选择日期:"
-                            labelCol={{span: 10}}
-                            wrapperCol={{span: 8}}
-                            >
-                            {getFieldDecorator(
-                                '年',
-                                {initialValue : this.selectedYear}
-                            )(
-                                <Select 
-                                placeholder="年份"                                        
-                                style={{ width : '100px',   marginRight : '5px' }}>
-                                <Option value="2003">2003</Option>
-                                <Option value="2004">2004</Option>
-                                <Option value="2005">2005</Option>
-                                <Option value="2006">2006</Option>
-                                <Option value="2007">2007</Option>
-                                <Option value="2008">2008</Option>
-                                <Option value="2009">2009</Option>
-                                <Option value="2010">2010</Option>
-                                <Option value="2011">2011</Option>
-                                <Option value="2012">2012</Option>
-                                <Option value="2013">2013</Option>
-                                <Option value="2014">2014</Option>
-                                <Option value="2015">2015</Option>
-                                <Option value="2016">2016</Option>                            
-                                <Option value="2017">2017</Option>
-                                <Option value="2018">2018</Option>
-                                <Option value="2019">2019</Option>
-                                <Option value="2020">2020</Option>
-                                <Option value="2021">2021</Option>
-                            </Select>
-                            )}
-                            </FormItem>
-                       
-                        <FormItem  
-                            wrapperCol={{span: 22}}                    
-                            >                             
-                            {getFieldDecorator(
-                                        '月',
-                                        {initialValue : this.selectedMonth}
-                                    )(
-                                        <Select 
-                                        placeholder="月份"
-                                        style={{width : '100px' }}>
-                                        <Option value="01">01</Option>
-                                        <Option value="02">02</Option>
-                                        <Option value="03">03</Option>
-                                        <Option value="04">04</Option>
-                                        <Option value="05">05</Option>
-                                        <Option value="06">06</Option>
-                                        <Option value="07">07</Option>
-                                        <Option value="08">08</Option>
-                                        <Option value="09">09</Option>
-                                        <Option value="10">10</Option>
-                                        <Option value="11">11</Option>
-                                        <Option value="12">12</Option>
-                                    </Select>
-                                    )}  
-                        </FormItem>
-                        
-                        <FormItem
-                            label="抄表形式:"
-                            labelCol={{span: 5}} 
-                            wrapperCol={{span: 18}}
-                            >                             
-                            {getFieldDecorator(
-                                '抄表形式',
-                                {initialValue : this.selectedType}
-                            )(
-                            <RadioGroup  style={{width : '250px' }}>
-                                <RadioButton value="3">全部</RadioButton>
-                                <RadioButton value="1">红外</RadioButton>
-                                <RadioButton value="2">手工</RadioButton>                           
-                            </RadioGroup>
-                            )}
-                        </FormItem>
-                        <FormItem >                        
-                        <Button type="primary" onClick={this.onSearch} icon="search">搜索</Button>
-                        </FormItem>
-                        <FormItem>                                            
-                        <Button type="danger" icon="form" onClick={this.onStatistics}>计算</Button>
-                        </FormItem>
-                        <FormItem>
-                        <Col span={24}>
-                        <Button type="danger" icon="file-excel" onClick={this.onToExcel}>导出Excel</Button>
-                        </Col>
-                        </FormItem>
+                <Form layout="inline">
+                    <Row> 
+                    <Col span={6}>
+                      <FormItem
+                      label="日期" 
+                      {...formItemLayout}                      
+                      >
+                          {getFieldDecorator(
+                              'date',
+                              {initialValue : moment(new Date(), monthFormat)}
+                          )(
+                              <MonthPicker placeholder="" format={monthFormat} />
+                          )}  
+                      </FormItem>
+                    </Col> 
+                    <Col span={6}>
+                      <FormItem
+                        label="抄表形式"
+                              {...formItemLayout}
+                              
+                          >
+                              {getFieldDecorator(
+                                  '抄表形式',
+                                  {initialValue : this.selectedType}
+                              )(
+                                  <Select                                
+                                   
+                                  > 
+                                  <Option key='3'>全部</Option>
+                                  <Option key='1'>红外</Option>
+                                  <Option key='2'>手工</Option>
+                                  </Select>
+                              )}
+                      </FormItem>           
+                    </Col>
+                    <Col offset={4} span={8}>                                               
+                      <Button type="primary" onClick={this.onSearch} style={{ marginLeft: 8  }} icon="search">搜索</Button>                                                                                       
+                      <Button type="danger" icon="form" style={{ marginLeft: 8  }} onClick={this.onStatistics}>计算</Button>                                             
+                      <Button type="danger" icon="file-excel" style={{ marginLeft: 8  }} onClick={this.onToExcel}>导出Excel</Button>                      
+                    </Col>
                     </Row>
                 </Form>
                 <div onClick={this.onAlertClose} style={{ display: showStat ? 'block' : 'none' }}>
@@ -560,27 +697,27 @@ class ContentLists extends Component {
                 </div>
                 {/* { showStat ? this.showStatistics() : null } */}
                 {/* {this.showStatistics()} */}
+                {this.renderEditForm()}
                 <Divider></Divider>
-                <Table 
-                  columns={this.columns}                     
-                  rowKey={record => parseInt(record.编号)}
-                  dataSource={this.state.data}
-                  // pagination={this.state.pagination}
-                  pagination={false}
-                  loading={this.state.loading}
-                  scroll={{ x: 2600,  y: 600  }}
-                  bordered
-                  footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
-                />
+                {this.renderEditableTable()}
             </div>
         );
     }
 }
 
 
-
 let contentLists = Form.create({})(ContentLists);
 export default withRouter(contentLists)
+
+
+const EditableCell = ({ editable, value, onChange }) => (
+  <div>
+    {editable
+      ? <Input style={{ margin: '-5px 0' }} value={value} onChange={e => onChange(e.target.value)} />
+      : value
+    }
+  </div>
+);
 
 
 
