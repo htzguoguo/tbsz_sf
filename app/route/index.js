@@ -34,7 +34,8 @@ export const childRoutes = [
 const routes = (
   <Switch>
     <Route path="/login" component={Login}/>
-     <Route path="/app" component={home}/>{/*菜单页入口 */}
+     <Route path="/app" component={LayoutWithSideBar}/>{/*菜单页入口 */}
+     <Route path="/home" component={home}/>{/*菜单页入口 */}
     <Route path="/" component={Login}/>
   </Switch>
 );

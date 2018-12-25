@@ -55,7 +55,7 @@ class Login extends React.Component  {
                             duration: 3,
                         });
                         //this.props.history.replace('/app/toll/take/0/0/0');
-                        this.props.history.replace('/app');
+                        this.props.history.replace('/home');
                     }
                 }).catch(err => {
                     this.setState({

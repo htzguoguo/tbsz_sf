@@ -20,6 +20,13 @@ module.exports = {
                     icon: 'user',
                     child : [
                         {
+                            key: 'sidebarsub116',
+                            name: '首页',
+                            icon: 'user',
+                            matchurl : '/app/toll/home',
+                            url: '/app/toll/home'
+                          },  
+                        {
                           key: 'sidebarsub115',
                           name: '自动创建月水费',
                           icon: 'user',

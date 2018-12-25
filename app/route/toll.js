@@ -3,7 +3,7 @@ import ListToll from '../views/Toll/List';
 import PrepareToll from '../views/Toll/Prepare';
 import SearchToll from '../views/Toll/Search';
 import Payment from '../views/Toll/Payment';
-
+import home from '../views/home';
 
 export const tollChildRoutes = [
     {
@@ -30,5 +30,11 @@ export const tollChildRoutes = [
       'path':'/app/toll/payment',
       'component': Payment,
       'exactly': false
-  }
+  },
+  {
+    'path':'/app/toll/home',
+    'component': home,
+    'exactly': false
+},
+
 ];

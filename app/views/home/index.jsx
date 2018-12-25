@@ -43,7 +43,7 @@ class Header extends React.Component {
                         <h3>菜单MENU</h3>
                         <Row type="flex" justify="space-between">
                             <Col span={5} className="colbg">
-                                <Link to="/app/toll/take/0/0/0">
+                                <Link to="/app/toll/home">
                                     <div className="picon color1">
                                         <Icon type="form" />
                                     </div>
@@ -52,7 +52,7 @@ class Header extends React.Component {
                                 </Link>
                             </Col>
                             <Col span={5} className="colbg">
-                                <Link to="/">
+                                <Link to="/app/search/unit">
                                     <div className="picon color2">
                                         <Icon type="file-search" />
                                     </div>
@@ -61,7 +61,7 @@ class Header extends React.Component {
                                 </Link>
                             </Col>
                             <Col span={5} className="colbg">
-                                <Link to="/">
+                                <Link to="/app/report/commission">
                                     <div className="picon color3">
                                         <Icon type="bar-chart" />
                                     </div>
