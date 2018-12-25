@@ -780,7 +780,8 @@ async function calculateFee(obj) {
         //月用水量=月用水和-本月计算出的用水量+最新计算出的用水量
         FYearWater = tempSum - parseInt(currentFee.用水量) + IUse;
         //剩余水量
-        FRemainWater = FRation*30- FYearWater;
+        //FRemainWater = FRation*30- FYearWater;
+        FRemainWater = (FRation * moment(`${年}-${月}`, "YYYY-MM").daysInMonth()) - FYearWater;
         if(年 + 月 > SSdate.slice(0, 6)) {
             FOverWater = IUse;//全部为超额水
             FPlanWater = 0;//计划用水

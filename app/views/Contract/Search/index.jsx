@@ -53,13 +53,13 @@ class SearchContract extends Component {
                 width: '25%'
             },
             {
-                title: '资料名称',
+                title: '文档名称',
                 dataIndex: '名称',
                 sorter: (a, b) => a.户名.length - b.户名.length, 
                 width: '15%'
             },
             {
-                title: '资料分类',
+                title: '文档名称',
                 dataIndex: '分类',
                 width: '15%'
             },
@@ -123,7 +123,7 @@ class SearchContract extends Component {
                 pagination.total = data.length;             
                 this.setState({
                     loading: false,
-                    data: data,
+                    data,
                     pagination,
                 });
                 notification.success({
@@ -239,13 +239,14 @@ class SearchContract extends Component {
                 </div>
                 {this.renderAdvancedForm()}
                 <Divider></Divider>
-                <Table columns={this.columns}                     
-                    rowKey={record => parseInt(record.编号)}
-                    dataSource={this.state.data}
-                    pagination={this.state.pagination}
-                    loading={this.state.loading}
-                    bordered
-                    footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
+                <Table 
+                  columns={this.columns}                     
+                  // rowKey={record => parseInt(record.编号)}
+                  dataSource={this.state.data}
+                  pagination={this.state.pagination}
+                  loading={this.state.loading}
+                  bordered
+                  footer={()=>'共有'+ (this.state.pagination.total ? this.state.pagination.total : 0) + '条记录'}
                 />
             </div>
         );

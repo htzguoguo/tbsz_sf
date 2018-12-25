@@ -182,7 +182,7 @@ class ContentLists extends Component {
           {
             title: '水费合计',
             width: 120,
-            render: (value, row, index) => row['实收水费'] - row['排污费']
+            render: (value, row, index) => parseFloat(row['实收水费'] - row['排污费']).toFixed(2)
           }, 
           {
             title: '实收水费',
