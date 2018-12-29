@@ -74,8 +74,10 @@ class SearchContract extends Component {
                     let local = record.原始文件.split(',');
                     let server = record.本地文件.split(',');
                     let items = [];
+                    console.log(local, server, index);
                     for(let i = 0; i < server.length; i++){
-                        items.push(<Tooltip title={local[index]} key={i}><a  onClick={downloadFile.bind(this, server[i], local[index], i)} >文件{i + 1}</a></Tooltip>)
+
+                        items.push(<Tooltip title={local[i]} key={i}><a  onClick={downloadFile.bind(this, server[i], local[i], i)} >文件{i + 1}</a></Tooltip>)
                         if(i < server.length - 1) {
                             items.push(<Divider type="vertical" />)
                         }
@@ -100,12 +102,14 @@ class SearchContract extends Component {
             {            
                 responseType: 'blob'
             }
-        ).then((dt) => {  
-            let blob = new Blob([dt.data], { type:   'application/vnd.openxmlformats-officedocument.wordprocessingml.document' } )
-            let link = document.createElement('a')
-            link.href = window.URL.createObjectURL(blob)
-            link.download = local
-            link.click()
+        ).then((dt) => { 
+          let ext = server.split('.')[1];
+
+          let blob = new Blob([dt.data])
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = local
+          link.click()
         }).catch(
         err => {
             handleError(err);

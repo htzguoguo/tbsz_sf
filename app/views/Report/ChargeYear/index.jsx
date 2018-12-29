@@ -144,10 +144,10 @@ class ChargeYear extends Component {
 
     renderSearchButtons = () =>
     <Col offset={12} span={12}>
-        <Button type="primary" style={{ marginLeft: 8, marginTop: 4 }} onClick={(e) => this.onSearch(e, 'meter')} icon="search">搜索(水表)</Button>
-        <Button type="primary" style={{ marginLeft: 8, marginTop: 4 }} onClick={(e) => this.onSearch(e, 'corp')} icon="search">搜索(企业)</Button>
-        <Button onClick={(e) => this.onToExcel(e, 1, 'chargeyear', '天保市政公司水费统计表', 'meter')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出(水表)</Button>
-        <Button onClick={(e) => this.onToExcel(e, 1, 'chargeyear', '天保市政公司水费统计表', 'corp')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出(企业)</Button>
+        <Button type="primary" style={{ marginLeft: 8, marginTop: 14 }} onClick={(e) => this.onSearch(e, 'meter')} icon="search">搜索(水表)</Button>
+        <Button type="primary" style={{ marginLeft: 8, marginTop: 14 }} onClick={(e) => this.onSearch(e, 'corp')} icon="search">搜索(企业)</Button>
+        <Button onClick={(e) => this.onToExcel(e, 1, 'chargeyear', '天保市政公司水费统计表', 'meter')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 14 }}    >导出(水表)</Button>
+        <Button onClick={(e) => this.onToExcel(e, 1, 'chargeyear', '天保市政公司水费统计表', 'corp')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 14 }}    >导出(企业)</Button>
     </Col>
 
     renderAdvancedForm() {

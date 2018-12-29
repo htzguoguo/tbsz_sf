@@ -175,7 +175,7 @@ class Detail extends Component {
     renderSearchButtons = () =>
     <Col span={4}>
         <Button onClick={this.onSearch} icon="search" type="primary">查询</Button>
-        <Button onClick={() => {PHE.printHtml(document.getElementById('printForm1').innerHTML)}} icon="printer" style={{ marginLeft: 8, marginTop: 4 }}   >打印</Button>
+        <Button onClick={() => {PHE.printHtml(document.getElementById('printForm1').innerHTML)}} icon="printer" style={{ marginLeft: 8, marginTop: 14 }}   >打印</Button>
     </Col>
 
     renderAdvancedForm() {

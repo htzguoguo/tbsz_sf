@@ -288,7 +288,7 @@ class OutputBank extends Component {
 
     renderSearchButtons = () =>
         <Col span={8}>
-            <Button loading={this.state.loading1} icon="search" style={{ marginTop: 4 }} onClick={this.fetchItems} >查询</Button>
+            <Button loading={this.state.loading1} icon="search" style={{ marginTop: 14 }} onClick={this.fetchItems} >查询</Button>
             <Button loading={this.state.loading2} icon="pie-chart" style={{ marginLeft: 8 }} onClick={this.onCreation} >生成</Button>       
             <Button loading={this.state.loading3} onClick={this.onToExcel} icon="printer" style={{ marginLeft: 8 }}   >打印</Button>
             <Button loading={this.state.loading4} onClick={this.onOffer} icon="save" style={{ marginLeft: 8 }}   >报盘</Button>

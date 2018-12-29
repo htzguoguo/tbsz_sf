@@ -247,7 +247,7 @@ class StatToll extends Component {
                     </FormItem> 
                 </Col>
                 <Col span={3} offset={8}>
-                    <Button loading={this.state.loading} style={{marginTop : "-5px"}} size="large" icon="search" onClick={this.onStat} type="primary">统计</Button>
+                    <Button loading={this.state.loading} style={{marginTop : "14px"}} size="large" icon="search" onClick={this.onStat} type="primary">统计</Button>
                 </Col>
             </Row>
             <Divider orientation="left">2.录入购水情况</Divider>

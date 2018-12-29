@@ -128,7 +128,7 @@ class TearDown extends Component {
                             </FormItem>            
                         </Col>
                         <Col span={4}>           
-                            <Button type="primary" style={{marginTop:5}} loading={this.state.loading1} onClick={this.onSearch} icon="search">搜索</Button>
+                            <Button type="primary" style={{ marginLeft: 8, marginTop: 14 }} loading={this.state.loading1} onClick={this.onSearch} icon="search">搜索</Button>
                         </Col>
                     </Row>
                     <Alert
@@ -142,7 +142,7 @@ class TearDown extends Component {
                     <Divider></Divider>
                     <Row>
                     <FormItem >                        
-                        <Button type="primary" loading={this.state.loading2} onClick={(e) => this.onToWord(e, 2, '终止供水合同')} icon="switcher">生成终止供水合同</Button>
+                        <Button type="primary"  loading={this.state.loading2} onClick={(e) => this.onToWord(e, 2, '终止供水合同')} icon="switcher">生成终止供水合同</Button>
                         </FormItem>
                     </Row>
                 </Form>   

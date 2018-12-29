@@ -298,11 +298,11 @@ class PaymentList extends Component {
                     </FormItem>           
                 </Col>
                 <Col span={6}>
-                      <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 4 }}  type="primary">查询</Button>         
+                      <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 14 }}  type="primary">查询</Button>         
                     <Button  type="primary" 
                     loading={this.state.loading2} 
                     onClick={() => {this.onHandlePayment(2)}} 
-                    icon="check" style={{ marginLeft: 8, marginTop: 4 }}   >缴费确认</Button>
+                    icon="check" style={{ marginLeft: 8, marginTop: 14 }}   >缴费确认</Button>
                 </Col> 
             </Row>
         </Form>

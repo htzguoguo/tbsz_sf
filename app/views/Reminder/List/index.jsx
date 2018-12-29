@@ -276,16 +276,16 @@ class ReminderList extends Component {
                     </FormItem>
                 </Col>
                 <Col  span={10}>
-                  <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 4 }}  type="primary">查询</Button>
-                  <Button  type="primary" onClick={() => this.handleModalVisible(true)} icon="message" style={{ marginLeft: 8, marginTop: 4 }}   >短信催缴</Button>
+                  <Button icon="search" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 14 }}  type="primary">查询</Button>
+                  <Button  type="primary" onClick={() => this.handleModalVisible(true)} icon="message" style={{ marginLeft: 8, marginTop: 14 }}   >短信催缴</Button>
                   <Button  type="primary" 
                   loading={this.state.loading1} 
                   onClick={() => {this.reminderToWord(1, 'reminder' ,'催款通知')}} 
-                  icon="exclamation-circle" style={{ marginLeft: 8, marginTop: 4 }}   >催款通知</Button>
+                  icon="exclamation-circle" style={{ marginLeft: 8, marginTop: 14 }}   >催款通知</Button>
                   <Button  type="primary" 
                   loading={this.state.loading2} 
                   onClick={() => {this.reminderToWord(2, 'suspension' ,'停水通知')}} 
-                  icon="poweroff" style={{ marginLeft: 8, marginTop: 4 }}   >停水通知</Button>
+                  icon="poweroff" style={{ marginLeft: 8, marginTop: 14 }}   >停水通知</Button>
                 </Col> 
             </Row>
         </Form>

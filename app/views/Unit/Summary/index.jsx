@@ -168,7 +168,7 @@ class UnitSummary extends Component {
                 </div>
                 <div>
                 <p>水费汇总</p>
-                <p>{summary.水费}</p>
+                <p>{parseFloat(summary.水费).toFixed(2)}</p>
                 </div>
             </div>
         );
