@@ -134,7 +134,7 @@ class Header extends React.Component {
                             style={{}}>
                             {menu}
                             <div className='userInfo'>
-                            <Dropdown overlay={adminPanle}>
+                            <Dropdown overlayStyle={{top : '70px'}} placement="bottomCenter" overlay={adminPanle}>
                                 <a className="ant-dropdown-link">
                                     <Avatar icon="user"  size="default"  >{username}</Avatar> <Icon type="down" />
                                 </a>

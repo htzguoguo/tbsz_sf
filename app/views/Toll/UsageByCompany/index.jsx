@@ -6,7 +6,7 @@ import {
     notification,  
     Divider, Input, Row, Col, Radio,
     Select,  Form,  
-    DatePicker,  InputNumber, Checkbox
+    DatePicker,  Card, Checkbox
 } from 'antd';
 import { Chart, Tooltip, Axis, Bar, Line, Point} from 'viser-react';
 import moment from 'moment';
@@ -181,8 +181,8 @@ class UsageByUnit extends Component {
     renderSearchButtons = (isSimple) => 
     <Col span={8}>
           <span style={{ float: 'right', marginBottom: 24 }}>
-              <Button onClick={this.onSearch} type="primary">查询</Button>
-              <Button style={{ marginLeft: 8 }} type="danger"   onClick={this.onToExcel}>导出Excel</Button>             
+              <Button onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 14 }} type="primary">查询</Button>
+              <Button style={{ marginLeft: 8, marginTop: 14 }} type="danger"   onClick={this.onToExcel}>导出Excel</Button>             
           </span>
       </Col>    
 
@@ -244,6 +244,11 @@ class UsageByUnit extends Component {
     }
 
     renderBar() {
+      let values = this.props.form.getFieldsValue();
+      values.起始年月 = values.起始年月 ? values.起始年月.format("YYYYMM") : '';
+      values.终止年月 = values.终止年月 ? values.终止年月.format("YYYYMM") : '';
+      
+
       const {data} = this.state;
       const items = data.map(item => ({
         日期 : `${item.年}年${item.月}月`,
@@ -251,16 +256,26 @@ class UsageByUnit extends Component {
       }));
       const scale = [{
         dataKey: '用水量',
-        tickInterval: 20,
+        min: 0
       }];
+
+      const t = <Row type='flex' align='top' justify='center'>
+      {
+        data && data.length > 0 ?  
+        `${data[0].户名}-从${values.起始年月}到${values.终止年月}用水量曲线图` :
+        ''
+      }
+      </Row> 
       return (
-        <Chart forceFit height={400} data={items} scale={scale}>
-          <Tooltip />
-          <Axis />
-          {/* <Bar position="日期*用水量" /> */}
-          <Line position="日期*用水量" />
-          <Point position="日期*用水量" shape="circle"/>
-        </Chart>
+        <Card title={t} bordered={false}  >
+          <Chart forceFit height={400} data={items} scale={scale}>
+            <Tooltip />
+            <Axis />
+            {/* <Bar position="日期*用水量" /> */}
+            <Line position="日期*用水量" />
+            <Point position="日期*用水量" shape="circle"/>
+          </Chart>
+        </Card>
       );
     }
 

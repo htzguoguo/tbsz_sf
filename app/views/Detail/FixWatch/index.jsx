@@ -79,7 +79,7 @@ class FixWatch extends Component {
 
     renderSearchButtons = () =>
     <Col span={4}>
-        <Button style={{ marginTop: 4 }} loading={this.state.loading1} icon="pie-chart" onClick={this.onQuery} >显示</Button> 
+        <Button style={{ marginTop: 14 }} loading={this.state.loading1} icon="pie-chart" onClick={this.onQuery} >显示</Button> 
         <Button   onClick={() => {PHE.printHtml(document.getElementById('printForm').innerHTML)}} icon="printer" style={{ marginLeft: 8 }}   >打印</Button>       
     </Col>
 

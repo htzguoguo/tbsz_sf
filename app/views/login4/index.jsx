@@ -54,8 +54,8 @@ class Login extends React.Component  {
                             description: '欢迎登陆：' + res.payload.data.user.姓名,
                             duration: 3,
                         });
-                        //this.props.history.replace('/app/toll/take/0/0/0');
-                        this.props.history.replace('/home');
+                        this.props.history.replace('/app/toll/take/0/0/0');
+                        //this.props.history.replace('/home');
                     }
                 }).catch(err => {
                     this.setState({
@@ -68,9 +68,9 @@ class Login extends React.Component  {
     }
 
     componentWillMount(){
-        // this.setState({
-        //     height: document.body.clientHeight
-        // });
+        this.setState({
+            height: document.body.clientHeight
+        });
     }
     // 自动获取浏览器可视区域高度
 
@@ -82,12 +82,12 @@ class Login extends React.Component  {
 
     componentDidMount(){
         // 监听window窗口变化,自动调整左侧菜单的高度
-        //window.addEventListener('resize', this.autoHeigth.bind(this));
+        window.addEventListener('resize', this.autoHeigth.bind(this));
     }
 
     componentWillUnmount(){
         // 组件注销时,移除window的resize事件监听,释放浏览器内存
-        //window.removeEventListener('resize',this.autoHeigth.bind(this));
+        window.removeEventListener('resize',this.autoHeigth.bind(this));
     }
 
     render() {

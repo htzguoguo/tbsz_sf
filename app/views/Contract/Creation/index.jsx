@@ -162,7 +162,7 @@ class ContractCreation extends Component {
                         </FormItem>        
                         </Col>                         
                         <Col span={4}>           
-                            <Button type="primary" style={{marginTop:5}} loading={this.state.loading1} onClick={this.onSearch} icon="search">搜索</Button>
+                            <Button type="primary" style={{ marginLeft: 8, marginTop: 14 }} loading={this.state.loading1} onClick={this.onSearch} icon="search">搜索</Button>
                         </Col>
                     </Row>
                     <Alert
