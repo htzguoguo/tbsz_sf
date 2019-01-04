@@ -93,7 +93,7 @@ class OutputDetail extends Component {
 
     renderSearchButtons = () =>
     <Col span={2}>
-        <Button onClick={(e) => this.onToExcel(e, 1, 'detail', '天保市政公司托收明细报表')} loading={this.state.loading1} icon="printer" style={{ marginLeft: 8, marginTop: 14 }}    >打印</Button>
+        <Button onClick={(e) => this.onToExcel(e, 1, 'detail', '天保市政公司托收明细报表')} loading={this.state.loading1} icon="printer" style={{ marginLeft: 8 }}    >打印</Button>
     </Col>
 
     onMonthChange = (date, dateString) => {

@@ -75,8 +75,8 @@ class Contract extends Component {
 
     renderSearchButtons = () =>
     <Col offset={8} span={5}>
-        <Button loading={this.state.loading1} icon="pie-chart" onClick={this.onQuery} style={{ marginLeft: 8, marginTop: 14 }}>显示</Button> 
-        <Button   onClick={() => {PHE.printHtml(document.getElementById('printForm').innerHTML)}} icon="printer" style={{ marginLeft: 8, marginTop: 14 }}   >打印</Button>       
+        <Button loading={this.state.loading1} icon="pie-chart" onClick={this.onQuery} >显示</Button> 
+        <Button   onClick={() => {PHE.printHtml(document.getElementById('printForm').innerHTML)}} icon="printer" style={{ marginLeft: 8 }}   >打印</Button>       
     </Col>
 
     renderAdvancedForm() {

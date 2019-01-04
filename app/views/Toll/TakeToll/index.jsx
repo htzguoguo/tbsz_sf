@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import styles from './index.less';
 import {
     Button, Form, Input,DatePicker,
     Select,  notification,

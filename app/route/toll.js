@@ -4,7 +4,7 @@ import EditTable from '../views/Toll/EditTable';
 import PrepareToll from '../views/Toll/Prepare';
 import SearchToll from '../views/Toll/Search';
 import Payment from '../views/Toll/Payment';
-import home from '../views/home';
+import home1 from '../views/home1';
 
 export const tollChildRoutes = [
     {
@@ -33,8 +33,8 @@ export const tollChildRoutes = [
       'exactly': false
   },
   {
-    'path':'/app/toll/home',
-    'component': home,
+    'path':'/app/toll/home1',
+    'component': home1,
     'exactly': false
 },
 

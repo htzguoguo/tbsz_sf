@@ -189,7 +189,7 @@ class LackUnit extends Component {
 
     renderSearchButtons = () =>
     <Col span={8}>
-        <Button style={{marginTop: 14}} loading={this.state.loading1} icon="pie-chart" onClick={this.onStatistics} >统计</Button>
+        <Button style={{marginTop: 4}} loading={this.state.loading1} icon="pie-chart" onClick={this.onStatistics} >统计</Button>
         {/* <Button icon="delete" style={{ marginLeft: 8 }} >删除</Button>
         <Button icon="printer" style={{ marginLeft: 8 }} type="danger"   >打印</Button> */}
         <Button icon="file-excel" onClick={this.onToExcel} loading={this.state.loading2} style={{ marginLeft: 8 }} type="danger"   >导出</Button>

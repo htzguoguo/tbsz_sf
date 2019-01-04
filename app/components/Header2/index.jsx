@@ -110,7 +110,7 @@ class Header extends React.Component {
                         keyPath = {item.name}
                         >
                             {
-                                item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} theme="outlined"/>}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
+                                item.url ? <Link to={item.url}>{item.icon && <Icon type={item.icon} />}{item.name}</Link> : <span>{item.icon && <Icon type={item.icon} />}{item.name}</span>
                             }
                         </Menu.Item>
                     )
@@ -133,13 +133,13 @@ class Header extends React.Component {
                             defaultSelectedKeys={[activeKey]}
                             style={{}}>
                             {menu}
-                          <div className='userInfo'>
-                            <Dropdown overlayStyle={{top : '70px'}} placement="bottomCenter" overlay={adminPanle}>
+                            <div className='userInfo'>
+                            <Dropdown overlay={adminPanle}>
                                 <a className="ant-dropdown-link">
                                     <Avatar icon="user"  size="default"  >{username}</Avatar> <Icon type="down" />
                                 </a>
                             </Dropdown>
-                          </div>
+                        </div>
                         </Menu>
 
                     </div>

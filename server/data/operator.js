@@ -20,6 +20,13 @@ module.exports = {
                     icon: 'user',
                     child : [
                         {
+                            key: 'sidebarsub116',
+                            name: '首页',
+                            icon: 'user',
+                            matchurl : '/app/toll/home1',
+                            url: '/app/toll/home1'
+                          },  
+                        {
                           key: 'sidebarsub115',
                           name: '创建月水费',
                           icon: 'user',
@@ -124,7 +131,7 @@ module.exports = {
         {
             key: 'menu2',
             name: '查询管理',
-            icon: 'search',
+            icon: 'file-search',
             baseurl : '/app/search',
             url: '/app/search/unit',
             child : [
@@ -268,7 +275,7 @@ module.exports = {
         {
             key: 'menu4',
             name: '明细管理',
-            icon: 'exception',
+            icon: 'file-protect',
             baseurl : '/app/detail',
             url: '/app/detail/allowance',
             child : [
@@ -327,7 +334,7 @@ module.exports = {
         {
             key: 'menu5',
             name: '托收管理',
-            icon: 'pay-circle',
+            icon: 'money-collect',
             baseurl : '/app/collection',
             url: '/app/collection/outputbank',
             child : [

@@ -341,8 +341,6 @@ class ContentLists extends Component {
 
     onEdit(text, record, index) {
         this.props.form.validateFields((err, values) => {
-          values.年 = values.date.format("YYYY");
-              values.月 = values.date.format("MM");
             if (!err) {
                 this.props.history.replace(`/app/toll/take/${text}/${values.年}/${values.月}`);                               
             }
@@ -688,9 +686,9 @@ class ContentLists extends Component {
                       </FormItem>           
                     </Col>
                     <Col offset={4} span={8}>                                               
-                      <Button type="primary" onClick={this.onSearch} style={{ marginLeft: 8, marginTop: 14  }} icon="search">搜索</Button>                                                                                       
-                      <Button type="danger" icon="form" style={{ marginLeft: 8, marginTop: 14  }} onClick={this.onStatistics}>计算</Button>                                             
-                      <Button type="danger" icon="file-excel" style={{ marginLeft: 8, marginTop: 14  }} onClick={this.onToExcel}>导出Excel</Button>                      
+                      <Button type="primary" onClick={this.onSearch} style={{ marginLeft: 8  }} icon="search">搜索</Button>                                                                                       
+                      <Button type="danger" icon="form" style={{ marginLeft: 8  }} onClick={this.onStatistics}>计算</Button>                                             
+                      <Button type="danger" icon="file-excel" style={{ marginLeft: 8  }} onClick={this.onToExcel}>导出Excel</Button>                      
                     </Col>
                     </Row>
                 </Form>

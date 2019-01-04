@@ -174,7 +174,7 @@ class ChangeBrowse extends Component {
 
     renderSearchButtons = () =>
     <Col span={8}>
-        <Button icon="search" onClick={this.onSearch} type="primary" style={{marginTop: 14}}>显示</Button>
+        <Button icon="search" onClick={this.onSearch} type="primary" style={{marginTop: 4}}>显示</Button>
         <Button icon="reload" style={{ marginLeft: 8 }} onClick={this.handleFormReset}>重置</Button>
         <Button icon="save" style={{ marginLeft: 8 }} type="danger"   onClick={this.onToExcel}>导出Excel</Button>
     </Col>

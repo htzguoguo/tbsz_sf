@@ -91,8 +91,8 @@ class RsOutputBank extends Component {
     }
     renderSearchButtons = () =>
     <Col offset={8} span={5}>
-        <Button onClick={(e) => this.onToExcel(e, 1, 'xinfeng', '天津市票据交换提出信件')} loading={this.state.loading1} icon="bars" style={{ marginLeft: 8, marginTop: 14 }}    >信封</Button>
-        <Button onClick={(e) => this.onToExcel(e, 2, 'xinfenghuizong', '天津市票据交换提出信件清单')} loading={this.state.loading2} icon="switcher" style={{ marginLeft: 8, marginTop: 14 }}   >清单</Button>
+        <Button onClick={(e) => this.onToExcel(e, 1, 'xinfeng', '天津市票据交换提出信件')} loading={this.state.loading1} icon="bars" style={{ }}    >信封</Button>
+        <Button onClick={(e) => this.onToExcel(e, 2, 'xinfenghuizong', '天津市票据交换提出信件清单')} loading={this.state.loading2} icon="switcher" style={{ marginLeft: 8 }}    >清单</Button>
     </Col>
 
     renderAdvancedForm() {

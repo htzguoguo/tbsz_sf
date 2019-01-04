@@ -43,7 +43,7 @@ class Header extends React.Component {
                         <h3>菜单MENU</h3>
                         <Row type="flex" justify="space-between">
                             <Col span={5} className="colbg">
-                                <Link to="/app/toll/prepare">
+                                <Link to="/app/toll/home">
                                     <div className="picon color1">
                                         <Icon type="form" />
                                     </div>
@@ -70,7 +70,7 @@ class Header extends React.Component {
                                 </Link>
                             </Col>
                             <Col span={5} className="colbg">
-                                <Link to="/app/detail/allowance">
+                                <Link to="/">
                                     <div className="picon color4">
                                         <Icon type="file-protect" />
                                     </div>
@@ -81,7 +81,7 @@ class Header extends React.Component {
                         </Row>
                         <Row type="flex" justify="space-between">
                             <Col span={5} className="colbg">
-                                <Link to="/app/collection/outputbank">
+                                <Link to="/">
                                     <div className="picon color2">
                                         <Icon type="money-collect" />
                                     </div>
@@ -90,7 +90,7 @@ class Header extends React.Component {
                                 </Link>
                             </Col>
                             <Col span={5} className="colbg">
-                                <Link to="/app/dict/usekind">
+                                <Link to="/">
                                     <div className="picon color5">
                                         <Icon type="book" />
                                     </div>
@@ -99,7 +99,7 @@ class Header extends React.Component {
                                 </Link>
                             </Col>
                             <Col span={5} className="colbg">
-                                <Link to="/app/contract/creation">
+                                <Link to="/">
                                     <div className="picon color6">
                                         <Icon type="copy" />
                                     </div>

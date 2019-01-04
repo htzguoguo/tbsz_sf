@@ -160,7 +160,7 @@ class CountShiZheng extends Component {
 
     renderSearchButtons = () =>
         <Col span={6}>
-            <Button style={{ marginTop: 14 }} loading={this.state.loading1} icon="pie-chart" onClick={this.onStatistics} >统计</Button>       
+            <Button style={{ marginTop: 4 }} loading={this.state.loading1} icon="pie-chart" onClick={this.onStatistics} >统计</Button>       
             <Button loading={this.state.loading2} onClick={this.onToExcel} icon="file-excel" style={{ marginLeft: 8 }}   >导出</Button>
         </Col>
 

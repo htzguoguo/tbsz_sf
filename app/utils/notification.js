@@ -1,9 +1,6 @@
 import {notification, Modal, Button} from 'antd';
 const confirm = Modal.confirm;
 let isShow = true;
-
- 
-
 export function authExpire(cb) {
     if (isShow) {
         isShow = false;

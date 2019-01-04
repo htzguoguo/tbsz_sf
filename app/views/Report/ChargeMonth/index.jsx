@@ -141,7 +141,7 @@ class ChargeMonth extends Component {
     renderSearchButtons = () =>
     <Col span={5}>
       <Button type="primary" onClick={this.onSearch} icon="search">搜索</Button>
-      <Button onClick={(e) => this.onToExcel(e, 1, 'chargemonth', '天保市政公司水费统计表')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 14 }}    >导出</Button>
+      <Button onClick={(e) => this.onToExcel(e, 1, 'chargemonth', '天保市政公司水费统计表')} loading={this.state.loading1} icon="file-excel" style={{ marginLeft: 8, marginTop: 4 }}    >导出</Button>
     </Col>
 
     renderAdvancedForm() {

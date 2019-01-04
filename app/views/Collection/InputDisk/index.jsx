@@ -229,7 +229,7 @@ class InputDisk extends Component {
                 </Col>
                 <Col  span={3}>
                 <Button
-                    style={{ marginTop: 14 }} 
+                    style={{ marginTop: 4 }} 
                     type="primary"
                     onClick={this.handleUpload}
                     disabled={this.state.fileList.length === 0}

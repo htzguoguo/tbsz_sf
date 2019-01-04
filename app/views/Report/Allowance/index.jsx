@@ -185,7 +185,7 @@ class Allowance extends Component {
 
     renderSearchButtons = () =>
     <Col offset={14} span={5}>
-        <Button  loading={this.state.loading1} icon="pie-chart" onClick={this.onQuery} style={{marginTop: 14}} >显示</Button>        
+        <Button  loading={this.state.loading1} icon="pie-chart" onClick={this.onQuery} style={{marginTop: 4}} >显示</Button>        
         <Button loading={this.state.loading2} icon="file-excel" onClick={this.onToExcel} style={{ marginLeft: 8 }} type="danger"   >导出</Button>
     </Col>
 
