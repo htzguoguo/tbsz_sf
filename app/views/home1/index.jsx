@@ -8,8 +8,8 @@ import { Layout, Row, Col, Icon, Badge, Menu, Dropdown, Avatar, Popover } from '
 import { Link, withRouter } from 'react-router-dom'
 import { getAllMenu, updateNavPath } from '../../actions/menu'
 import styles from './home.less';
-import {G2,Chart,Geom,Axis,Tooltip,Coord,Label,Legend,View,Guide,Shape,Facet,Util} from "bizcharts";
-import DataSet from "@antv/data-set";
+// import {G2,Chart,Geom,Axis,Tooltip,Coord,Label,Legend,View,Guide,Shape,Facet,Util} from "bizcharts";
+// import DataSet from "@antv/data-set";
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 
@@ -34,139 +34,139 @@ class Header extends React.Component {
    
    
     render() {
-        const data = [
-            {
-              name: "计划水费",
-              "Jan.": 18.9,
-              "Feb.": 28.8,
-              "Mar.": 39.3,
-              "Apr.": 81.4,
-              May: 47,
-              "Jun.": 20.3,
-              "Jul.": 24,
-              "Aug.": 35.6
-            },
-            {
-              name: "实收水费",
-              "Jan.": 12.4,
-              "Feb.": 23.2,
-              "Mar.": 34.5,
-              "Apr.": 99.7,
-              May: 52.6,
-              "Jun.": 35.5,
-              "Jul.": 37.4,
-              "Aug.": 42.4
-            }
-          ];
+        // const data = [
+        //     {
+        //       name: "计划水费",
+        //       "Jan.": 18.9,
+        //       "Feb.": 28.8,
+        //       "Mar.": 39.3,
+        //       "Apr.": 81.4,
+        //       May: 47,
+        //       "Jun.": 20.3,
+        //       "Jul.": 24,
+        //       "Aug.": 35.6
+        //     },
+        //     {
+        //       name: "实收水费",
+        //       "Jan.": 12.4,
+        //       "Feb.": 23.2,
+        //       "Mar.": 34.5,
+        //       "Apr.": 99.7,
+        //       May: 52.6,
+        //       "Jun.": 35.5,
+        //       "Jul.": 37.4,
+        //       "Aug.": 42.4
+        //     }
+        //   ];
 
-          const ds = new DataSet();
-          const dv = ds.createView().source(data);
-          dv.transform({
-            type: "fold",
-            fields: ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug."],
-            // 展开字段集
-            key: "月份",
-            // key字段
-            value: "月均水费" // value字段
-          });
+        //   const ds = new DataSet();
+        //   const dv = ds.createView().source(data);
+        //   dv.transform({
+        //     type: "fold",
+        //     fields: ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug."],
+        //     // 展开字段集
+        //     key: "月份",
+        //     // key字段
+        //     value: "月均水费" // value字段
+        //   });
 
-          const data1 = [
-            {
-              month: "1月",
-              value: 0
-            },
-            {
-              month: "2月",
-              value: 0
-            },
-            {
-              month: "3月",
-              value: 0
-            },
-            {
-                month: "4月",
-              value: 0
-            },
-            {
-                month: "5月",
-              value: 0
-            },
-            {
-                month: "6月",
-              value: 0
-            },
-            {
-                month: "7月",
-              value: 0
-            },
-            {
-                month: "8月",
-              value: 14.55
-            },
-            {
-                month: "9月",
-              value:14.55
-            },
-            {
-                month: "10月",
-              value: 14.55
-            },
-            {
-                month: "11月",
-              value:14.55
-            },
-            {
-                month: "12月",
-              value: 14.55
-            }
+        //   const data1 = [
+        //     {
+        //       month: "1月",
+        //       value: 0
+        //     },
+        //     {
+        //       month: "2月",
+        //       value: 0
+        //     },
+        //     {
+        //       month: "3月",
+        //       value: 0
+        //     },
+        //     {
+        //         month: "4月",
+        //       value: 0
+        //     },
+        //     {
+        //         month: "5月",
+        //       value: 0
+        //     },
+        //     {
+        //         month: "6月",
+        //       value: 0
+        //     },
+        //     {
+        //         month: "7月",
+        //       value: 0
+        //     },
+        //     {
+        //         month: "8月",
+        //       value: 14.55
+        //     },
+        //     {
+        //         month: "9月",
+        //       value:14.55
+        //     },
+        //     {
+        //         month: "10月",
+        //       value: 14.55
+        //     },
+        //     {
+        //         month: "11月",
+        //       value:14.55
+        //     },
+        //     {
+        //         month: "12月",
+        //       value: 14.55
+        //     }
             
-          ];
-          const cols = {
-            value: {
-              min: 0
-            },
-            month: {
-              range: [0, 1]
-            }
-          }
+        //   ];
+        //   const cols = {
+        //     value: {
+        //       min: 0
+        //     },
+        //     month: {
+        //       range: [0, 1]
+        //     }
+        //   }
 
-          const data2 = [
-            {
-              label: "玉和田",
-              计划用水量: 2800,
-              实际用水量: 2260
-            },
-            {
-              label: "给水加压站",
-              计划用水量: 1800,
-              实际用水量: 1300
-            },
-            {
-              label: "中信物流",
-              计划用水量: 950,
-              实际用水量: 900
-            },
-            {
-              label: "起步区雨污水泵站",
-              计划用水量: 500,
-              实际用水量: 390
-            },
-            {
-              label: "天津港国际物流",
-              计划用水量: 170,
-              实际用水量: 100
-            }
-          ];
-          const dss = new DataSet();
-          const dvv = ds.createView().source(data2);
-          dvv.transform({
-            type: "fold",
-            fields: ["计划用水量", "实际用水量"],
-            // 展开字段集
-            key: "type",
-            // key字段
-            value: "value" // value字段
-          });
+        //   const data2 = [
+        //     {
+        //       label: "玉和田",
+        //       计划用水量: 2800,
+        //       实际用水量: 2260
+        //     },
+        //     {
+        //       label: "给水加压站",
+        //       计划用水量: 1800,
+        //       实际用水量: 1300
+        //     },
+        //     {
+        //       label: "中信物流",
+        //       计划用水量: 950,
+        //       实际用水量: 900
+        //     },
+        //     {
+        //       label: "起步区雨污水泵站",
+        //       计划用水量: 500,
+        //       实际用水量: 390
+        //     },
+        //     {
+        //       label: "天津港国际物流",
+        //       计划用水量: 170,
+        //       实际用水量: 100
+        //     }
+        //   ];
+        //   const dss = new DataSet();
+        //   const dvv = ds.createView().source(data2);
+        //   dvv.transform({
+        //     type: "fold",
+        //     fields: ["计划用水量", "实际用水量"],
+        //     // 展开字段集
+        //     key: "type",
+        //     // key字段
+        //     value: "value" // value字段
+        //   });
 
         return(
             <div className="contentgutter">
@@ -252,7 +252,7 @@ class Header extends React.Component {
                                 <h4 className="card-title">2018年水费统计表</h4>
                             </div>
                             <div className="card-body">
-                                <Chart height={350} data={dv} forceFit>
+                                {/* <Chart height={350} data={dv} forceFit>
                                     <Axis name="月份" />
                                     <Axis name="月均水费" />
                                     <Legend />
@@ -272,7 +272,7 @@ class Header extends React.Component {
                                         }
                                         ]}
                                     />
-                                </Chart>
+                                </Chart> */}
                             </div>
                         </div>
                     </Col>
@@ -283,7 +283,7 @@ class Header extends React.Component {
                                 <h4 className="card-title">2018年12月企业用水量</h4>
                             </div>
                             <div className="card-body">
-                                <table class="table">
+                                <table className="table">
                                     <thead className="text-warning">
                                         <tr>
                                             <th>编号</th>
@@ -353,7 +353,7 @@ class Header extends React.Component {
                                 <h4 className="card-title">2018年崔缴水费</h4>
                             </div>
                             <div className="card-body">
-                                <Chart height={350} data={data1} scale={cols} forceFit>
+                                {/* <Chart height={350} data={data1} scale={cols} forceFit>
                                     <Axis name="month" />
                                     <Axis name="value" />
                                     <Tooltip
@@ -373,7 +373,7 @@ class Header extends React.Component {
                                         lineWidth: 1
                                         }}
                                     />
-                                </Chart>
+                                </Chart> */}
                             </div>
                         </div>
                     </Col>
@@ -386,7 +386,7 @@ class Header extends React.Component {
                                 <h4 className="card-title">崔缴企业汇总</h4>
                             </div>
                             <div className="card-body">
-                            <table class="table">
+                            <table className="table">
                                     <thead className="text-warning">
                                         <tr>
                                             <th>编号</th>
@@ -456,7 +456,7 @@ class Header extends React.Component {
                                 <h4 className="card-title">崔缴企业全年用水量</h4>
                             </div>
                             <div className="card-body">
-                                <Chart height={350} data={dvv} forceFit>
+                                {/* <Chart height={350} data={dvv} forceFit>
                                     <Legend />
                                     <Coord transpose scale={[1, -1]} />
                                     <Axis
@@ -478,7 +478,7 @@ class Header extends React.Component {
                                         }
                                         ]}
                                     />
-                                </Chart>
+                                </Chart> */}
                             </div>
                         </div>
                     </Col>
